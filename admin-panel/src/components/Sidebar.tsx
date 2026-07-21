@@ -40,9 +40,9 @@ export default function Sidebar() {
         
         
         <Link 
-          href="/settings"
+          href="/clientrequests"
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${
-            pathname === "/settings" ? activeStyles : inactiveStyles
+            pathname === "/clientrequests" ? activeStyles : inactiveStyles
           }`}
         >
           Client Requests
