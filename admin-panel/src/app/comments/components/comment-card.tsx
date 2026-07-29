@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 
-interface CommentCardProps {
+export interface CommentCardProps {
   id: string;
-  tourTitle: string;
+  commentType: "website" | "post"; 
+  tourTitle?: string;              
   userName: string;
   userAvatar: string;
   commentText: string;
@@ -13,6 +14,7 @@ interface CommentCardProps {
 
 export default function CommentCard({
   id,
+  commentType,
   tourTitle,
   userName,
   userAvatar,
@@ -37,7 +39,7 @@ export default function CommentCard({
 
     // TODO: Connect to your API to save the reply in the database
     console.log(`Sending reply to comment ${id}:`, replyText);
-    
+
     setReplyText("");
     setIsReplying(false);
   };
@@ -45,13 +47,24 @@ export default function CommentCard({
   return (
     <div className="w-full bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-6 mb-4 transition-all hover:shadow-md">
       
-      {/* Top Section: Tour Target Tag & Visibility Toggle Switch */}
+      {/* Top Section: Comment Type Tag & Visibility Toggle Switch */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+        
+        {/* Dynamic Type Tag */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Target Tour:</span>
-          <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100">
-            {tourTitle}
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            Source:
           </span>
+
+          {commentType === "website" ? (
+            <span className="px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 rounded-md border border-blue-100 flex items-center gap-1.5">
+              <span>🌐</span> About Website
+            </span>
+          ) : (
+            <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100 flex items-center gap-1.5">
+              <span>📌</span> Tour: {tourTitle || "Specific Post"}
+            </span>
+          )}
         </div>
 
         {/* Visibility Toggle Controls */}
@@ -82,7 +95,7 @@ export default function CommentCard({
           alt={userName}
           className="w-10 h-10 rounded-full object-cover border border-slate-200 bg-slate-50 flex-shrink-0"
         />
-        
+
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-bold text-slate-800 mb-0.5">{userName}</h3>
           <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
