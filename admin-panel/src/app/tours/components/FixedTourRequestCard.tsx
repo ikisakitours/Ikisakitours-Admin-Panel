@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 
-// Types matching the form submission data
-export interface ClientRequestProps {
+// Types matching fixed tour ad submissions
+export interface FixedTourBookingProps {
   id: string;
-  requestType: "guide_only" | "vehicle_only" | "full_package";
+  adTitle: string; // The specific tour ad/package title the client selected
+  tourType: "one_day" | "multi_day";
   clientName: string;
   email: string;
   phone: string;
@@ -15,64 +16,55 @@ export interface ClientRequestProps {
   status: "pending" | "contacted" | "completed";
 }
 
-export default function RequestCard({
+export default function FixedTourCard({
   id,
-  requestType,
+  adTitle,
+  tourType,
   clientName,
   email,
   phone,
-  //placesToVisit,
   travelDates,
   groupSize,
   additionalNotes,
   status: initialStatus,
-}: ClientRequestProps) {
+}: FixedTourBookingProps) {
   const [status, setStatus] = useState(initialStatus);
 
-  // Helper to render distinct badges for each request type
-  const renderTypeBadge = () => {
-    switch (requestType) {
-      case "guide_only":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            Tour Guide Only
-          </span>
-        );
-      case "vehicle_only":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-            Vehicle Only
-          </span>
-        );
-      case "full_package":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            Full Package (Guide + Vehicle)
-          </span>
-        );
+  // Badge indicator for 1-Day vs Multi-Day Tours
+  const renderTourBadge = () => {
+    if (tourType === "one_day") {
+      return (
+        <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          One-Day Tour
+        </span>
+      );
     }
+    return (
+      <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+        Multi-Day Tour
+      </span>
+    );
   };
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all p-6 mb-4">
-
-      {/* Top Header: Request Type Badge & Admin Status Selector */}
+    <div className="w-full bg-white border border-slate-200 rounded-xl shadow-xs hover:shadow-md transition-all p-6 mb-4">
+      
+      {/* Top Bar: Tour Type Badge & Status Selector */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-        {renderTypeBadge()}
+        {renderTourBadge()}
 
-        {/* Status Dropdown to keep track of follow-ups */}
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as any)}
-          className={`text-xs font-bold px-3 py-1.5 rounded-lg border focus:outline-none transition-colors cursor-pointer ${status === "completed"
+          className={`text-xs font-bold px-3 py-1.5 rounded-lg border focus:outline-none transition-colors cursor-pointer ${
+            status === "completed"
               ? "bg-emerald-500 text-white border-emerald-500"
               : status === "contacted"
-                ? "bg-slate-800 text-white border-slate-800"
-                : "bg-slate-100 text-slate-600 border-slate-200"
-            }`}
+              ? "bg-slate-800 text-white border-slate-800"
+              : "bg-slate-100 text-slate-600 border-slate-200"
+          }`}
         >
           <option value="pending" className="bg-white text-slate-800">Pending Review</option>
           <option value="contacted" className="bg-white text-slate-800">Contacted / In Progress</option>
@@ -80,9 +72,9 @@ export default function RequestCard({
         </select>
       </div>
 
-      {/* Main Body: Client Contact Info & Travel Details Grid */}
+      {/* Main Content: Client Details & Selected Ad Title */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-
+        
         {/* Column 1: Client Personal Details */}
         <div className="space-y-3">
           <div>
@@ -111,24 +103,20 @@ export default function RequestCard({
           </div>
         </div>
 
-        {/* Column 2: Requested Places to Visit */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4">
-          {/*
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
-            Requested Destination / Itinerary
-          </span>
-          
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {placesToVisit.map((place, index) => (
-              <span key={index} className="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 text-xs font-medium rounded-lg shadow-2xs">
-                📍 {place}
-              </span>
-            ))}
+        {/* Column 2: Selected Tour Package / Ad Title */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
+              Booked Package Ad
+            </span>
+            <p className="text-sm font-bold text-slate-900 bg-white border border-slate-200 px-3 py-2.5 rounded-lg shadow-2xs">
+              🏷️ {adTitle}
+            </p>
           </div>
-          */}
+
           {additionalNotes && (
-            <div className="mt-2 pt-2 border-t border-slate-200/60">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Notes:</span>
+            <div className="mt-3 pt-2 border-t border-slate-200/60">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Client Notes:</span>
               <p className="text-xs text-slate-600 italic mt-0.5 line-clamp-2">{additionalNotes}</p>
             </div>
           )}
@@ -136,10 +124,10 @@ export default function RequestCard({
 
       </div>
 
-      {/* Footer: One-click Contact Action Buttons */}
+      {/* Footer: One-Click Contact Actions */}
       <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
         <a
-          href={`mailto:${email}?subject=Regarding Your Tour Request`}
+          href={`mailto:${email}?subject=Regarding Your Booking: ${adTitle}`}
           className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors"
         >
           <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +138,7 @@ export default function RequestCard({
 
         <a
           href={`tel:${phone}`}
-          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-xs transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />

@@ -30,9 +30,9 @@ export default function Sidebar() {
         
         
         <Link 
-          href="/users" 
+          href="/tours" 
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${
-            pathname === "/users" ? activeStyles : inactiveStyles
+            pathname === "/tours" ? activeStyles : inactiveStyles
           }`}
         >
           Tours
