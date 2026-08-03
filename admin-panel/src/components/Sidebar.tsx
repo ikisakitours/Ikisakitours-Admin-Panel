@@ -8,69 +8,74 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 bg-slate-950/80 backdrop-blur-md text-slate-300 flex flex-col border-r border-white/10 sticky top-0 h-screen">
-      
+
       <div className="h-16 flex items-center justify-center px-6 border-b border-white/5">
         <span className="text-xl font-black tracking-wider bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
           TOUR ADMIN
         </span>
       </div>
 
-     
+
       <nav className="flex-1 p-4 space-y-1.5">
-        
-        
-        <Link 
-          href="/" 
-          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${
-            pathname === "/" ? activeStyles : inactiveStyles
-          }`}
+
+
+        <Link
+          href="/"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/" ? activeStyles : inactiveStyles
+            }`}
         >
           Dashboard
         </Link>
-        
-        
-        <Link 
-          href="/tours" 
-          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${
-            pathname === "/tours" ? activeStyles : inactiveStyles
-          }`}
+
+
+        <Link
+          href="/tours"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/tours" ? activeStyles : inactiveStyles
+            }`}
         >
           Tours
         </Link>
-        
-        
-        <Link 
+
+
+        <Link
           href="/clientrequests"
-          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${
-            pathname === "/clientrequests" ? activeStyles : inactiveStyles
-          }`}
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/clientrequests" ? activeStyles : inactiveStyles
+            }`}
         >
-          Client Requests
+          Services
         </Link>
 
-        
-        <Link 
-          href="/comments" 
-          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${
-            pathname === "/comments" ? activeStyles : inactiveStyles
-          }`}
+
+        <Link
+          href="/comments"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/comments" ? activeStyles : inactiveStyles
+            }`}
         >
           Comments
         </Link>
 
-        
-        <Link 
-          href="/adminlogs" 
-          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${
-            pathname === "/adminlogs" ? activeStyles : inactiveStyles
-          }`}
+
+        <Link
+          href="/contact"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/contact" ? activeStyles : inactiveStyles
+            }`}
+        >
+          Contact
+        </Link>
+
+
+        <Link
+          href="/adminlogs"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/adminlogs" ? activeStyles : inactiveStyles
+            }`}
         >
           Audit logs
         </Link>
-        
+
+
       </nav>
 
-      
+
       <div className="p-4 border-t border-white/5 text-[10px] uppercase tracking-widest text-slate-500 font-bold text-center">
         Powered by Next.js
       </div>
