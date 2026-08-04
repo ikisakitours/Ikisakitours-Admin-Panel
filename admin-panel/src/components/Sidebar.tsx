@@ -20,8 +20,8 @@ export default function Sidebar() {
 
 
         <Link
-          href="/"
-          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/" ? activeStyles : inactiveStyles
+          href="/dashboard"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/dashboard" ? activeStyles : inactiveStyles
             }`}
         >
           Dashboard

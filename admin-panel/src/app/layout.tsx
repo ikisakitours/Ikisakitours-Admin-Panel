@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Roboto_Mono } from "next/font/google";
+import { Roboto_Mono, Geist } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
@@ -20,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={cn("h-full antialiased", "font-sans", geist.variable)}>
       {/* 2. Apply the font class directly to the body so it inherits everywhere */}
       <body className={`${robotoMono.className} min-h-full bg-slate-50 text-slate-900`}>
         <div className="flex min-h-screen">
