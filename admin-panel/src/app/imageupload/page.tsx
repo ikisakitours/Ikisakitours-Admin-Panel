@@ -9,6 +9,7 @@ export interface AssetImage {
   url: string;
   title: string;
   alt: string;
+  description?: string;
   size: string;
   uploadedAt: string;
 }
@@ -19,6 +20,7 @@ const INITIAL_IMAGES: AssetImage[] = [
     url: "https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=800&q=80",
     title: "Sigiriya Lion Rock Fortress",
     alt: "Aerial view of the ancient Sigiriya Lion Rock Fortress surrounded by lush green jungle in Sri Lanka",
+    description: "A UNESCO World Heritage Site featuring ancient palace ruins atop a massive rock column.",
     size: "2.4 MB",
     uploadedAt: "Aug 10, 2026",
   },
@@ -27,6 +29,7 @@ const INITIAL_IMAGES: AssetImage[] = [
     url: "https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=800&q=80",
     title: "Nine Arch Bridge Demodara",
     alt: "Iconic Nine Arch Bridge in Ella Sri Lanka with a blue train crossing over lush tea plantations",
+    description: "Famous viaduct bridge in Ella surrounded by dense jungle and tea agricultural lands.",
     size: "1.8 MB",
     uploadedAt: "Aug 09, 2026",
   },
@@ -35,6 +38,7 @@ const INITIAL_IMAGES: AssetImage[] = [
     url: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=800&q=80",
     title: "Mirissa Coconut Tree Hill",
     alt: "Scenic tropical sunset at Coconut Tree Hill overlooking turquoise ocean waves in Mirissa Sri Lanka",
+    description: "Popular viewpoint on the southern coast featuring palm trees jutting out over the ocean.",
     size: "1.5 MB",
     uploadedAt: "Aug 07, 2026",
   },
@@ -43,6 +47,7 @@ const INITIAL_IMAGES: AssetImage[] = [
     url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFOGL4N23KtthYGxmt92mOpl1hYIUkIqh3XWThDn92ZsKseSlRL3pY5gI&s=10",
     title: "Ella Rock Peak Trail",
     alt: "Panoramic mountain valley view from the top of Ella Rock during early morning sunrise in Sri Lanka",
+    description: "Scenic hiking trail offering view of the central highlands valley.",
     size: "2.1 MB",
     uploadedAt: "Aug 05, 2026",
   },
@@ -51,6 +56,7 @@ const INITIAL_IMAGES: AssetImage[] = [
     url: "https://images.unsplash.com/photo-1588001832198-c15cff59b078?auto=format&fit=crop&w=800&q=80",
     title: "Yala Safari Wild Elephant",
     alt: "Wild Sri Lankan elephant roaming through Yala National Park safari reservation",
+    description: "Wild wildlife encounter inside Yala National Park.",
     size: "1.9 MB",
     uploadedAt: "Aug 03, 2026",
   },
@@ -66,6 +72,7 @@ export default function ImageUploadPage() {
       url: asset.previewUrl, // Replace with your uploaded backend image URL when connected
       title: asset.title || "Untitled Image",
       alt: asset.alt || "No alt tag provided",
+      description: asset.description || "",
       size: `${(asset.file.size / (1024 * 1024)).toFixed(1)} MB`,
       uploadedAt: new Date().toLocaleDateString("en-US", {
         month: "short",
@@ -79,7 +86,7 @@ export default function ImageUploadPage() {
 
   const handleUpdateMetadata = (
     id: string,
-    field: "title" | "alt",
+    field: "title" | "alt" | "description",
     value: string
   ) => {
     setImages((prev) =>

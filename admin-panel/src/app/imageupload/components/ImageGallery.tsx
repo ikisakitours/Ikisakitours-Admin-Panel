@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Tag,
   FileText,
+  AlignLeft,
 } from "lucide-react";
 import {
   Card,
@@ -18,11 +19,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AssetImage } from "./ImageUploader";
+
+export interface AssetImage {
+  id: string;
+  url: string;
+  title: string;
+  alt: string;
+  description?: string;
+  size?: string;
+  uploadedAt?: string;
+}
 
 interface ImageGalleryProps {
   images: AssetImage[];
-  onUpdateMetadata: (id: string, field: "title" | "alt", value: string) => void;
+  onUpdateMetadata: (
+    id: string,
+    field: "title" | "alt" | "description",
+    value: string
+  ) => void;
   onDeleteImage: (id: string) => void;
 }
 
@@ -43,7 +57,9 @@ export default function ImageGallery({
   const filteredImages = images.filter(
     (img) =>
       img.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      img.alt.toLowerCase().includes(searchQuery.toLowerCase())
+      img.alt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (img.description &&
+        img.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -56,7 +72,7 @@ export default function ImageGallery({
               Image Assets ({filteredImages.length})
             </CardTitle>
             <CardDescription className="text-xs text-slate-500 mt-0.5">
-              Manage titles, SEO alt tags, and copy asset URLs for your site.
+              Manage titles, SEO alt tags, descriptions, and copy asset URLs for your site.
             </CardDescription>
           </div>
 
@@ -66,7 +82,7 @@ export default function ImageGallery({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search title or alt tag..."
+              placeholder="Search title, alt, or description..."
               className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
             />
           </div>
@@ -112,17 +128,20 @@ export default function ImageGallery({
                     </button>
                   </div>
 
-                  <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-slate-900/70 text-white text-[10px] font-medium backdrop-blur-xs">
-                    {img.size}
-                  </span>
+                  {img.size && (
+                    <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-slate-900/70 text-white text-[10px] font-medium backdrop-blur-xs">
+                      {img.size}
+                    </span>
+                  )}
                 </div>
 
                 {/* Metadata Fields */}
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
                   <div className="space-y-2.5">
+                    {/* Title Input */}
                     <div>
                       <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1 mb-1">
-                        <FileText className="w-3 h-3" /> Title
+                        <FileText className="w-3 h-3 text-indigo-500" /> Title
                       </label>
                       <input
                         type="text"
@@ -135,17 +154,34 @@ export default function ImageGallery({
                       />
                     </div>
 
+                    {/* SEO Alt Tag Input */}
                     <div>
                       <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1 mb-1">
                         <Tag className="w-3 h-3 text-indigo-500" /> SEO Alt Tag
                       </label>
-                      <textarea
-                        rows={2}
+                      <input
+                        type="text"
                         value={img.alt}
                         onChange={(e) =>
                           onUpdateMetadata(img.id, "alt", e.target.value)
                         }
                         placeholder="Descriptive alt text for SEO..."
+                        className="w-full text-xs text-slate-600 bg-slate-50 border border-slate-200/80 rounded-md px-2.5 py-1.5 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    {/* Description Textarea */}
+                    <div>
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1 mb-1">
+                        <AlignLeft className="w-3 h-3 text-indigo-500" /> Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={img.description || ""}
+                        onChange={(e) =>
+                          onUpdateMetadata(img.id, "description", e.target.value)
+                        }
+                        placeholder="Optional description..."
                         className="w-full text-xs text-slate-600 bg-slate-50 border border-slate-200/80 rounded-md px-2.5 py-1.5 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
                       />
                     </div>
