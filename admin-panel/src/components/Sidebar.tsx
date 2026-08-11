@@ -72,6 +72,14 @@ export default function Sidebar() {
           Audit logs
         </Link>
 
+        <Link
+          href="/imageupload"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/imageupload" ? activeStyles : inactiveStyles
+            }`}
+        >
+          Image Uploads
+        </Link>
+
 
       </nav>
 
