@@ -80,12 +80,20 @@ export default function Sidebar() {
           Image Uploads
         </Link>
 
+        <Link
+          href="/addpackage"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/addpackage" ? activeStyles : inactiveStyles
+            }`}
+        >
+          Add New Package
+        </Link>
+
 
       </nav>
 
 
       <div className="p-4 border-t border-white/5 text-[10px] uppercase tracking-widest text-slate-500 font-bold text-center">
-        Powered by Next.js
+        Powered by Shehan_W
       </div>
     </aside>
   );
