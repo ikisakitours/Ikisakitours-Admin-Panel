@@ -15,9 +15,7 @@ export default function Sidebar() {
         </span>
       </div>
 
-
       <nav className="flex-1 p-4 space-y-1.5">
-
 
         <Link
           href="/dashboard"
@@ -27,6 +25,13 @@ export default function Sidebar() {
           Dashboard
         </Link>
 
+        <Link
+          href="/users"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/users" ? activeStyles : inactiveStyles
+            }`}
+        >
+          Registed Users
+        </Link>
 
         <Link
           href="/tours"
@@ -36,7 +41,6 @@ export default function Sidebar() {
           Tours
         </Link>
 
-
         <Link
           href="/clientrequests"
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/clientrequests" ? activeStyles : inactiveStyles
@@ -44,7 +48,6 @@ export default function Sidebar() {
         >
           Services
         </Link>
-
 
         <Link
           href="/comments"
@@ -54,7 +57,6 @@ export default function Sidebar() {
           Comments
         </Link>
 
-
         <Link
           href="/contact"
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/contact" ? activeStyles : inactiveStyles
@@ -62,7 +64,6 @@ export default function Sidebar() {
         >
           Contact
         </Link>
-
 
         <Link
           href="/adminlogs"
@@ -88,9 +89,7 @@ export default function Sidebar() {
           Add New Package
         </Link>
 
-
       </nav>
-
 
       <div className="p-4 border-t border-white/5 text-[10px] uppercase tracking-widest text-slate-500 font-bold text-center">
         Powered by Shehan_W
