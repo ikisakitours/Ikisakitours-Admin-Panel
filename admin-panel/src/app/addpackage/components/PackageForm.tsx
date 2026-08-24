@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Save, Tag, Sparkles, MapPin, DollarSign, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Save, Tag, Sparkles, MapPin, DollarSign, Image as ImageIcon, Upload } from "lucide-react";
 
 export interface PackageFormData {
   title: string;
@@ -43,6 +43,7 @@ const ORIGIN_OPTIONS = [
 ];
 
 export default function PackageForm() {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PackageFormData>({
     title: "",
     subtitle: "",
@@ -63,7 +64,36 @@ export default function PackageForm() {
     imageUrl: "",
   });
 
-  // Handle title & auto-generate slug
+  // 1. AI JSON File Upload Handler
+  const handleJsonUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        
+        // Auto-generate slug if title exists in JSON
+        if (json.title && !json.slug) {
+          json.slug = json.title
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, "")
+            .replace(/[\s_-]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+        }
+
+        // Merge imported JSON with state defaults
+        setFormData((prev) => ({ ...prev, ...json }));
+        alert("Package form autofilled successfully!");
+      } catch (err) {
+        alert("Invalid JSON file format.");
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleTitleChange = (val: string) => {
     const slugified = val
       .toLowerCase()
@@ -75,7 +105,6 @@ export default function PackageForm() {
     setFormData((prev) => ({ ...prev, title: val, slug: slugified }));
   };
 
-  // Generic Dynamic Array Handlers (Highlights, Includes, Excludes)
   const handleArrayChange = (
     field: "highlights" | "includes" | "excludes",
     index: number,
@@ -100,19 +129,50 @@ export default function PackageForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 2. Submit Handler calling NestJS Backend
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
+    // Transform form string data into types expected by NestJS CreateAddPackageDto
     const payload = {
-      ...formData,
-      categoryLabel: CATEGORY_MAP[formData.category],
-      badges:
-        formData.badgeType !== "none"
-          ? [{ label: formData.badgeLabel, type: formData.badgeType }]
-          : [],
+      title: formData.title,
+      subtitle: formData.subtitle,
+      slug: formData.slug,
+      summary: formData.lead,
+      imageUrl: formData.imageUrl,
+      tourType: formData.tourType === "multi-day" ? "Multi-Day Tour" : "Day Tour",
+      category: CATEGORY_MAP[formData.category] || "Cultural",
+      startingOrigin: formData.origin,
+      price: Number(formData.price.replace(/[^0-9.]/g, "")), // Clean "$299" -> 299
+      discount: Number(formData.discount),
+      duration: formData.duration,
+      badge: formData.badgeType !== "none" ? formData.badgeLabel || formData.badgeType : "No Badge",
+      highlights: formData.highlights.filter((item) => item.trim() !== ""), // Strip empty strings
+      description: formData.description,
     };
 
-    console.log("Saving Package Payload:", payload);
-    alert("Package saved successfully! (Check browser console)");
+    try {
+      const response = await fetch("http://localhost:4000/addpackages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create package");
+      }
+
+      const result = await response.json();
+      alert(`Success! Package saved with ID: ${result.id}`);
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -125,10 +185,28 @@ export default function PackageForm() {
         </div>
         <button
           type="submit"
-          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
+          disabled={loading}
+          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-semibold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
         >
-          <Save className="w-4 h-4" /> Save Package
+          <Save className="w-4 h-4" /> {loading ? "Publishing..." : "Save Package"}
         </button>
+      </div>
+
+      {/* AI JSON File Upload Box */}
+      <div className="p-4 bg-indigo-50/50 border border-dashed border-indigo-200 rounded-xl flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Upload className="w-5 h-5 text-indigo-600" />
+          <div>
+            <p className="text-xs font-semibold text-indigo-900">Import AI Generated JSON</p>
+            <p className="text-[11px] text-indigo-600">Upload a .json file to autofill all form fields below instantly.</p>
+          </div>
+        </div>
+        <input
+          type="file"
+          accept=".json"
+          onChange={handleJsonUpload}
+          className="text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer"
+        />
       </div>
 
       {/* 1. Basic Information */}
@@ -202,12 +280,8 @@ export default function PackageForm() {
             placeholder="https://your-media-db.com/images/sigiriya-hero.jpg"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
           />
-          <p className="text-[11px] text-slate-400 mt-1">
-            Enter the central media URL. Description, alt tags, and title metadata will be fetched automatically from the media database.
-          </p>
         </div>
 
-        {/* Optional Live Preview */}
         {formData.imageUrl && (
           <div className="flex items-center gap-4 p-3 bg-slate-50 border border-slate-200 rounded-xl max-w-md">
             <img
@@ -291,7 +365,7 @@ export default function PackageForm() {
               required
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              placeholder="$299"
+              placeholder="299"
               className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
