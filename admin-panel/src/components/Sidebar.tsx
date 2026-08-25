@@ -89,6 +89,14 @@ export default function Sidebar() {
           Add New Package
         </Link>
 
+        <Link
+          href="/newupdates"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/newupdates" ? activeStyles : inactiveStyles
+            }`}
+        >
+          New Updates
+        </Link>
+
       </nav>
 
       <div className="p-4 border-t border-white/5 text-[10px] uppercase tracking-widest text-slate-500 font-bold text-center">
