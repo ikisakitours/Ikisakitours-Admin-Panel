@@ -1,2 +1,2 @@
-# Tour-Admin-Panel
-This is an admin panel of a tour guide agency
+# Ikisaki-Tour-Admin-Panel
+This is an admin panel of www.ikisakitours.com
