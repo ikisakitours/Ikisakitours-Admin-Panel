@@ -1,11 +1,12 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import UserCard, { UserData } from "./components/UserCard";
-import { UsersService } from "@/services/users.service";
+import UserCard from "./components/UserCard";
+import { UsersService, User } from "@/services/users.service";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<UserData[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
