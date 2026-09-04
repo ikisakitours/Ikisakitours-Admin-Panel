@@ -8,7 +8,7 @@ export interface CommentCardProps {
   commentType: "website" | "post"; 
   tourTitle?: string;              
   userName: string;
-  userAvatar: string;
+  userAvatar?: string | null;
   commentText: string;
   initialIsVisible: boolean;
   adminReply?: string;
@@ -27,16 +27,36 @@ export default function CommentCard({
   onReplyUpdated,
 }: CommentCardProps) {
   const [isVisible, setIsVisible] = useState(initialIsVisible);
+  const [isUpdatingVisibility, setIsUpdatingVisibility] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const isWebsiteComment = commentType === "website";
 
-  // Handler for toggle visibility on the public web app
-  const handleToggleVisibility = () => {
-    setIsVisible(!isVisible);
-    console.log(`Comment ${id} visibility toggled to: ${!isVisible}`);
+  // Get first letter of username for avatar fallback
+  const userInitial = userName ? userName.trim().charAt(0).toUpperCase() : "U";
+
+  // Handler for toggle visibility with API sync
+  const handleToggleVisibility = async () => {
+    const newVisibility = !isVisible;
+    
+    // Optimistic UI update
+    setIsVisible(newVisibility);
+
+    try {
+      setIsUpdatingVisibility(true);
+      await CommentsService.toggleVisibility(id, {
+        isPubliclyVisible: newVisibility,
+      });
+    } catch (error: any) {
+      // Revert back on failure
+      setIsVisible(!newVisibility);
+      alert(error.message || "Failed to update visibility in database.");
+    } finally {
+      setIsUpdatingVisibility(false);
+    }
   };
 
   // Handler for saving and pushing the reply to backend API
@@ -93,9 +113,10 @@ export default function CommentCard({
           </span>
           <button
             onClick={handleToggleVisibility}
+            disabled={isUpdatingVisibility}
             className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
               isVisible ? "bg-emerald-500" : "bg-slate-200"
-            }`}
+            } ${isUpdatingVisibility ? "opacity-50 cursor-wait" : ""}`}
           >
             <span
               className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
@@ -108,12 +129,20 @@ export default function CommentCard({
 
       {/* Middle Section: User Metadata Profile & The Comment Content */}
       <div className="flex gap-4 items-start mb-4">
-        {/* User Profile Pic */}
-        <img
-          src={userAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop"}
-          alt={userName}
-          className="w-10 h-10 rounded-full object-cover border border-slate-200 bg-slate-50 flex-shrink-0"
-        />
+        
+        {/* User Profile Pic OR Fallback Initial Badge */}
+        {userAvatar && !imgError ? (
+          <img
+            src={userAvatar}
+            alt={userName}
+            onError={() => setImgError(true)}
+            className="w-10 h-10 rounded-full object-cover border border-slate-200 bg-slate-50 flex-shrink-0"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 font-bold text-sm flex-shrink-0 select-none">
+            {userInitial}
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-bold text-slate-800 mb-0.5">{userName}</h3>
