@@ -7,6 +7,10 @@ export interface User {
   lastname: string;
   email: string;
   country: string;
+  avatarUrl: string | null;
+  isVerified: boolean;
+  isVip: boolean;
+  hasAccess: boolean;
   createdAt: string;
 }
 
