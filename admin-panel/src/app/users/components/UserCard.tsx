@@ -72,7 +72,7 @@ export default function UserCard({ user }: UserCardProps) {
             {/* VIP Label Badge */}
             {user.isVip && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                VIP
+                Vip
               </span>
             )}
           </div>
