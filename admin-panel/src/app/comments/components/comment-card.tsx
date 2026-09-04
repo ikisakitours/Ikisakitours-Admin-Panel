@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CommentsService, Comment } from "@/services/comments.service";
 
 export interface CommentCardProps {
   id: string;
@@ -10,6 +11,8 @@ export interface CommentCardProps {
   userAvatar: string;
   commentText: string;
   initialIsVisible: boolean;
+  adminReply?: string;
+  onReplyUpdated?: (updatedComment: Comment) => void;
 }
 
 export default function CommentCard({
@@ -20,28 +23,44 @@ export default function CommentCard({
   userAvatar,
   commentText,
   initialIsVisible,
+  adminReply,
+  onReplyUpdated,
 }: CommentCardProps) {
   const [isVisible, setIsVisible] = useState(initialIsVisible);
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const isWebsiteComment = commentType === "website";
 
   // Handler for toggle visibility on the public web app
   const handleToggleVisibility = () => {
     setIsVisible(!isVisible);
-    // TODO: Connect to your API to update database visibility state here
     console.log(`Comment ${id} visibility toggled to: ${!isVisible}`);
   };
 
-  // Handler for saving and pushing the reply to database
-  const handleSendReply = (e: React.FormEvent) => {
+  // Handler for saving and pushing the reply to backend API
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!replyText.trim()) return;
+    if (!replyText.trim() || isWebsiteComment) return;
 
-    // TODO: Connect to your API to save the reply in the database
-    console.log(`Sending reply to comment ${id}:`, replyText);
+    try {
+      setSubmitting(true);
+      const updatedComment = await CommentsService.reply(id, {
+        adminReply: replyText,
+      });
 
-    setReplyText("");
-    setIsReplying(false);
+      if (onReplyUpdated) {
+        onReplyUpdated(updatedComment);
+      }
+
+      setReplyText("");
+      setIsReplying(false);
+    } catch (error: any) {
+      alert(error.message || "Failed to post reply");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -56,7 +75,7 @@ export default function CommentCard({
             Source:
           </span>
 
-          {commentType === "website" ? (
+          {isWebsiteComment ? (
             <span className="px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 rounded-md border border-blue-100 flex items-center gap-1.5">
               <span>🌐</span> About Website
             </span>
@@ -104,23 +123,40 @@ export default function CommentCard({
         </div>
       </div>
 
+      {/* Existing Admin Reply View (If Present) */}
+      {adminReply && (
+        <div className="mt-3 mb-4 pl-3 border-l-2 border-emerald-500 bg-emerald-50/40 p-3 rounded-r-xl">
+          <p className="text-xs font-bold text-emerald-800 mb-1">Admin Response:</p>
+          <p className="text-xs text-slate-700 leading-relaxed">{adminReply}</p>
+        </div>
+      )}
+
       {/* Bottom Section: Interactive Action Toolbar */}
-      <div className="flex items-center justify-end pt-2">
-        {!isReplying && (
-          <button
-            onClick={() => setIsReplying(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors"
-          >
-            <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-            </svg>
-            Reply to Comment
-          </button>
-        )}
-      </div>
+      {!adminReply && (
+        <div className="flex items-center justify-end pt-2">
+          {!isReplying && (
+            <button
+              type="button"
+              disabled={isWebsiteComment}
+              onClick={() => setIsReplying(true)}
+              title={isWebsiteComment ? "Replies are disabled for general website feedback" : "Reply to this comment"}
+              className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-colors border ${
+                isWebsiteComment
+                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
+                  : "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700 cursor-pointer"
+              }`}
+            >
+              <svg className={`w-4 h-4 ${isWebsiteComment ? "text-slate-400" : "text-slate-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
+              {isWebsiteComment ? "Reply Disabled (Website Feedback)" : "Reply to Comment"}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Expandable Form: Input Section to Post Reply Responses */}
-      {isReplying && (
+      {isReplying && !isWebsiteComment && !adminReply && (
         <form onSubmit={handleSendReply} className="mt-4 pt-4 border-t border-slate-100 transition-all">
           <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Admin Response</label>
           <textarea
@@ -143,10 +179,10 @@ export default function CommentCard({
             </button>
             <button
               type="submit"
-              disabled={!replyText.trim()}
-              className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
+              disabled={submitting || !replyText.trim()}
+              className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
             >
-              Send & Publish Reply
+              {submitting ? "Sending..." : "Send & Publish Reply"}
             </button>
           </div>
         </form>
