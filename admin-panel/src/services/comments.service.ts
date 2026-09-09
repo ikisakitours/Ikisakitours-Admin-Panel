@@ -39,8 +39,7 @@ export const CommentsService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         }),
-
-    // PATCH /comments/:id/visibility
+    
     // PATCH /comments/:id/visibility
     toggleVisibility: (id: string, payload: { isPubliclyVisible: boolean }) =>
         fetcher<Comment>(`/comments/${id}/visibility`, {
