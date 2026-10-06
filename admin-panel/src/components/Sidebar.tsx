@@ -90,6 +90,14 @@ export default function Sidebar() {
         </Link>
 
         <Link
+          href="/blogs"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/blogs" ? activeStyles : inactiveStyles
+            }`}
+        >
+          Blogs
+        </Link>
+
+        <Link
           href="/newupdates"
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/newupdates" ? activeStyles : inactiveStyles
             }`}
