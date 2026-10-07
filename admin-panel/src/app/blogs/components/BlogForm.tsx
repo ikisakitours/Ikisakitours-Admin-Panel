@@ -9,6 +9,9 @@ export default function BlogForm() {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [formData, setFormData] = useState({
         title: "",
+        summary: "",
+        category: "",
+        readTime: "",
         author: "",
         blog: "",
     });
@@ -36,9 +39,12 @@ export default function BlogForm() {
                 imageUrls = await blogService.uploadImages(selectedFiles, "blogs");
             }
 
-            // 2. Submit pure JSON containing R2 image URLs
+            // 2. Submit pure JSON containing R2 image URLs & new fields
             const blogData = {
                 title: formData.title,
+                summary: formData.summary,
+                category: formData.category,
+                readTime: formData.readTime,
                 author: formData.author,
                 blog: formData.blog,
                 images: imageUrls,
@@ -47,9 +53,16 @@ export default function BlogForm() {
             const newPost = await blogService.createBlog(blogData);
             alert(`Blog created successfully! ID: ${newPost.id}`);
 
-            // Reset
+            // Reset form
             setSelectedFiles([]);
-            setFormData({ title: "", author: "", blog: "" });
+            setFormData({
+                title: "",
+                summary: "",
+                category: "",
+                readTime: "",
+                author: "",
+                blog: "",
+            });
         } catch (err: any) {
             alert(`Error: ${err.message}`);
         } finally {
@@ -71,6 +84,7 @@ export default function BlogForm() {
                 </button>
             </div>
 
+            {/* Title */}
             <div>
                 <label className="block text-xs font-semibold mb-1">Title</label>
                 <input
@@ -79,20 +93,63 @@ export default function BlogForm() {
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                    placeholder="e.g. Getting Started with Next.js & NestJS"
                 />
             </div>
 
+            {/* Author, Category, Read Time Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label className="block text-xs font-semibold mb-1">Author</label>
+                    <input
+                        type="text"
+                        required
+                        value={formData.author}
+                        onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                        className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                        placeholder="e.g. John Doe"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-xs font-semibold mb-1">Category</label>
+                    <input
+                        type="text"
+                        required
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                        placeholder="e.g. Engineering, Tech, Design"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-xs font-semibold mb-1">Read Time</label>
+                    <input
+                        type="text"
+                        required
+                        value={formData.readTime}
+                        onChange={(e) => setFormData({ ...formData, readTime: e.target.value })}
+                        className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                        placeholder="e.g. 5 min read"
+                    />
+                </div>
+            </div>
+
+            {/* Summary */}
             <div>
-                <label className="block text-xs font-semibold mb-1">Author</label>
-                <input
-                    type="text"
+                <label className="block text-xs font-semibold mb-1">Summary / Excerpt</label>
+                <textarea
+                    rows={2}
                     required
-                    value={formData.author}
-                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                    value={formData.summary}
+                    onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                     className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                    placeholder="Brief overview of the blog post for preview cards..."
                 />
             </div>
 
+            {/* Images */}
             <div>
                 <label className="block text-xs font-semibold mb-1">Images</label>
                 <input
@@ -117,14 +174,16 @@ export default function BlogForm() {
                 )}
             </div>
 
+            {/* Content */}
             <div>
                 <label className="block text-xs font-semibold mb-1">Blog Content</label>
                 <textarea
-                    rows={6}
+                    rows={8}
                     required
                     value={formData.blog}
                     onChange={(e) => setFormData({ ...formData, blog: e.target.value })}
                     className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                    placeholder="Write your blog content here..."
                 />
             </div>
         </form>
