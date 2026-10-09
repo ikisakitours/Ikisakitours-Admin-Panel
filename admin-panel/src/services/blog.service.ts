@@ -1,5 +1,9 @@
 export interface BlogPayload {
   title: string;
+  slug?: string;
+  summary: string;
+  category: string;
+  readTime: string;
   blog: string;
   author: string;
   images?: string[];
@@ -45,6 +49,32 @@ class BlogService {
     return res.json();
   }
 
+  // Fetch all blog previews (for admin list or preview cards)
+  async getPreviews() {
+    const res = await fetch(`${this.API_URL}/blogs/previews`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch blog previews");
+    }
+
+    return res.json();
+  }
+
+  // Delete blog by ID
+  async deleteBlog(id: string) {
+    const res = await fetch(`${this.API_URL}/blogs/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to delete blog post");
+    }
+
+    return res.json();
+  }
+
   // Handle Like/Unlike action
   async toggleLike(id: string, action: "like" | "unlike") {
     const res = await fetch(`${this.API_URL}/blogs/${id}/like`, {
@@ -54,6 +84,11 @@ class BlogService {
       },
       body: JSON.stringify({ action }),
     });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to update like status");
+    }
 
     return res.json();
   }

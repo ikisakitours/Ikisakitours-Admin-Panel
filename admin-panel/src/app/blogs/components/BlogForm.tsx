@@ -4,7 +4,11 @@ import { useState } from "react";
 import { blogService } from "@/services/blog.service";
 import { Save, Image as ImageIcon, X } from "lucide-react";
 
-export default function BlogForm() {
+interface BlogFormProps {
+  onSuccess?: () => void;
+}
+
+export default function BlogForm({ onSuccess }: BlogFormProps) {
     const [loading, setLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isCustomSlug, setIsCustomSlug] = useState(false);
