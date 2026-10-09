@@ -7,14 +7,41 @@ import { Save, Image as ImageIcon, X } from "lucide-react";
 export default function BlogForm() {
     const [loading, setLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [isCustomSlug, setIsCustomSlug] = useState(false);
     const [formData, setFormData] = useState({
         title: "",
+        slug: "",
         summary: "",
         category: "",
         readTime: "",
         author: "",
         blog: "",
     });
+
+    // Helper function to turn strings into URL-friendly slugs
+    const slugify = (text: string) => {
+        return text
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, "")
+            .replace(/[\s_-]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+    };
+
+    // Auto-update slug when title changes unless user manually edited slug
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const title = e.target.value;
+        setFormData((prev) => ({
+            ...prev,
+            title,
+            slug: isCustomSlug ? prev.slug : slugify(title),
+        }));
+    };
+
+    const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setIsCustomSlug(true);
+        setFormData({ ...formData, slug: slugify(e.target.value) });
+    };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -39,9 +66,10 @@ export default function BlogForm() {
                 imageUrls = await blogService.uploadImages(selectedFiles, "blogs");
             }
 
-            // 2. Submit pure JSON containing R2 image URLs & new fields
+            // 2. Submit pure JSON containing R2 image URLs & metadata
             const blogData = {
                 title: formData.title,
+                slug: formData.slug || slugify(formData.title),
                 summary: formData.summary,
                 category: formData.category,
                 readTime: formData.readTime,
@@ -55,8 +83,10 @@ export default function BlogForm() {
 
             // Reset form
             setSelectedFiles([]);
+            setIsCustomSlug(false);
             setFormData({
                 title: "",
+                slug: "",
                 summary: "",
                 category: "",
                 readTime: "",
@@ -84,17 +114,32 @@ export default function BlogForm() {
                 </button>
             </div>
 
-            {/* Title */}
-            <div>
-                <label className="block text-xs font-semibold mb-1">Title</label>
-                <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
-                    placeholder="e.g. Getting Started with Next.js & NestJS"
-                />
+            {/* Title & Slug */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-xs font-semibold mb-1">Title</label>
+                    <input
+                        type="text"
+                        required
+                        value={formData.title}
+                        onChange={handleTitleChange}
+                        className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                        placeholder="e.g. Getting Started with Next.js & NestJS"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-xs font-semibold mb-1">
+                        URL Slug <span className="text-slate-400 font-normal">(Auto-generated)</span>
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.slug}
+                        onChange={handleSlugChange}
+                        className="w-full text-xs border rounded-lg p-2.5 bg-slate-50 outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-slate-600"
+                        placeholder="getting-started-with-nextjs-nestjs"
+                    />
+                </div>
             </div>
 
             {/* Author, Category, Read Time Grid */}
@@ -119,7 +164,7 @@ export default function BlogForm() {
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
-                        placeholder="e.g. Engineering, Tech, Design"
+                        placeholder="e.g. Travel, Engineering"
                     />
                 </div>
 
