@@ -1,22 +1,34 @@
-import BlogForm from "./components/BlogForm";
+"use client";
 
-export default function AddPackage() {
+import { useState } from "react";
+import BlogForm from "./components/BlogForm";
+import BlogList from "./components/BlogList";
+
+export default function BlogsPage() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleBlogCreated = () => {
+    // Incrementing key forces BlogList to refetch fresh data
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
-    <main className="w-full py-8 px-4 sm:px-6">
+    <main className="w-full py-8 px-4 sm:px-6 space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Create Blog Post
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Publish new travel stories, guides, and updates for your audience.
-          </p>
-        </div>
+      <div className="pb-6 border-b border-slate-200">
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          Blogs Management
+        </h1>
+        <p className="text-xs text-slate-500 mt-1">
+          Publish new travel articles and manage existing content.
+        </p>
       </div>
 
-      {/* Package Form Component */}
-      <BlogForm/>
+      {/* Creation Form */}
+      <BlogForm onSuccess={handleBlogCreated} />
+
+      {/* Live Previews & Delete List */}
+      <BlogList refreshKey={refreshKey} />
     </main>
   );
 }
