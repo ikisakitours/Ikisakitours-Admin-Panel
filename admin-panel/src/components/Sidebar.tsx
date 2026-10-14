@@ -98,6 +98,14 @@ export default function Sidebar() {
         </Link>
 
         <Link
+          href="/destinations"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/destinations" ? activeStyles : inactiveStyles
+            }`}
+        >
+          Destinations
+        </Link>
+
+        <Link
           href="/newupdates"
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/newupdates" ? activeStyles : inactiveStyles
             }`}
