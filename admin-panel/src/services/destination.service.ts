@@ -3,6 +3,7 @@ export interface DestinationPayload {
   slug?: string;
   summary: string;
   description: string;
+  province: string;
   highlights: string[];
   images?: string[];
   bestTimeToVisit: string;
