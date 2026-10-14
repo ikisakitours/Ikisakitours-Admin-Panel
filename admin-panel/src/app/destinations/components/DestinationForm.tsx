@@ -18,6 +18,7 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
         slug: "",
         summary: "",
         description: "",
+        province: "",
         bestTimeToVisit: "",
         climate: "",
         primaryLanguage: "",
@@ -85,17 +86,18 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
         try {
             let imageUrls: string[] = [];
 
-            // 1. Upload files to Cloudflare R2 first (using blogService's upload pattern or destination service equivalent)
+            // 1. Upload files to Cloudflare R2 first
             if (selectedFiles.length > 0) {
                 imageUrls = await destinationService.uploadImages(selectedFiles, "destinations");
             }
 
-            // 2. Submit pure JSON containing R2 image URLs & metadata
+            // 2. Submit pure JSON containing R2 image URLs & metadata including province
             const destinationData = {
                 title: formData.title,
                 slug: formData.slug || slugify(formData.title),
                 summary: formData.summary,
                 description: formData.description,
+                province: formData.province,
                 highlights: highlights.filter((h) => h.trim() !== ""),
                 images: imageUrls,
                 bestTimeToVisit: formData.bestTimeToVisit,
@@ -119,6 +121,7 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
                 slug: "",
                 summary: "",
                 description: "",
+                province: "",
                 bestTimeToVisit: "",
                 climate: "",
                 primaryLanguage: "",
@@ -176,6 +179,19 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
                         placeholder="kandy"
                     />
                 </div>
+            </div>
+
+            {/* Province Field */}
+            <div>
+                <label className="block text-xs font-semibold mb-1">Province</label>
+                <input
+                    type="text"
+                    required
+                    value={formData.province}
+                    onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+                    className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                    placeholder="e.g. Central Province"
+                />
             </div>
 
             {/* Summary & Description */}
