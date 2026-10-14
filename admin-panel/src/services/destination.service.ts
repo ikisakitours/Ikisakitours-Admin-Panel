@@ -1,10 +1,10 @@
-export interface CreateDestinationPayload {
+export interface DestinationPayload {
   title: string;
   slug?: string;
   summary: string;
   description: string;
   highlights: string[];
-  images: string[];
+  images?: string[];
   bestTimeToVisit: string;
   climate: string;
   primaryLanguage: string;
@@ -15,72 +15,71 @@ export interface CreateDestinationPayload {
   };
 }
 
-export interface DestinationPreview {
-  id: string;
-  title: string;
-  slug: string;
-  summary: string;
-  heroImage: string | null;
-  bestTimeToVisit: string;
-  climate: string;
-}
+class DestinationService {
+  private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-export interface DestinationResponse extends CreateDestinationPayload {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-}
+  // Step 1: Upload raw image files to Cloudflare R2 batch endpoint (same pattern as blogService)
+  async uploadImages(files: File[], folder: string = "destinations"): Promise<string[]> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+    formData.append("folder", folder);
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://ikisakitours-backend.vercel.app';
-
-export const DestinationService = {
-  // 1. Fetch small previews for admin dashboard list
-  async getPreviews(): Promise<DestinationPreview[]> {
-    const res = await fetch(`${API_URL}/api/destinations/previews`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
+    const res = await fetch(`${this.API_URL}/uploads/batch`, {
+      method: "POST",
+      body: formData,
     });
 
     if (!res.ok) {
-      throw new Error('Failed to fetch destination previews.');
+      throw new Error("Failed to upload images to R2");
     }
 
-    return res.json();
-  },
+    const data: { urls: string[] } = await res.json();
+    return data.urls;
+  }
 
-  // 2. Create a new destination
-  async createDestination(payload: CreateDestinationPayload): Promise<DestinationResponse> {
-    const res = await fetch(`${API_URL}/api/destinations`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+  // Step 2: Save destination payload (with R2 URLs) to database
+  async createDestination(payload: DestinationPayload) {
+    const res = await fetch(`${this.API_URL}/destinations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(
-        Array.isArray(errorData.message)
-          ? errorData.message.join(', ')
-          : errorData.message || 'Failed to create destination.'
-      );
+      const error = await res.json();
+      throw new Error(error.message || "Failed to create destination");
     }
 
     return res.json();
-  },
+  }
 
-  // 3. Delete a destination by ID
-  async deleteDestination(id: string): Promise<{ message: string }> {
-    const res = await fetch(`${API_URL}/api/destinations/${id}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+  // Fetch all destination previews (for admin list or preview cards)
+  async getPreviews() {
+    const res = await fetch(`${this.API_URL}/destinations/previews`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch destination previews");
+    }
+
+    return res.json();
+  }
+
+  // Delete destination by ID
+  async deleteDestination(id: string) {
+    const res = await fetch(`${this.API_URL}/destinations/${id}`, {
+      method: "DELETE",
     });
 
     if (!res.ok) {
-      throw new Error('Failed to delete destination.');
+      const error = await res.json();
+      throw new Error(error.message || "Failed to delete destination");
     }
 
     return res.json();
-  },
-};
+  }
+}
+
+export const destinationService = new DestinationService();
