@@ -42,11 +42,11 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          href="/clientrequests"
-          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/clientrequests" ? activeStyles : inactiveStyles
+          href="/tourservices"
+          className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/tourservices" ? activeStyles : inactiveStyles
             }`}
         >
-          Services
+          Tour Services
         </Link>
 
         <Link
