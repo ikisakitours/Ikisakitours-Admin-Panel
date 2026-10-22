@@ -1,5 +1,8 @@
 class TourServiceAdminService {
-  private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  // Automatically strips a trailing slash or trailing /api if present, then appends /api safely
+  private API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000")
+    .replace(/\/api\/?$/, "")
+    .replace(/\/$/, "");
 
   async getCustomRequests() {
     const res = await fetch(`${this.API_URL}/api/services/custom`);
