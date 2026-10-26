@@ -2,25 +2,18 @@
 
 import { useState } from "react";
 
-export type InquiryType =
-  | "tour_inquiry"
-  | "services"
-  | "general"
-  | "partnership_media"
-  | "others";
-
 export interface ContactInquiryProps {
   id: string;
   fullName: string;
   email: string;
   phone: string;
-  inquiryType: InquiryType;
+  inquiryType: string;
   subject: string;
   message: string;
   createdAt: string;
   status: "pending" | "contacted" | "completed";
-  tourInterest?: string; // <-- Added tourInterest field
-  onDelete?: (id: string) => void; // <-- Added delete callback
+  tourInterest?: string;
+  onDelete?: (id: string) => void;
 }
 
 export default function ContactInquiryCard({
@@ -38,54 +31,16 @@ export default function ContactInquiryCard({
 }: ContactInquiryProps) {
   const [status, setStatus] = useState(initialStatus);
 
-  // Render distinctive badges for each updated Inquiry Type
-  const renderInquiryBadge = () => {
-    switch (inquiryType) {
-      case "tour_inquiry":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            Tour Inquiry & Availability
-          </span>
-        );
-      case "services":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            Services
-          </span>
-        );
-      case "general":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60 flex items-center gap-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-            General Questions
-          </span>
-        );
-      case "partnership_media":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200/60 flex items-center gap-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-            Partnership & Media
-          </span>
-        );
-      case "others":
-      default:
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-            Others
-          </span>
-        );
-    }
-  };
-
   return (
     <div className="w-full bg-white border border-slate-200 rounded-3xl shadow-sm hover:shadow-md transition-all p-6 mb-4 font-sans">
-      {/* Header: Inquiry Type Badge, Date, and Admin Status Dropdown */}
+      {/* Header: Dynamic Inquiry Type Badge, Date, and Admin Status Dropdown */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-4">
         <div className="flex flex-wrap items-center gap-3">
-          {renderInquiryBadge()}
+          {/* Dynamically display whatever string is stored in the database */}
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 flex items-center gap-1.5 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+            {inquiryType || "General Inquiry"}
+          </span>
           <span className="text-xs text-slate-400 font-mono font-medium">{createdAt}</span>
         </div>
 
@@ -142,7 +97,6 @@ export default function ContactInquiryCard({
             </div>
           </div>
 
-          {/* Tour Interest Tag (if specified) */}
           {tourInterest && (
             <div className="pt-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono block mb-1">Tour Interest</span>
