@@ -7,7 +7,7 @@ export interface FaqPayload {
 class FaqService {
   private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-  // Fetch all FAQs (public endpoint for client side)
+  // Fetch all FAQs
   async getFaqs() {
     const res = await fetch(`${this.API_URL}/api/faqs`);
 
@@ -19,13 +19,12 @@ class FaqService {
     return res.json();
   }
 
-  // Create a new FAQ (admin endpoint requiring API key)
-  async createFaq(payload: FaqPayload, adminApiKey: string) {
+  // Create a new FAQ (without admin API key header)
+  async createFaq(payload: FaqPayload, _adminApiKey?: string) {
     const res = await fetch(`${this.API_URL}/api/faqs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-api-key": adminApiKey,
       },
       body: JSON.stringify(payload),
     });
@@ -38,13 +37,10 @@ class FaqService {
     return res.json();
   }
 
-  // Delete FAQ by ID (admin endpoint requiring API key)
-  async deleteFaq(id: string, adminApiKey: string) {
+  // Delete FAQ by ID (without admin API key header)
+  async deleteFaq(id: string) {
     const res = await fetch(`${this.API_URL}/api/faqs/${id}`, {
       method: "DELETE",
-      headers: {
-        "x-admin-api-key": adminApiKey,
-      },
     });
 
     if (!res.ok) {

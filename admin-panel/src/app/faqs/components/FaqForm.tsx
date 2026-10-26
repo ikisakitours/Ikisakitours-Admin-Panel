@@ -1,5 +1,6 @@
 'use client';
 
+import { faqService } from '@/services/faq.service';
 import { useState } from 'react';
 
 export default function FaqForm({ onFaqCreated }: { onFaqCreated: () => void }) {
@@ -15,78 +16,99 @@ export default function FaqForm({ onFaqCreated }: { onFaqCreated: () => void }) 
     setError('');
 
     try {
-      const adminApiKey = localStorage.getItem('adminApiKey') || ''; // Or your API key storage method
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/faqs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-api-key': adminApiKey,
-        },
-        body: JSON.stringify({ category, question, answer }),
-      });
-
-      if (!res.ok) throw new Error('Failed to create FAQ');
+      await faqService.createFaq({ category, question, answer }, '');
 
       setCategory('');
       setQuestion('');
       setAnswer('');
-      onFaqCreated(); // Refresh the list
+      onFaqCreated();
     } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+      setError(err.message || 'Failed to create FAQ');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-[#1a1a1a] p-6 rounded-xl border border-neutral-800 shadow-lg mb-8">
-      <h2 className="text-xl font-semibold text-white mb-4">Add New FAQ</h2>
-      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">Category *</label>
-          <input
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="e.g. General, Booking, Tours"
-            required
-            className="w-full bg-[#111] border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#d4af37]"
-          />
+    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-8 font-sans">
+      <form onSubmit={handleSubmit}>
+        {/* Header Section */}
+        <div className="flex justify-between items-start mb-6 pb-6 border-b border-slate-100">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 font-mono tracking-tight">
+              Add New FAQ
+            </h2>
+            <p className="text-slate-500 text-sm font-mono mt-1">
+              Configure FAQ category, question, and detailed answer.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-mono font-medium text-sm px-6 py-3 rounded-xl transition-all shadow-sm hover:shadow flex items-center gap-2 disabled:opacity-50 shrink-0"
+          >
+            {loading ? 'Publishing...' : 'Publish FAQ'}
+          </button>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">Question *</label>
-          <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Type the question here..."
-            required
-            className="w-full bg-[#111] border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#d4af37]"
-          />
-        </div>
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 font-mono text-sm">
+            {error}
+          </div>
+        )}
 
-        <div>
-          <label className="block text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">Answer *</label>
-          <textarea
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            placeholder="Type the detailed answer here..."
-            rows={4}
-            required
-            className="w-full bg-[#111] border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#d4af37]"
-          />
-        </div>
+        {/* Form Body */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 text-indigo-600 font-mono font-semibold text-sm">
+            <span>🏷️</span>
+            <span>FAQ Details</span>
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-[#d4af37] text-black font-semibold px-6 py-2.5 rounded-lg hover:bg-[#c5a028] transition duration-200 disabled:opacity-50"
-        >
-          {loading ? 'Publishing...' : 'Publish FAQ'}
-        </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-mono font-semibold text-slate-600 uppercase tracking-wider mb-2">
+                Category *
+              </label>
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="e.g. General, Booking, Tours"
+                required
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono font-semibold text-slate-600 uppercase tracking-wider mb-2">
+                Question *
+              </label>
+              <input
+                type="text"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="e.g. What is the cancellation policy?"
+                required
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-mono font-semibold text-slate-600 uppercase tracking-wider mb-2">
+              Answer *
+            </label>
+            <textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              placeholder="Provide a thorough, helpful answer..."
+              rows={4}
+              required
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+            />
+          </div>
+        </div>
       </form>
     </div>
   );

@@ -1,5 +1,8 @@
 'use client';
 
+import { faqService } from "@/services/faq.service";
+
+
 export interface FaqItem {
   id: string;
   category: string;
@@ -12,15 +15,7 @@ export default function FaqList({ faqs, onDeleted }: { faqs: FaqItem[]; onDelete
     if (!confirm('Are you sure you want to delete this FAQ?')) return;
 
     try {
-      const adminApiKey = localStorage.getItem('adminApiKey') || '';
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/faqs/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'x-admin-api-key': adminApiKey,
-        },
-      });
-
-      if (!res.ok) throw new Error('Failed to delete FAQ');
+      await faqService.deleteFaq(id);
       onDeleted();
     } catch (err) {
       alert('Error deleting FAQ');
@@ -28,29 +23,48 @@ export default function FaqList({ faqs, onDeleted }: { faqs: FaqItem[]; onDelete
   };
 
   if (faqs.length === 0) {
-    return <p className="text-neutral-400 text-sm">No FAQs found in the database.</p>;
+    return (
+      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm text-center">
+        <p className="text-slate-400 font-mono text-sm">No FAQs found in the database.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-white mb-4">Existing FAQs</h2>
-      {faqs.map((faq) => (
-        <div key={faq.id} className="bg-[#1a1a1a] p-5 rounded-xl border border-neutral-800 flex justify-between items-start gap-4">
-          <div className="space-y-2">
-            <span className="inline-block bg-[#2a2a2a] text-[#d4af37] text-xs px-2.5 py-1 rounded-md font-medium">
-              {faq.category}
-            </span>
-            <h3 className="text-white font-medium text-lg">{faq.question}</h3>
-            <p className="text-neutral-400 text-sm whitespace-pre-wrap">{faq.answer}</p>
-          </div>
-          <button
-            onClick={() => handleDelete(faq.id)}
-            className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-sm transition duration-200 shrink-0"
+    <div className="space-y-6 font-sans">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-slate-900 font-mono tracking-tight">
+          Existing FAQs ({faqs.length})
+        </h2>
+      </div>
+
+      <div className="space-y-4">
+        {faqs.map((faq) => (
+          <div
+            key={faq.id}
+            className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex justify-between items-start gap-6 transition hover:shadow-md"
           >
-            Delete
-          </button>
-        </div>
-      ))}
+            <div className="space-y-3 flex-1">
+              <span className="inline-block bg-indigo-50 text-indigo-600 text-xs px-3 py-1 rounded-lg font-mono font-medium">
+                {faq.category}
+              </span>
+              <h3 className="text-slate-900 font-bold text-lg font-mono tracking-tight">
+                {faq.question}
+              </h3>
+              <p className="text-slate-600 text-sm whitespace-pre-wrap font-mono leading-relaxed">
+                {faq.answer}
+              </p>
+            </div>
+
+            <button
+              onClick={() => handleDelete(faq.id)}
+              className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-xs font-mono font-medium transition duration-200 shrink-0"
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
