@@ -65,6 +65,7 @@ export default function Sidebar() {
           Contact
         </Link>
 
+        {/*    
         <Link
           href="/adminlogs"
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/adminlogs" ? activeStyles : inactiveStyles
@@ -72,6 +73,7 @@ export default function Sidebar() {
         >
           Audit logs
         </Link>
+        */}
 
         <Link
           href="/imageupload"
