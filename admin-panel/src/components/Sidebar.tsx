@@ -120,7 +120,7 @@ export default function Sidebar() {
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/faqs" ? activeStyles : inactiveStyles
             }`}
         >
-          New Updates
+          FAQS
         </Link>
 
       </nav>
