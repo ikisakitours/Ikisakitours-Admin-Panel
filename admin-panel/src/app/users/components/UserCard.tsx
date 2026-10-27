@@ -1,19 +1,54 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Globe, Eye, EyeOff, Hash, CheckCircle2, Crown, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Mail, Globe, Eye, EyeOff, Hash, CheckCircle2, Crown, ShieldAlert, ShieldCheck, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { User } from "@/services/users.service";
+import { User, UsersService } from "@/services/users.service";
 
 interface UserCardProps {
   user: User;
+  onUserUpdate?: (updatedUser: User) => void;
 }
 
-export default function UserCard({ user }: UserCardProps) {
+export default function UserCard({ user: initialUser, onUserUpdate }: UserCardProps) {
   const [showId, setShowId] = useState(false);
+  const [user, setUser] = useState<User>(initialUser);
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
   const fullName = `${user.firstname} ${user.lastname}`;
   const initial = user.firstname ? user.firstname.charAt(0).toUpperCase() : "U";
+
+  // Toggle Active/Blocked status
+  const handleToggleAccess = async () => {
+    try {
+      setLoadingAction("access");
+      const updated = await UsersService.updateStatus(user.id, {
+        hasAccess: !user.hasAccess,
+      });
+      setUser(updated);
+      if (onUserUpdate) onUserUpdate(updated);
+    } catch (err) {
+      alert("Failed to update access status");
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  // Toggle VIP status
+  const handleToggleVip = async () => {
+    try {
+      setLoadingAction("vip");
+      const updated = await UsersService.updateStatus(user.id, {
+        isVip: !user.isVip,
+      });
+      setUser(updated);
+      if (onUserUpdate) onUserUpdate(updated);
+    } catch (err) {
+      alert("Failed to update VIP status");
+    } finally {
+      setLoadingAction(null);
+    }
+  };
 
   return (
     <div className="w-full bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
@@ -56,25 +91,45 @@ export default function UserCard({ user }: UserCardProps) {
             </div>
           </div>
 
-          {/* Badges Stack */}
+          {/* Badges Stack (Interactive Toggles) */}
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
-            {/* Access Status Badge */}
-            {user.hasAccess ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <ShieldCheck className="w-3 h-3" /> Active
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                <ShieldAlert className="w-3 h-3" /> Blocked
-              </span>
-            )}
+            {/* Access Status Toggle Button */}
+            <button
+              type="button"
+              disabled={loadingAction !== null}
+              onClick={handleToggleAccess}
+              className="group cursor-pointer focus:outline-none"
+              title="Click to toggle access status"
+            >
+              {user.hasAccess ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 group-hover:bg-emerald-100 transition-colors">
+                  {loadingAction === "access" ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldCheck className="w-3 h-3" />} Active
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 group-hover:bg-rose-100 transition-colors">
+                  {loadingAction === "access" ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldAlert className="w-3 h-3" />} Blocked
+                </span>
+              )}
+            </button>
 
-            {/* VIP Label Badge */}
-            {user.isVip && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                VIP
-              </span>
-            )}
+            {/* VIP Status Toggle Button */}
+            <button
+              type="button"
+              disabled={loadingAction !== null}
+              onClick={handleToggleVip}
+              className="group cursor-pointer focus:outline-none"
+              title="Click to toggle VIP status"
+            >
+              {user.isVip ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 group-hover:bg-amber-100 transition-colors">
+                  {loadingAction === "vip" && <Loader2 className="w-3 h-3 animate-spin" />} VIP
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200 group-hover:bg-slate-200 transition-colors">
+                  {loadingAction === "vip" && <Loader2 className="w-3 h-3 animate-spin" />} Standard
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
