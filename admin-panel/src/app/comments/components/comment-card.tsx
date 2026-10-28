@@ -2,17 +2,20 @@
 
 import { useState } from "react";
 import { CommentsService, Comment } from "@/services/comments.service";
+import { PackageReviewsService, PackageReview } from "@/services/package-reviews.service";
 
 export interface CommentCardProps {
   id: string;
-  commentType: "website" | "post"; 
-  tourTitle?: string;              
+  commentType: "website" | "package-review"; 
+  tourTitle?: string;                             
   userName: string;
   userAvatar?: string | null;
   commentText: string;
   initialIsVisible: boolean;
-  adminReply?: string;
-  onReplyUpdated?: (updatedComment: Comment) => void;
+  adminReply?: string | null;
+  rating?: number | null;
+  imageUrls?: string[];
+  onReplyUpdated?: (updatedItem: any) => void;
 }
 
 export default function CommentCard({
@@ -24,6 +27,8 @@ export default function CommentCard({
   commentText,
   initialIsVisible,
   adminReply,
+  rating,
+  imageUrls = [],
   onReplyUpdated,
 }: CommentCardProps) {
   const [isVisible, setIsVisible] = useState(initialIsVisible);
@@ -32,30 +37,29 @@ export default function CommentCard({
   const [replyText, setReplyText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [currentAdminReply, setCurrentAdminReply] = useState(adminReply);
 
   const isWebsiteComment = commentType === "website";
 
   // Get first letter of username for avatar fallback
   const userInitial = userName ? userName.trim().charAt(0).toUpperCase() : "U";
 
-  // Handler for toggle visibility with API sync
+  // Handler for toggle visibility with API sync (Website comments only)
   const handleToggleVisibility = async () => {
-    const newVisibility = !isVisible;
-    
-    // Optimistic UI update
-    setIsVisible(newVisibility);
-
-    try {
-      setIsUpdatingVisibility(true);
-      await CommentsService.toggleVisibility(id, {
-        isPubliclyVisible: newVisibility,
-      });
-    } catch (error: any) {
-      // Revert back on failure
-      setIsVisible(!newVisibility);
-      alert(error.message || "Failed to update visibility in database.");
-    } finally {
-      setIsUpdatingVisibility(false);
+    if (isWebsiteComment) {
+      const newVisibility = !isVisible;
+      setIsVisible(newVisibility);
+      try {
+        setIsUpdatingVisibility(true);
+        await CommentsService.toggleVisibility(id, {
+          isPubliclyVisible: newVisibility,
+        });
+      } catch (error: any) {
+        setIsVisible(!newVisibility);
+        alert(error.message || "Failed to update visibility in database.");
+      } finally {
+        setIsUpdatingVisibility(false);
+      }
     }
   };
 
@@ -66,12 +70,21 @@ export default function CommentCard({
 
     try {
       setSubmitting(true);
-      const updatedComment = await CommentsService.reply(id, {
-        adminReply: replyText,
-      });
+      let updatedItem;
 
+      if (commentType === "package-review") {
+        updatedItem = await PackageReviewsService.reply(id, {
+          adminReply: replyText,
+        });
+      } else {
+        updatedItem = await CommentsService.reply(id, {
+          adminReply: replyText,
+        });
+      }
+
+      setCurrentAdminReply(replyText);
       if (onReplyUpdated) {
-        onReplyUpdated(updatedComment);
+        onReplyUpdated(updatedItem);
       }
 
       setReplyText("");
@@ -101,30 +114,32 @@ export default function CommentCard({
             </span>
           ) : (
             <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100 flex items-center gap-1.5">
-              <span>📌</span> Tour: {tourTitle || "Specific Post"}
+              <span>📦</span> Package Review: {tourTitle || "Tour Package"}
             </span>
           )}
         </div>
 
-        {/* Visibility Toggle Controls */}
-        <div className="flex items-center gap-3">
-          <span className={`text-xs font-medium transition-colors ${isVisible ? "text-slate-600" : "text-slate-400"}`}>
-            {isVisible ? "Publicly Visible" : "Hidden on Website"}
-          </span>
-          <button
-            onClick={handleToggleVisibility}
-            disabled={isUpdatingVisibility}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              isVisible ? "bg-emerald-500" : "bg-slate-200"
-            } ${isUpdatingVisibility ? "opacity-50 cursor-wait" : ""}`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                isVisible ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
-        </div>
+        {/* Visibility Toggle Controls (Active for website comments) */}
+        {isWebsiteComment && (
+          <div className="flex items-center gap-3">
+            <span className={`text-xs font-medium transition-colors ${isVisible ? "text-slate-600" : "text-slate-400"}`}>
+              {isVisible ? "Publicly Visible" : "Hidden on Website"}
+            </span>
+            <button
+              onClick={handleToggleVisibility}
+              disabled={isUpdatingVisibility}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                isVisible ? "bg-emerald-500" : "bg-slate-200"
+              } ${isUpdatingVisibility ? "opacity-50 cursor-wait" : ""}`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  isVisible ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Middle Section: User Metadata Profile & The Comment Content */}
@@ -145,30 +160,56 @@ export default function CommentCard({
         )}
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-slate-800 mb-0.5">{userName}</h3>
-          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-800 mb-0.5">{userName}</h3>
+            
+            {/* Star Rating Display for Package Reviews */}
+            {rating !== null && rating !== undefined && (
+              <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                <span className="text-amber-500 text-xs font-bold">★</span>
+                <span className="text-xs font-bold text-amber-700">{rating} / 5</span>
+              </div>
+            )}
+          </div>
+
+          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap mt-1">
             {commentText}
           </p>
+
+          {/* Multi-Image Previews (Up to 5 images) */}
+          {imageUrls && imageUrls.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {imageUrls.map((url, idx) => (
+                <a key={idx} href={url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={url}
+                    alt={`Review attachment ${idx + 1}`}
+                    className="w-16 h-16 object-cover rounded-lg border border-slate-200 hover:opacity-90 transition-opacity"
+                  />
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Existing Admin Reply View (If Present) */}
-      {adminReply && (
+      {currentAdminReply && (
         <div className="mt-3 mb-4 pl-3 border-l-2 border-emerald-500 bg-emerald-50/40 p-3 rounded-r-xl">
           <p className="text-xs font-bold text-emerald-800 mb-1">Admin Response:</p>
-          <p className="text-xs text-slate-700 leading-relaxed">{adminReply}</p>
+          <p className="text-xs text-slate-700 leading-relaxed">{currentAdminReply}</p>
         </div>
       )}
 
       {/* Bottom Section: Interactive Action Toolbar */}
-      {!adminReply && (
+      {!currentAdminReply && (
         <div className="flex items-center justify-end pt-2">
           {!isReplying && (
             <button
               type="button"
               disabled={isWebsiteComment}
               onClick={() => setIsReplying(true)}
-              title={isWebsiteComment ? "Replies are disabled for general website feedback" : "Reply to this comment"}
+              title={isWebsiteComment ? "Replies are disabled for general website feedback" : "Reply to this review"}
               className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-colors border ${
                 isWebsiteComment
                   ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
@@ -178,21 +219,21 @@ export default function CommentCard({
               <svg className={`w-4 h-4 ${isWebsiteComment ? "text-slate-400" : "text-slate-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
               </svg>
-              {isWebsiteComment ? "Reply Disabled (Website Feedback)" : "Reply to Comment"}
+              {isWebsiteComment ? "Reply Disabled (Website Feedback)" : "Reply to Review"}
             </button>
           )}
         </div>
       )}
 
       {/* Expandable Form: Input Section to Post Reply Responses */}
-      {isReplying && !isWebsiteComment && !adminReply && (
+      {isReplying && !isWebsiteComment && !currentAdminReply && (
         <form onSubmit={handleSendReply} className="mt-4 pt-4 border-t border-slate-100 transition-all">
           <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Admin Response</label>
           <textarea
             rows={3}
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Type your official response to this client query..."
+            placeholder="Type your official response to this client package review..."
             className="w-full text-sm text-slate-800 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
           />
           <div className="flex items-center justify-end gap-2 mt-2">
