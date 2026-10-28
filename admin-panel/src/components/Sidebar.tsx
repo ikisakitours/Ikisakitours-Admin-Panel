@@ -38,7 +38,7 @@ export default function Sidebar() {
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/tours" ? activeStyles : inactiveStyles
             }`}
         >
-          Tours
+          Package Bookings
         </Link>
 
         <Link
@@ -73,7 +73,7 @@ export default function Sidebar() {
         >
           Audit logs
         </Link>
-        */}
+        
 
         <Link
           href="/imageupload"
@@ -82,6 +82,7 @@ export default function Sidebar() {
         >
           Image Uploads
         </Link>
+        */}
 
         <Link
           href="/addpackage"
