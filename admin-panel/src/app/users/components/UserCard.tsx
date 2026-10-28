@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Globe, Eye, EyeOff, Hash, CheckCircle2, Crown, ShieldAlert, ShieldCheck, Loader2 } from "lucide-react";
+import { Mail, Globe, Eye, EyeOff, Hash, CheckCircle2, ShieldAlert, ShieldCheck, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { User, UsersService } from "@/services/users.service";
 
@@ -50,6 +50,22 @@ export default function UserCard({ user: initialUser, onUserUpdate }: UserCardPr
     }
   };
 
+  // Toggle Verified status
+  const handleToggleVerified = async () => {
+    try {
+      setLoadingAction("verified");
+      const updated = await UsersService.updateStatus(user.id, {
+        isVerified: !user.isVerified,
+      });
+      setUser(updated);
+      if (onUserUpdate) onUserUpdate(updated);
+    } catch (err) {
+      alert("Failed to update verification status");
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
       <div>
@@ -73,7 +89,7 @@ export default function UserCard({ user: initialUser, onUserUpdate }: UserCardPr
               {/* VIP Indicator Badge */}
               {user.isVip && (
                 <span className="absolute -top-1 -right-1 bg-amber-500 text-white p-0.5 rounded-full border border-white" title="VIP Member">
-                  <Crown className="w-2.5 h-2.5 fill-current" />
+                  <span className="w-2.5 h-2.5 block bg-amber-500 rounded-full" />
                 </span>
               )}
             </div>
@@ -127,6 +143,25 @@ export default function UserCard({ user: initialUser, onUserUpdate }: UserCardPr
               ) : (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200 group-hover:bg-slate-200 transition-colors">
                   {loadingAction === "vip" && <Loader2 className="w-3 h-3 animate-spin" />} Standard
+                </span>
+              )}
+            </button>
+
+            {/* Verified Status Toggle Button */}
+            <button
+              type="button"
+              disabled={loadingAction !== null}
+              onClick={handleToggleVerified}
+              className="group cursor-pointer focus:outline-none"
+              title="Click to toggle verified status"
+            >
+              {user.isVerified ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 group-hover:bg-blue-100 transition-colors">
+                  {loadingAction === "verified" ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />} Verified
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200 group-hover:bg-slate-200 transition-colors">
+                  {loadingAction === "verified" && <Loader2 className="w-3 h-3 animate-spin" />} Unverified
                 </span>
               )}
             </button>
