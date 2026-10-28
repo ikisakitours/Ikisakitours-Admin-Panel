@@ -17,6 +17,7 @@ export interface User {
 export interface UpdateUserStatusPayload {
   isVip?: boolean;
   hasAccess?: boolean;
+  isVerified?: boolean;
 }
 
 export const UsersService = {
