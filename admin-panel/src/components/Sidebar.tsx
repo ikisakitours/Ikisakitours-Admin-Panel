@@ -54,7 +54,7 @@ export default function Sidebar() {
           className={`flex items-center px-4 py-3 rounded-xl border transition-all duration-200 ${pathname === "/comments" ? activeStyles : inactiveStyles
             }`}
         >
-          Comments
+          Comments and Reviews
         </Link>
 
         <Link

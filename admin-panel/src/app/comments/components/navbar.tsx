@@ -19,12 +19,12 @@ export default function Navbar({
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
   const handleFilterSelect = (value: string) => {
-    onFilterChange(value); // Notify parent page
+    onFilterChange(value);
     setIsFilterOpen(false);
   };
 
   const handleCategorySelect = (value: string) => {
-    onCategoryChange(value); // Notify parent page
+    onCategoryChange(value);
     setIsCategoryOpen(false);
   };
 
@@ -74,10 +74,10 @@ export default function Navbar({
                 🌐 About Website
               </button>
               <button
-                onClick={() => handleCategorySelect("Specific Post")}
+                onClick={() => handleCategorySelect("Package Review")}
                 className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
               >
-                📌 Specific Post
+                📦 Package Review
               </button>
             </div>
           )}
