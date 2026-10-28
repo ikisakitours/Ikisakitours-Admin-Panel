@@ -14,7 +14,7 @@ import {
   RefreshCw, 
   HelpCircle,
   FileCode,
-  Image
+  Image as ImageIcon
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -22,7 +22,6 @@ export default function Sidebar() {
   const activeStyles = "bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-500/20";
   const inactiveStyles = "text-slate-400 hover:text-slate-100 hover:bg-white/5 hover:border-white/5 border-transparent";
 
-  // List configuration including Audit Logs & Image Uploads
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/users", label: "Registed Users", icon: Users },
@@ -31,7 +30,7 @@ export default function Sidebar() {
     { href: "/comments", label: "Comments & Reviews", icon: MessageSquareText },
     { href: "/contact", label: "Contact", icon: Mail },
     { href: "/adminlogs", label: "Audit Logs", icon: FileCode },
-    { href: "/imageupload", label: "Image Uploads", icon: Image },
+    { href: "/imageupload", label: "Image Uploads", icon: ImageIcon },
     { href: "/addpackage", label: "Add New Package", icon: PlusCircle },
     { href: "/blogs", label: "Blogs", icon: FileText },
     { href: "/destinations", label: "Destinations", icon: MapPin },
@@ -40,7 +39,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-slate-950/80 backdrop-blur-md text-slate-300 flex flex-col border-r border-white/10 sticky top-0 h-screen">
+    <aside className="w-64 bg-slate-950/85 backdrop-blur-md text-slate-300 flex flex-col border-r border-white/10 sticky top-0 h-screen select-none">
 
       {/* Header Brand */}
       <div className="h-16 flex items-center justify-center px-6 border-b border-white/5 flex-shrink-0">
@@ -49,8 +48,8 @@ export default function Sidebar() {
         </span>
       </div>
 
-      {/* Scrollable Navigation Area */}
-      <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto custom-scrollbar">
+      {/* Scrollable Navigation Area with Hidden Scrollbars */}
+      <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
