@@ -16,10 +16,22 @@ export interface DestinationPayload {
   };
 }
 
+export interface DestinationPreview {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  heroImage: string | null;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+}
+
 class DestinationService {
   private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-  // Step 1: Upload raw image files to Cloudflare R2 batch endpoint (same pattern as blogService)
+  // Step 1: Upload raw image files to Cloudflare R2 batch endpoint
   async uploadImages(files: File[], folder: string = "destinations"): Promise<string[]> {
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
@@ -63,6 +75,24 @@ class DestinationService {
     if (!res.ok) {
       const error = await res.json();
       throw new Error(error.message || "Failed to fetch destination previews");
+    }
+
+    return res.json();
+  }
+
+  // Fetch package preview snapshot data for a list of specific destination IDs
+  async findPackagePreviewsByIds(ids: string[]): Promise<DestinationPreview[]> {
+    const res = await fetch(`${this.API_URL}/destinations/package/batch`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch destination package previews");
     }
 
     return res.json();
