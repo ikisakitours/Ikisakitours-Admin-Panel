@@ -30,17 +30,15 @@ export default function TourServiceCard({ item, onStatusChange }: TourServiceCar
         }
     };
 
-    // Dynamic background and text colors based on status type
+    // Dynamic background and text colors matched strictly with backend ServiceStatus enum
     const getStatusStyles = (currentStatus: string) => {
         switch (currentStatus?.toLowerCase()) {
             case 'approved':
             case 'active':
-            case 'confirmed':
                 return 'bg-emerald-50 text-emerald-700 border-emerald-200';
             case 'rejected':
                 return 'bg-rose-50 text-rose-700 border-rose-200';
-            case 'completed':
-                return 'bg-blue-50 text-blue-700 border-blue-200';
+            case 'pending':
             default:
                 return 'bg-amber-50 text-amber-700 border-amber-200';
         }
@@ -112,7 +110,7 @@ export default function TourServiceCard({ item, onStatusChange }: TourServiceCar
                 )}
             </div>
 
-            {/* Status Footer with Interactive Selector */}
+            {/* Status Footer with Backend-Synced Options */}
             <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
                 <span className="text-slate-500 font-medium">Update Status:</span>
                 <div className="flex items-center gap-2">
@@ -125,9 +123,8 @@ export default function TourServiceCard({ item, onStatusChange }: TourServiceCar
                     >
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
-                        <option value="confirmed">Confirmed</option>
+                        <option value="active">Active</option>
                         <option value="rejected">Rejected</option>
-                        <option value="completed">Completed</option>
                     </select>
                 </div>
             </div>
