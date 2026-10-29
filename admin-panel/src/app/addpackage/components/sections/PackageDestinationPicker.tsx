@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Building, Plus, X } from "lucide-react";
 import { destinationService } from "@/services/destination.service";
-import { DestinationSnapshot } from "../types/package.types";
+import { DestinationSnapshot } from "../../types/package.types";
 
 interface Props {
   selectedDestinations: DestinationSnapshot[];
