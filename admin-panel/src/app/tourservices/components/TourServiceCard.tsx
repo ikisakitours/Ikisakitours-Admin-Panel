@@ -1,14 +1,53 @@
 "use client";
 
-import { Calendar, Clock, MapPin, User, Phone, Mail } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Clock, MapPin, User, Phone, Mail, Loader2 } from "lucide-react";
+import { tourServiceAdmin } from "@/services/tourservice.service";
 
 interface TourServiceCardProps {
     item: any;
+    onStatusChange?: (updatedItem: any) => void;
 }
 
-export default function TourServiceCard({ item }: TourServiceCardProps) {
+export default function TourServiceCard({ item, onStatusChange }: TourServiceCardProps) {
+    const [status, setStatus] = useState(item.status || "pending");
+    const [loading, setLoading] = useState(false);
+
+    // Handle instant status change from the card
+    const handleStatusUpdate = async (newStatus: string) => {
+        try {
+            setLoading(true);
+            const updated = await tourServiceAdmin.updateServiceStatus(item.id, newStatus);
+            setStatus(newStatus);
+            if (onStatusChange) {
+                onStatusChange(updated);
+            }
+        } catch (error) {
+            console.error("Failed to update status:", error);
+            alert("Failed to update status. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Dynamic background and text colors based on status type
+    const getStatusStyles = (currentStatus: string) => {
+        switch (currentStatus?.toLowerCase()) {
+            case 'approved':
+            case 'active':
+            case 'confirmed':
+                return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            case 'rejected':
+                return 'bg-rose-50 text-rose-700 border-rose-200';
+            case 'completed':
+                return 'bg-blue-50 text-blue-700 border-blue-200';
+            default:
+                return 'bg-amber-50 text-amber-700 border-amber-200';
+        }
+    };
+
     return (
-        <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-sm flex flex-col justify-between">
+        <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
             <div className="space-y-3">
                 {/* Top Badge & Vehicle */}
                 <div className="flex justify-between items-start">
@@ -73,10 +112,24 @@ export default function TourServiceCard({ item }: TourServiceCardProps) {
                 )}
             </div>
 
-            {/* Status Footer */}
+            {/* Status Footer with Interactive Selector */}
             <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
-                <span className="text-slate-400 font-medium">Status: <span className="text-amber-600 capitalize font-semibold">{item.status}</span></span>
-                <button className="text-indigo-600 font-semibold hover:text-indigo-800">View Details</button>
+                <span className="text-slate-500 font-medium">Update Status:</span>
+                <div className="flex items-center gap-2">
+                    {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />}
+                    <select
+                        value={status}
+                        disabled={loading}
+                        onChange={(e) => handleStatusUpdate(e.target.value)}
+                        className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border capitalize cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${getStatusStyles(status)}`}
+                    >
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
             </div>
         </div>
     );
