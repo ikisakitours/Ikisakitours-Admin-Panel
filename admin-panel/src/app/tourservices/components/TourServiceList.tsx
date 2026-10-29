@@ -7,9 +7,10 @@ import TourServiceCard from "./TourServiceCard";
 interface TourServiceListProps {
     activeTab: "custom" | "chauffeur" | "transfer";
     refreshKey: number;
+    selectedStatus: string;
 }
 
-export default function TourServiceList({ activeTab, refreshKey }: TourServiceListProps) {
+export default function TourServiceList({ activeTab, refreshKey, selectedStatus }: TourServiceListProps) {
     const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -33,6 +34,12 @@ export default function TourServiceList({ activeTab, refreshKey }: TourServiceLi
         }
     };
 
+    // Filter requests based on selected status
+    const filteredRequests = requests.filter((item) => {
+        if (selectedStatus === "all") return true;
+        return item.status?.toLowerCase() === selectedStatus.toLowerCase();
+    });
+
     if (loading) {
         return <div className="text-center py-12 text-xs text-slate-400">Loading requests...</div>;
     }
@@ -45,9 +52,17 @@ export default function TourServiceList({ activeTab, refreshKey }: TourServiceLi
         );
     }
 
+    if (filteredRequests.length === 0) {
+        return (
+            <div className="text-center py-12 bg-white rounded-xl border border-slate-200 text-xs text-slate-400 shadow-sm">
+                No requests found matching the status &quot;{selectedStatus}&quot;.
+            </div>
+        );
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {requests.map((item) => (
+            {filteredRequests.map((item) => (
                 <TourServiceCard key={item.id} item={item} />
             ))}
         </div>
