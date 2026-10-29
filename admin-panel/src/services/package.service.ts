@@ -2,6 +2,12 @@ import { PackageFormData } from "@/app/addpackage/types/package.types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+export interface PackageListItem {
+  id: string;
+  slug: string;
+  title: string;
+}
+
 export const packageService = {
   async createPackage(formData: PackageFormData, images: File[]) {
     const data = new FormData();
@@ -67,7 +73,7 @@ export const packageService = {
     return await response.json();
   },
 
-  async getAllPackages() {
+  async getAllPackages(): Promise<PackageListItem[]> {
     const response = await fetch(`${API_URL}/addpackages`);
     if (!response.ok) {
       throw new Error("Failed to fetch packages");
@@ -75,7 +81,7 @@ export const packageService = {
     return await response.json();
   },
 
-  async getPackageBySlug(slug: string) {
+  async getPackageBySlug(slug: string): Promise<PackageFormData> {
     const response = await fetch(`${API_URL}/addpackages/${slug}`);
     if (!response.ok) {
       throw new Error("Failed to fetch package details");
