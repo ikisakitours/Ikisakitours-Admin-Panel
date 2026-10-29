@@ -3,19 +3,15 @@ import { PackageFormData } from "@/app/addpackage/types/package.types";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export const packageService = {
-  /**
-   * Submits package form data alongside raw file images to NestJS
-   */
   async createPackage(formData: PackageFormData, images: File[]) {
     const data = new FormData();
 
-    // 1. Append basic primitive and new metadata fields
     data.append("type", formData.type);
-    data.append("category", formData.category);       // <-- Added
-    data.append("origin", formData.origin);           // <-- Added
-    data.append("duration", formData.duration);       // <-- Added
+    data.append("category", formData.category);
+    data.append("origin", formData.origin);
+    data.append("duration", formData.duration);
     if (formData.badge) {
-      data.append("badge", formData.badge);           // <-- Added (optional)
+      data.append("badge", formData.badge);
     }
     data.append("slug", formData.slug);
     data.append("titleEmphasis", formData.titleEmphasis);
@@ -27,7 +23,6 @@ export const packageService = {
     data.append("leadDescription", formData.leadDescription);
     data.append("description", formData.description);
 
-    // 2. Stringify complex objects/arrays for NestJS DTO parsing
     data.append(
       "activityDetails",
       JSON.stringify(formData.activityDetails.filter((a) => a.title.trim() !== ""))
@@ -42,7 +37,6 @@ export const packageService = {
         formData.itinerary.map((it) => ({ ...it, day: Number(it.day) }))
       )
     );
-    // Send the full destination snapshot objects selected from the database
     data.append(
       "destinations",
       JSON.stringify(formData.destinations.filter((d) => d.id))
@@ -56,12 +50,10 @@ export const packageService = {
       JSON.stringify(formData.excludes.filter((e) => e.trim() !== ""))
     );
 
-    // 3. Append binary image files under field name 'images' matching NestJS FilesInterceptor('images')
     images.forEach((file) => {
       data.append("images", file);
     });
 
-    // 4. Send request to backend
     const response = await fetch(`${API_URL}/addpackages`, {
       method: "POST",
       body: data,
@@ -70,6 +62,56 @@ export const packageService = {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to create package");
+    }
+
+    return await response.json();
+  },
+
+  async getAllPackages() {
+    const response = await fetch(`${API_URL}/addpackages`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch packages");
+    }
+    return await response.json();
+  },
+
+  async getPackageBySlug(slug: string) {
+    const response = await fetch(`${API_URL}/addpackages/${slug}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch package details");
+    }
+    return await response.json();
+  },
+
+  async updatePackageTextOnly(slug: string, formData: PackageFormData) {
+    const payload = {
+      ...formData,
+      price: Number(formData.price),
+      discount: Number(formData.discount || 0),
+    };
+
+    const response = await fetch(`${API_URL}/addpackages/${slug}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to update package");
+    }
+
+    return await response.json();
+  },
+
+  async deletePackage(slug: string) {
+    const response = await fetch(`${API_URL}/addpackages/${slug}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to delete package");
     }
 
     return await response.json();

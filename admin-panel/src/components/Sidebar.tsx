@@ -14,7 +14,8 @@ import {
   RefreshCw, 
   HelpCircle,
   FileCode,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ListOrdered
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -32,6 +33,7 @@ export default function Sidebar() {
     { href: "/adminlogs", label: "Audit Logs", icon: FileCode },
     { href: "/imageupload", label: "Image Uploads", icon: ImageIcon },
     { href: "/addpackage", label: "Add New Package", icon: PlusCircle },
+    { href: "/managepackages", label: "Manage Packages", icon: ListOrdered },
     { href: "/blogs", label: "Blogs", icon: FileText },
     { href: "/destinations", label: "Destinations", icon: MapPin },
     { href: "/newupdates", label: "Update Availability", icon: RefreshCw },
