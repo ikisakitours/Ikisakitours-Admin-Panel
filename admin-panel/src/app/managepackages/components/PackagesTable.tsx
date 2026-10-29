@@ -1,26 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { packageService } from "@/services/package.service";
-import { Edit2, Trash2, Tag, MapPin, Calendar, RefreshCw } from "lucide-react";
-
-interface PackageSummary {
-  id: string;
-  slug: string;
-  title: string;
-  type: string;
-  category: string;
-  origin: string;
-  duration: string;
-  price: number;
-}
+import { packageService, PackageListItem } from "@/services/package.service";
+import { Edit2, Trash2, RefreshCw } from "lucide-react";
 
 interface Props {
   onEdit: (slug: string) => void;
 }
 
 export function PackagesTable({ onEdit }: Props) {
-  const [packages, setPackages] = useState<PackageSummary[]>([]);
+  const [packages, setPackages] = useState<PackageListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
 
@@ -83,9 +72,6 @@ export function PackagesTable({ onEdit }: Props) {
             <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold uppercase tracking-wider">
               <tr>
                 <th className="py-3 px-4">Title & Slug</th>
-                <th className="py-3 px-4">Category</th>
-                <th className="py-3 px-4">Origin & Duration</th>
-                <th className="py-3 px-4">Price</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -98,20 +84,6 @@ export function PackagesTable({ onEdit }: Props) {
                       /{pkg.slug}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 font-medium rounded-md text-[11px]">
-                      <Tag className="w-3 h-3" /> {pkg.category || pkg.type}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-slate-500 space-y-1">
-                    <div className="flex items-center gap-1 text-[11px]">
-                      <MapPin className="w-3 h-3 text-slate-400" /> {pkg.origin || "N/A"}
-                    </div>
-                    <div className="flex items-center gap-1 text-[11px]">
-                      <Calendar className="w-3 h-3 text-slate-400" /> {pkg.duration || "N/A"}
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 font-bold text-slate-900">${pkg.price}</td>
                   <td className="py-3.5 px-4 text-right space-x-2">
                     <button
                       type="button"
