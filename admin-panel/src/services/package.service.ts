@@ -1,5 +1,4 @@
-import { PackageFormData } from "@/app/addpackage/components/PackageForm";
-
+import { PackageFormData } from "@/app/addpackage/types/package.types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -10,8 +9,14 @@ export const packageService = {
   async createPackage(formData: PackageFormData, images: File[]) {
     const data = new FormData();
 
-    // 1. Append basic primitive fields
+    // 1. Append basic primitive and new metadata fields
     data.append("type", formData.type);
+    data.append("category", formData.category);       // <-- Added
+    data.append("origin", formData.origin);           // <-- Added
+    data.append("duration", formData.duration);       // <-- Added
+    if (formData.badge) {
+      data.append("badge", formData.badge);           // <-- Added (optional)
+    }
     data.append("slug", formData.slug);
     data.append("titleEmphasis", formData.titleEmphasis);
     data.append("title", formData.title);
@@ -37,9 +42,10 @@ export const packageService = {
         formData.itinerary.map((it) => ({ ...it, day: Number(it.day) }))
       )
     );
+    // Send the full destination snapshot objects selected from the database
     data.append(
       "destinations",
-      JSON.stringify(formData.destinations.filter((d) => d.name.trim() !== ""))
+      JSON.stringify(formData.destinations.filter((d) => d.id))
     );
     data.append(
       "includes",
@@ -55,8 +61,7 @@ export const packageService = {
       data.append("images", file);
     });
 
-    // Note: Do not manually set Content-Type header when sending FormData!
-    // The browser automatically sets boundary headers.
+    // 4. Send request to backend
     const response = await fetch(`${API_URL}/addpackages`, {
       method: "POST",
       body: data,
