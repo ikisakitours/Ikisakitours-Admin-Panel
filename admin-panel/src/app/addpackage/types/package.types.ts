@@ -1,3 +1,7 @@
+export type PackageType = "oneday" | "multiday";
+
+export type PackageBadge = "new_arrival" | "discounted" | "popular" | "featured";
+
 export interface ActivityDetail {
   title: string;
   description: string;
@@ -23,11 +27,11 @@ export interface DestinationSnapshot {
 }
 
 export interface PackageFormData {
-  type: "oneday" | "multiday";
+  type: PackageType;
   category: string;
   origin: string;
   duration: string;
-  badge?: "new_arrival" | "discounted" | "popular" | "featured";
+  badge?: PackageBadge;
   slug: string;
   titleEmphasis: string;
   title: string;

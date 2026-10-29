@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { packageService } from "@/services/package.service";
-import { PackageFormData, ActivityDetail, ItineraryItem, DestinationSnapshot } from "../types/package.types";
-import { PackageDestinationPicker } from "./PackageDestinationPicker";
+import { PackageDestinationPicker } from "./sections/PackageDestinationPicker";
 import {
   Plus,
   Trash2,
@@ -15,7 +14,9 @@ import {
   Calendar,
   Layers,
   X,
+  Award,
 } from "lucide-react";
+import { ItineraryItem, PackageBadge, PackageFormData } from "../types/package.types";
 
 export default function PackageForm() {
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,7 @@ export default function PackageForm() {
     excludes: [""],
   });
 
+  // Handle local File Selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
@@ -54,6 +56,7 @@ export default function PackageForm() {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Auto-slug generator
   const handleTitleChange = (val: string) => {
     const slugified = val
       .toLowerCase()
@@ -65,6 +68,7 @@ export default function PackageForm() {
     setFormData((prev) => ({ ...prev, title: val, slug: slugified }));
   };
 
+  // Simple Array Handlers (Highlights, Includes, Excludes)
   const handleSimpleArrayChange = (
     field: "highlights" | "includes" | "excludes",
     index: number,
@@ -86,14 +90,64 @@ export default function PackageForm() {
     }));
   };
 
+  // Activity Handlers
+  const handleActivityChange = (index: number, key: "title" | "description", value: string) => {
+    const updated = [...formData.activityDetails];
+    updated[index][key] = value;
+    setFormData((prev) => ({ ...prev, activityDetails: updated }));
+  };
+
+  const addActivity = () => {
+    setFormData((prev) => ({
+      ...prev,
+      activityDetails: [...prev.activityDetails, { title: "", description: "" }],
+    }));
+  };
+
+  const removeActivity = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      activityDetails: prev.activityDetails.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Itinerary Handlers
+  const handleItineraryChange = (index: number, key: keyof ItineraryItem, value: any) => {
+    const updated = [...formData.itinerary];
+    updated[index] = { ...updated[index], [key]: value };
+    setFormData((prev) => ({ ...prev, itinerary: updated }));
+  };
+
+  const addItineraryDay = () => {
+    setFormData((prev) => ({
+      ...prev,
+      itinerary: [
+        ...prev.itinerary,
+        { day: prev.itinerary.length + 1, title: "", description: "", images: [] },
+      ],
+    }));
+  };
+
+  const removeItineraryDay = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      itinerary: prev.itinerary
+        .filter((_, i) => i !== index)
+        .map((item, idx) => ({ ...item, day: idx + 1 })),
+    }));
+  };
+
+  // Form Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (selectedFiles.length === 0) {
       alert("Please select at least one gallery image to upload.");
       return;
     }
 
     setLoading(true);
+
     try {
       const result = await packageService.createPackage(formData, selectedFiles);
       alert(`Success! Package created with ID: ${result.id}`);
@@ -122,10 +176,10 @@ export default function PackageForm() {
         </button>
       </div>
 
-      {/* Basic Overview & New Metadata Fields */}
+      {/* 1. Basic Overview & Metadata */}
       <div className="space-y-4">
         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-          <Tag className="w-4 h-4 text-indigo-500" /> Basic Overview
+          <Tag className="w-4 h-4 text-indigo-500" /> Basic Overview & Metadata
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -146,7 +200,7 @@ export default function PackageForm() {
               required
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              placeholder="e.g. Wildlife, Adventure"
+              placeholder="e.g. Wildlife, Adventure, Cultural"
               className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
             />
           </div>
@@ -168,9 +222,22 @@ export default function PackageForm() {
               required
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-              placeholder="e.g. 3 Days / 8 Hours"
+              placeholder="e.g. 4 Days / 8 Hours"
               className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
             />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Badge</label>
+            <select
+              value={formData.badge}
+              onChange={(e) => setFormData({ ...formData, badge: e.target.value as PackageBadge })}
+              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white"
+            >
+              <option value="new_arrival">New Arrival</option>
+              <option value="discounted">Discounted</option>
+              <option value="popular">Popular</option>
+              <option value="featured">Featured</option>
+            </select>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Title Emphasis</label>
@@ -217,7 +284,71 @@ export default function PackageForm() {
         </div>
       </div>
 
-      {/* Gallery Images */}
+      {/* 2. Lead Header Information */}
+      <div className="space-y-4 pt-4 border-t border-slate-100">
+        <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <Layers className="w-4 h-4 text-indigo-500" /> Lead Header Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Lead Title</label>
+            <input
+              type="text"
+              required
+              value={formData.leadTitle}
+              onChange={(e) => setFormData({ ...formData, leadTitle: e.target.value })}
+              placeholder="e.g. Discover Sri Lanka's Heritage"
+              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Lead Description</label>
+            <input
+              type="text"
+              required
+              value={formData.leadDescription}
+              onChange={(e) => setFormData({ ...formData, leadDescription: e.target.value })}
+              placeholder="Short catchy tagline explaining the tour..."
+              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Pricing */}
+      <div className="space-y-4 pt-4 border-t border-slate-100">
+        <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <DollarSign className="w-4 h-4 text-indigo-500" /> Pricing
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Base Price ($)</label>
+            <input
+              type="number"
+              min="0"
+              required
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              placeholder="e.g. 450"
+              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Discount (%)</label>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={formData.discount}
+              onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+              placeholder="0 to 100"
+              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Gallery Images */}
       <div className="space-y-4 pt-4 border-t border-slate-100">
         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
           <ImageIcon className="w-4 h-4 text-indigo-500" /> Gallery Images
@@ -230,24 +361,218 @@ export default function PackageForm() {
           className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white cursor-pointer"
         />
         {selectedFiles.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {selectedFiles.map((file, idx) => (
-              <div key={idx} className="flex items-center gap-2 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                <span className="truncate max-w-[150px]">{file.name}</span>
-                <button type="button" onClick={() => removeSelectedFile(idx)} className="text-slate-400 hover:text-red-500">
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
+          <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl space-y-2">
+            <p className="text-xs font-semibold text-indigo-900">Attached Images ({selectedFiles.length}):</p>
+            <div className="flex flex-wrap gap-2">
+              {selectedFiles.map((file, idx) => (
+                <div key={idx} className="flex items-center gap-2 px-2.5 py-1 bg-white border border-indigo-200 rounded-lg text-xs text-slate-700">
+                  <span className="truncate max-w-[150px]">{file.name}</span>
+                  <button type="button" onClick={() => removeSelectedFile(idx)} className="text-slate-400 hover:text-red-500 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Reusable Destination Picker Component */}
+      {/* 5. Destination Picker Component */}
       <PackageDestinationPicker
         selectedDestinations={formData.destinations}
         onChange={(destinations) => setFormData({ ...formData, destinations })}
       />
+
+      {/* 6. Activity Details */}
+      <div className="space-y-4 pt-4 border-t border-slate-100">
+        <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-indigo-500" /> Activity Details
+        </h3>
+        {formData.activityDetails.map((activity, idx) => (
+          <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-700">Activity #{idx + 1}</span>
+              {formData.activityDetails.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeActivity(idx)}
+                  className="text-slate-400 hover:text-red-500 text-xs flex items-center gap-1 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Remove
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                type="text"
+                placeholder="Activity Title"
+                value={activity.title}
+                onChange={(e) => handleActivityChange(idx, "title", e.target.value)}
+                className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
+              />
+              <input
+                type="text"
+                placeholder="Activity Description"
+                value={activity.description}
+                onChange={(e) => handleActivityChange(idx, "description", e.target.value)}
+                className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
+              />
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addActivity}
+          className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Activity
+        </button>
+      </div>
+
+      {/* 7. Itinerary */}
+      <div className="space-y-4 pt-4 border-t border-slate-100">
+        <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-indigo-500" /> Itinerary
+        </h3>
+        {formData.itinerary.map((item, idx) => (
+          <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-indigo-600">Day {item.day}</span>
+              {formData.itinerary.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeItineraryDay(idx)}
+                  className="text-slate-400 hover:text-red-500 text-xs flex items-center gap-1 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Remove Day
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Day Number</label>
+                <input
+                  type="number"
+                  value={item.day}
+                  onChange={(e) => handleItineraryChange(idx, "day", e.target.value)}
+                  className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
+                />
+              </div>
+              <div className="md:col-span-3">
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Day Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Arrival in Colombo & City Exploration"
+                  value={item.title}
+                  onChange={(e) => handleItineraryChange(idx, "title", e.target.value)}
+                  className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-500 mb-1">Day Description</label>
+              <textarea
+                rows={2}
+                placeholder="Day schedule details..."
+                value={item.description}
+                onChange={(e) => handleItineraryChange(idx, "description", e.target.value)}
+                className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none resize-y"
+              />
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addItineraryDay}
+          className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Itinerary Day
+        </button>
+      </div>
+
+      {/* 8. Highlights, Includes & Excludes */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
+        <div className="space-y-3">
+          <h4 className="text-xs font-bold text-slate-800">Highlights</h4>
+          {formData.highlights.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={item}
+                onChange={(e) => handleSimpleArrayChange("highlights", idx, e.target.value)}
+                placeholder={`Highlight #${idx + 1}`}
+                className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+              />
+              {formData.highlights.length > 1 && (
+                <button type="button" onClick={() => removeSimpleArrayItem("highlights", idx)} className="text-slate-400 hover:text-red-500">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={() => addSimpleArrayItem("highlights")} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+            <Plus className="w-3.5 h-3.5" /> Add
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="text-xs font-bold text-slate-800">Includes</h4>
+          {formData.includes.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={item}
+                onChange={(e) => handleSimpleArrayChange("includes", idx, e.target.value)}
+                placeholder={`Included Item #${idx + 1}`}
+                className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+              />
+              {formData.includes.length > 1 && (
+                <button type="button" onClick={() => removeSimpleArrayItem("includes", idx)} className="text-slate-400 hover:text-red-500">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={() => addSimpleArrayItem("includes")} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+            <Plus className="w-3.5 h-3.5" /> Add
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="text-xs font-bold text-slate-800">Excludes</h4>
+          {formData.excludes.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={item}
+                onChange={(e) => handleSimpleArrayChange("excludes", idx, e.target.value)}
+                placeholder={`Excluded Item #${idx + 1}`}
+                className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+              />
+              {formData.excludes.length > 1 && (
+                <button type="button" onClick={() => removeSimpleArrayItem("excludes", idx)} className="text-slate-400 hover:text-red-500">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={() => addSimpleArrayItem("excludes")} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+            <Plus className="w-3.5 h-3.5" /> Add
+          </button>
+        </div>
+      </div>
+
+      {/* 9. Detailed Description */}
+      <div className="space-y-2 pt-4 border-t border-slate-100">
+        <label className="block text-xs font-semibold text-slate-600">Detailed Description</label>
+        <textarea
+          rows={4}
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Detailed description for the package..."
+          className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none resize-y"
+        />
+      </div>
     </form>
   );
 }
