@@ -6,11 +6,12 @@ import TourServiceList from "./components/TourServiceList";
 
 export default function TourServicesPage() {
     const [activeTab, setActiveTab] = useState<"custom" | "chauffeur" | "transfer">("custom");
+    const [selectedStatus, setSelectedStatus] = useState("all");
     const [refreshKey, setRefreshKey] = useState(0);
 
     const handleTabChange = (tab: "custom" | "chauffeur" | "transfer") => {
         setActiveTab(tab);
-        // Optional: trigger a refresh or reset when switching tabs if needed
+        setSelectedStatus("all"); // Optional: reset status filter when switching tabs
         setRefreshKey((prev) => prev + 1);
     };
 
@@ -27,10 +28,19 @@ export default function TourServicesPage() {
             </div>
 
             {/* Tabbed Navbar Component */}
-            <TourServiceNavbar activeTab={activeTab} setActiveTab={handleTabChange} />
+            <TourServiceNavbar 
+                activeTab={activeTab} 
+                setActiveTab={handleTabChange} 
+                selectedStatus={selectedStatus}
+                setSelectedStatus={setSelectedStatus}
+            />
 
             {/* Live Requests List Component */}
-            <TourServiceList activeTab={activeTab} refreshKey={refreshKey} />
+            <TourServiceList 
+                activeTab={activeTab} 
+                refreshKey={refreshKey} 
+                selectedStatus={selectedStatus}
+            />
         </main>
     );
 }
