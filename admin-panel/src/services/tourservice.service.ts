@@ -23,6 +23,23 @@ class TourServiceAdminService {
     if (!res.ok) throw new Error("Failed to fetch transfer service requests");
     return res.json();
   }
+
+  // --- NEW: Update the status of any service request (custom, chauffeur, or transfer) ---
+  async updateServiceStatus(id: string, status: string) {
+    const res = await fetch(`${this.getBaseUrl()}/services/${id}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to update service request status");
+    }
+
+    return res.json();
+  }
 }
 
 export const tourServiceAdmin = new TourServiceAdminService();
