@@ -28,8 +28,15 @@ export function PackageDestinationPicker({ selectedDestinations, onChange }: Pro
       !selectedDestinations.some((selected) => selected.id === dest.id)
   );
 
-  const addDestination = (dest: DestinationSnapshot) => {
-    onChange([...selectedDestinations, dest]);
+  const addDestination = async (dest: DestinationSnapshot) => {
+    try {
+      // Fetch the full destination details including coordinates from the package batch endpoint
+      const [fullDest] = await destinationService.findPackagePreviewsByIds([dest.id]);
+      onChange([...selectedDestinations, fullDest || dest]);
+    } catch (err) {
+      console.error("Failed to fetch destination coordinates", err);
+      onChange([...selectedDestinations, dest]);
+    }
     setQuery("");
     setIsOpen(false);
   };
