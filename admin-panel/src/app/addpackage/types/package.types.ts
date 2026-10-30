@@ -22,14 +22,7 @@ export interface ItineraryItem {
 
 export interface DestinationSnapshot {
   id: string;
-  title: string;
   slug: string;
-  summary: string;
-  heroImage: string | null;
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
 }
 
 export interface PackageFormData {
