@@ -9,15 +9,25 @@ interface Props {
 }
 
 export function BasicOverviewSection({ formData, setFormData }: Props) {
-  const handleTitleChange = (val: string) => {
-    const slugified = val
+  // Helper to generate a slug from combined Title 1 and Title 2
+  const updateSlug = (title1: string, title2: string) => {
+    const combined = `${title1} ${title2}`;
+    return combined
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, "")
       .replace(/[\s_-]+/g, "-")
       .replace(/^-+|-+$/g, "");
+  };
 
-    setFormData((prev) => ({ ...prev, title: val, slug: slugified }));
+  const handleTitle1Change = (val: string) => {
+    const newSlug = updateSlug(val, formData.titleEmphasis);
+    setFormData((prev) => ({ ...prev, title: val, slug: newSlug }));
+  };
+
+  const handleTitle2Change = (val: string) => {
+    const newSlug = updateSlug(formData.title, val);
+    setFormData((prev) => ({ ...prev, titleEmphasis: val, slug: newSlug }));
   };
 
   return (
@@ -84,29 +94,29 @@ export function BasicOverviewSection({ formData, setFormData }: Props) {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">Title Emphasis</label>
-          <input
-            type="text"
-            required
-            value={formData.titleEmphasis}
-            onChange={(e) => setFormData({ ...formData, titleEmphasis: e.target.value })}
-            placeholder="e.g. Exclusive"
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">Package Title</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">Title 1 (Main Title)</label>
           <input
             type="text"
             required
             value={formData.title}
-            onChange={(e) => handleTitleChange(e.target.value)}
+            onChange={(e) => handleTitle1Change(e.target.value)}
             placeholder="e.g. Ancient Kingdom"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">URL Slug</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">Title 2 (Highlight)</label>
+          <input
+            type="text"
+            required
+            value={formData.titleEmphasis}
+            onChange={(e) => handleTitle2Change(e.target.value)}
+            placeholder="e.g. Exclusive"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">URL Slug (Auto: Title 1 + Title 2)</label>
           <input
             type="text"
             readOnly
