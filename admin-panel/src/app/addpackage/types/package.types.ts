@@ -16,8 +16,8 @@ export interface ItineraryItem {
   details: string[];
   scenicStops?: string[];
   activities?: string[];
-  meals: string;
-  accommodation: string;
+  meals: string[];
+  accommodation: string[];
 }
 
 export interface DestinationSnapshot {
