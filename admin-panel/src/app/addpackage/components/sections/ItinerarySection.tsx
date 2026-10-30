@@ -8,6 +8,15 @@ interface Props {
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
 }
 
+type DynamicArrayKeys =
+  | "locations"
+  | "route"
+  | "details"
+  | "scenicStops"
+  | "activities"
+  | "meals"
+  | "accommodation";
+
 export function ItinerarySection({ formData, setFormData }: Props) {
   const handleItineraryChange = (index: number, key: keyof ItineraryItem, value: any) => {
     const updated = [...formData.itinerary];
@@ -15,8 +24,13 @@ export function ItinerarySection({ formData, setFormData }: Props) {
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
-  // Helper for dynamic string arrays (locations, route, details, scenicStops, activities)
-  const handleArrayItemChange = (dayIndex: number, arrayKey: 'locations' | 'route' | 'details' | 'scenicStops' | 'activities', itemIndex: number, value: string) => {
+  // Helper for dynamic string arrays
+  const handleArrayItemChange = (
+    dayIndex: number,
+    arrayKey: DynamicArrayKeys,
+    itemIndex: number,
+    value: string
+  ) => {
     const updated = [...formData.itinerary];
     const currentArray = [...(updated[dayIndex][arrayKey] || [])];
     currentArray[itemIndex] = value;
@@ -24,7 +38,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
-  const addArrayItem = (dayIndex: number, arrayKey: 'locations' | 'route' | 'details' | 'scenicStops' | 'activities') => {
+  const addArrayItem = (dayIndex: number, arrayKey: DynamicArrayKeys) => {
     const updated = [...formData.itinerary];
     const currentArray = [...(updated[dayIndex][arrayKey] || [])];
     currentArray.push("");
@@ -32,7 +46,11 @@ export function ItinerarySection({ formData, setFormData }: Props) {
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
-  const removeArrayItem = (dayIndex: number, arrayKey: 'locations' | 'route' | 'details' | 'scenicStops' | 'activities', itemIndex: number) => {
+  const removeArrayItem = (
+    dayIndex: number,
+    arrayKey: DynamicArrayKeys,
+    itemIndex: number
+  ) => {
     const updated = [...formData.itinerary];
     const currentArray = [...(updated[dayIndex][arrayKey] || [])];
     currentArray.splice(itemIndex, 1);
@@ -54,8 +72,8 @@ export function ItinerarySection({ formData, setFormData }: Props) {
           details: [""],
           scenicStops: [""],
           activities: [""],
-          meals: "",
-          accommodation: "",
+          meals: [""],
+          accommodation: [""],
         },
       ],
     }));
@@ -124,33 +142,68 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             </div>
           </div>
 
-          {/* Row 2: Meals & Accommodation */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Meals</label>
-              <input
-                type="text"
-                placeholder="e.g. None (Refreshment water provided)"
-                value={item.meals || ""}
-                onChange={(e) => handleItineraryChange(idx, "meals", e.target.value)}
-                className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Accommodation</label>
-              <input
-                type="text"
-                placeholder="e.g. N/A (Day Tour) or Luxury Hotel"
-                value={item.accommodation || ""}
-                onChange={(e) => handleItineraryChange(idx, "accommodation", e.target.value)}
-                className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Dynamic Lists Section (Locations, Route, Details, Scenic Stops, Activities) */}
+          {/* Dynamic Lists Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            
+            {/* Meals */}
+            <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
+              <label className="block text-[11px] font-bold text-slate-700">Meals</label>
+              {(item.meals || []).map((m, mIdx) => (
+                <div key={mIdx} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="e.g. Breakfast at Hotel"
+                    value={m}
+                    onChange={(e) => handleArrayItemChange(idx, "meals", mIdx, e.target.value)}
+                    className="w-full text-xs border border-slate-200 bg-slate-50 rounded-lg p-2 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(idx, "meals", mIdx)}
+                    className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addArrayItem(idx, "meals")}
+                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer pt-1"
+              >
+                <Plus className="w-3 h-3" /> Add Meal Option
+              </button>
+            </div>
+
+            {/* Accommodation */}
+            <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
+              <label className="block text-[11px] font-bold text-slate-700">Accommodation</label>
+              {(item.accommodation || []).map((acc, aIdx) => (
+                <div key={aIdx} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="e.g. 4-Star Beach Resort"
+                    value={acc}
+                    onChange={(e) => handleArrayItemChange(idx, "accommodation", aIdx, e.target.value)}
+                    className="w-full text-xs border border-slate-200 bg-slate-50 rounded-lg p-2 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(idx, "accommodation", aIdx)}
+                    className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addArrayItem(idx, "accommodation")}
+                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer pt-1"
+              >
+                <Plus className="w-3 h-3" /> Add Accommodation
+              </button>
+            </div>
+
             {/* Locations */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Locations</label>
@@ -181,7 +234,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
               </button>
             </div>
 
-            {/* Route Stops */}
+            {/* Route Flow */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Route Flow</label>
               {(item.route || []).map((rt, rIdx) => (
@@ -211,7 +264,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
               </button>
             </div>
 
-            {/* Details Bullet Points */}
+            {/* Detailed Schedule Bullet Points */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80 md:col-span-2">
               <label className="block text-[11px] font-bold text-slate-700">Detailed Schedule Bullet Points</label>
               {(item.details || []).map((det, dIdx) => (
@@ -300,9 +353,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
                 <Plus className="w-3 h-3" /> Add Activity
               </button>
             </div>
-
           </div>
-
         </div>
       ))}
 
