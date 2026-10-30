@@ -10,8 +10,14 @@ export interface ActivityDetail {
 export interface ItineraryItem {
   day: number;
   title: string;
-  description: string;
-  images?: string[];
+  travelTime: string;
+  locations: string[];
+  route: string[];
+  details: string[];
+  scenicStops?: string[];
+  activities?: string[];
+  meals: string;
+  accommodation: string;
 }
 
 export interface DestinationSnapshot {

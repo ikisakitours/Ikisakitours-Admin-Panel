@@ -33,7 +33,20 @@ export default function PackageFormWrapper() {
     activityDetails: [{ title: "", description: "" }],
     highlights: [""],
     description: "",
-    itinerary: [{ day: 1, title: "", description: "", images: [] }],
+    itinerary: [
+      {
+        day: 1,
+        title: "",
+        travelTime: "",
+        locations: [""],
+        route: [""],
+        details: [""],
+        scenicStops: [""],
+        activities: [""],
+        meals: "",
+        accommodation: "",
+      },
+    ],
     destinations: [],
     includes: [""],
     excludes: [""],
@@ -110,7 +123,7 @@ export default function PackageFormWrapper() {
       </div>
 
       <PricingSection formData={formData} setFormData={setFormData} />
-      
+
       <GallerySection selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} />
 
       <PackageDestinationPicker
