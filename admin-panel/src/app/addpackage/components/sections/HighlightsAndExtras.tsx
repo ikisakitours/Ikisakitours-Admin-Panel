@@ -6,100 +6,80 @@ import { PackageFormData } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
+  locale: "en" | "ja"; // <-- Added
 }
 
-export function HighlightsAndExtras({ formData, setFormData }: Props) {
-  const handleSimpleArrayChange = (
-    field: "highlights" | "includes" | "excludes",
-    index: number,
-    value: string
-  ) => {
-    const updated = [...formData[field]];
+type ListField = "highlights" | "includes" | "excludes";
+type LocaleField = "highlightsJa" | "includesJa" | "excludesJa";
+
+export function HighlightsAndExtras({ formData, setFormData, locale }: Props) {
+  
+  // Resolve which array to map to based on locale
+  const getFieldKey = (field: ListField): keyof PackageFormData => {
+    if (locale === "ja") {
+      return (field + "Ja") as keyof PackageFormData;
+    }
+    return field;
+  };
+
+  const handleSimpleArrayChange = (field: ListField, index: number, value: string) => {
+    const targetKey = getFieldKey(field);
+    const currentArray = (formData[targetKey] as string[]) || [];
+    const updated = [...currentArray];
     updated[index] = value;
-    setFormData((prev) => ({ ...prev, [field]: updated }));
+    setFormData((prev) => ({ ...prev, [targetKey]: updated }));
   };
 
-  const addSimpleArrayItem = (field: "highlights" | "includes" | "excludes") => {
-    setFormData((prev) => ({ ...prev, [field]: [...prev[field], ""] }));
+  const addSimpleArrayItem = (field: ListField) => {
+    const targetKey = getFieldKey(field);
+    const currentArray = (formData[targetKey] as string[]) || [];
+    setFormData((prev) => ({ ...prev, [targetKey]: [...currentArray, ""] }));
   };
 
-  const removeSimpleArrayItem = (field: "highlights" | "includes" | "excludes", index: number) => {
+  const removeSimpleArrayItem = (field: ListField, index: number) => {
+    const targetKey = getFieldKey(field);
+    const currentArray = (formData[targetKey] as string[]) || [];
     setFormData((prev) => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index),
+      [targetKey]: currentArray.filter((_, i) => i !== index),
     }));
+  };
+
+  const renderList = (field: ListField, title: string) => {
+    const targetKey = getFieldKey(field);
+    const items = (formData[targetKey] as string[]) || [""];
+
+    return (
+      <div className="space-y-3">
+        <h4 className="text-xs font-bold text-slate-800">{title}</h4>
+        {items.map((item, idx) => (
+          <div key={idx} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={item}
+              onChange={(e) => handleSimpleArrayChange(field, idx, e.target.value)}
+              placeholder={`${title} #${idx + 1}`}
+              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            />
+            {items.length > 1 && (
+              <button type="button" onClick={() => removeSimpleArrayItem(field, idx)} className="text-slate-400 hover:text-red-500">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        ))}
+        <button type="button" onClick={() => addSimpleArrayItem(field)} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+          <Plus className="w-3.5 h-3.5" /> Add
+        </button>
+      </div>
+    );
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
-      <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-800">Highlights</h4>
-        {formData.highlights.map((item, idx) => (
-          <div key={idx} className="flex items-center gap-2">
-            <input
-              type="text"
-              value={item}
-              onChange={(e) => handleSimpleArrayChange("highlights", idx, e.target.value)}
-              placeholder={`Highlight #${idx + 1}`}
-              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
-            />
-            {formData.highlights.length > 1 && (
-              <button type="button" onClick={() => removeSimpleArrayItem("highlights", idx)} className="text-slate-400 hover:text-red-500">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        ))}
-        <button type="button" onClick={() => addSimpleArrayItem("highlights")} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-          <Plus className="w-3.5 h-3.5" /> Add
-        </button>
-      </div>
-
-      <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-800">Includes</h4>
-        {formData.includes.map((item, idx) => (
-          <div key={idx} className="flex items-center gap-2">
-            <input
-              type="text"
-              value={item}
-              onChange={(e) => handleSimpleArrayChange("includes", idx, e.target.value)}
-              placeholder={`Included Item #${idx + 1}`}
-              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
-            />
-            {formData.includes.length > 1 && (
-              <button type="button" onClick={() => removeSimpleArrayItem("includes", idx)} className="text-slate-400 hover:text-red-500">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        ))}
-        <button type="button" onClick={() => addSimpleArrayItem("includes")} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-          <Plus className="w-3.5 h-3.5" /> Add
-        </button>
-      </div>
-
-      <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-800">Excludes</h4>
-        {formData.excludes.map((item, idx) => (
-          <div key={idx} className="flex items-center gap-2">
-            <input
-              type="text"
-              value={item}
-              onChange={(e) => handleSimpleArrayChange("excludes", idx, e.target.value)}
-              placeholder={`Excluded Item #${idx + 1}`}
-              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
-            />
-            {formData.excludes.length > 1 && (
-              <button type="button" onClick={() => removeSimpleArrayItem("excludes", idx)} className="text-slate-400 hover:text-red-500">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        ))}
-        <button type="button" onClick={() => addSimpleArrayItem("excludes")} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-          <Plus className="w-3.5 h-3.5" /> Add
-        </button>
-      </div>
+      {renderList("highlights", "Highlights")}
+      {renderList("includes", "Includes")}
+      {renderList("excludes", "Excludes")}
     </div>
   );
 }

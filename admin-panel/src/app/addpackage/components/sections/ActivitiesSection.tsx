@@ -6,19 +6,29 @@ import { PackageFormData } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
+  locale: "en" | "ja"; // <-- Added
 }
 
-export function ActivitiesSection({ formData, setFormData }: Props) {
+export function ActivitiesSection({ formData, setFormData, locale }: Props) {
+  
   const handleActivityChange = (index: number, key: "title" | "description", value: string) => {
+    const targetKey = locale === "ja" ? `${key}Ja` : key;
     const updated = [...formData.activityDetails];
-    updated[index][key] = value;
+    
+    // TypeScript assertion to safely set the dynamic key
+    (updated[index] as any)[targetKey] = value;
+    
     setFormData((prev) => ({ ...prev, activityDetails: updated }));
   };
 
   const addActivity = () => {
+    const newActivity = locale === "ja" 
+      ? { title: "", description: "", titleJa: "", descriptionJa: "" }
+      : { title: "", description: "" };
+      
     setFormData((prev) => ({
       ...prev,
-      activityDetails: [...prev.activityDetails, { title: "", description: "" }],
+      activityDetails: [...prev.activityDetails, newActivity as any],
     }));
   };
 
@@ -32,7 +42,7 @@ export function ActivitiesSection({ formData, setFormData }: Props) {
   return (
     <div className="space-y-4 pt-4 border-t border-slate-100">
       <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-indigo-500" /> Activity Details
+        <Sparkles className="w-4 h-4 text-indigo-500" /> Activity Details ({locale === "en" ? "English" : "Japanese"})
       </h3>
       {formData.activityDetails.map((activity, idx) => (
         <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
@@ -52,14 +62,14 @@ export function ActivitiesSection({ formData, setFormData }: Props) {
             <input
               type="text"
               placeholder="Activity Title"
-              value={activity.title}
+              value={locale === "en" ? activity.title : ((activity as any).titleJa || "")}
               onChange={(e) => handleActivityChange(idx, "title", e.target.value)}
               className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
             />
             <input
               type="text"
               placeholder="Activity Description"
-              value={activity.description}
+              value={locale === "en" ? activity.description : ((activity as any).descriptionJa || "")}
               onChange={(e) => handleActivityChange(idx, "description", e.target.value)}
               className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
             />
