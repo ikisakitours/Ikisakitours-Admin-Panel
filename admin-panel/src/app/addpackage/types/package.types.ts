@@ -32,6 +32,8 @@ export interface PackageFormData {
   duration: string;
   badge?: PackageBadge;
   slug: string;
+
+  // ── legacy (kept — existing form fields, existing reads) ──
   titleEmphasis: string;
   title: string;
   price: string;
@@ -46,4 +48,38 @@ export interface PackageFormData {
   destinations: DestinationSnapshot[];
   includes: string[];
   excludes: string[];
+
+  // ═══════════════════════════════════════════════════════════
+  // ADDED: localized scalar/array fields.
+  // All optional — old `PackageFormData` objects (e.g. from
+  // getPackageBySlug before the backend widens its response)
+  // still satisfy this type, so nothing breaks during rollout.
+  //
+  // Conventions:
+  //  - `En` = English variant (falls back to legacy field on write)
+  //  - `Ja` = Japanese variant (absent → read-time falls back to En)
+  // ═══════════════════════════════════════════════════════════
+  titleEn?: string;
+  titleJa?: string;
+
+  titleEmphasisEn?: string;
+  titleEmphasisJa?: string;
+
+  leadTitleEn?: string;
+  leadTitleJa?: string;
+
+  leadDescriptionEn?: string;
+  leadDescriptionJa?: string;
+
+  descriptionEn?: string;
+  descriptionJa?: string;
+
+  highlightsEn?: string[];
+  highlightsJa?: string[];
+
+  includesEn?: string[];
+  includesJa?: string[];
+
+  excludesEn?: string[];
+  excludesJa?: string[];
 }

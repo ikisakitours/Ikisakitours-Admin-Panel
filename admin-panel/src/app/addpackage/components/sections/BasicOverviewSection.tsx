@@ -6,9 +6,11 @@ import { PackageFormData, PackageBadge } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
+  locale: "en" | "ja"; // <-- Added
 }
 
-export function BasicOverviewSection({ formData, setFormData }: Props) {
+export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
+  
   // Helper to generate a slug from combined Title 1 and Title 2
   const updateSlug = (title1: string, title2: string) => {
     const combined = `${title1} ${title2}`;
@@ -21,13 +23,22 @@ export function BasicOverviewSection({ formData, setFormData }: Props) {
   };
 
   const handleTitle1Change = (val: string) => {
-    const newSlug = updateSlug(val, formData.titleEmphasis);
-    setFormData((prev) => ({ ...prev, title: val, slug: newSlug }));
+    // Only regenerate slug when editing English (Slug stays consistent)
+    if (locale === "en") {
+      const newSlug = updateSlug(val, formData.titleEmphasis);
+      setFormData((prev) => ({ ...prev, title: val, slug: newSlug }));
+    } else {
+      setFormData((prev) => ({ ...prev, titleJa: val }));
+    }
   };
 
   const handleTitle2Change = (val: string) => {
-    const newSlug = updateSlug(formData.title, val);
-    setFormData((prev) => ({ ...prev, titleEmphasis: val, slug: newSlug }));
+    if (locale === "en") {
+      const newSlug = updateSlug(formData.title, val);
+      setFormData((prev) => ({ ...prev, titleEmphasis: val, slug: newSlug }));
+    } else {
+      setFormData((prev) => ({ ...prev, titleEmphasisJa: val }));
+    }
   };
 
   return (
@@ -94,24 +105,28 @@ export function BasicOverviewSection({ formData, setFormData }: Props) {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">Title 1 (Main Title)</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">
+            Title 1 (Main Title) - {locale === "en" ? "English" : "Japanese"}
+          </label>
           <input
             type="text"
-            required
-            value={formData.title}
+            required={locale === "en"}
+            value={locale === "en" ? formData.title : (formData.titleJa || "")}
             onChange={(e) => handleTitle1Change(e.target.value)}
-            placeholder="e.g. Ancient Kingdom"
+            placeholder={locale === "en" ? "e.g. Ancient Kingdom" : "例：古代王国"}
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">Title 2 (Highlight)</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">
+            Title 2 (Highlight) - {locale === "en" ? "English" : "Japanese"}
+          </label>
           <input
             type="text"
-            required
-            value={formData.titleEmphasis}
+            required={locale === "en"}
+            value={locale === "en" ? formData.titleEmphasis : (formData.titleEmphasisJa || "")}
             onChange={(e) => handleTitle2Change(e.target.value)}
-            placeholder="e.g. Exclusive"
+            placeholder={locale === "en" ? "e.g. Exclusive" : "例：限定"}
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>

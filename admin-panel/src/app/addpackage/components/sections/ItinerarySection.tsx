@@ -6,6 +6,7 @@ import { PackageFormData, ItineraryItem } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
+  locale: "en" | "ja"; // <-- Added
 }
 
 type DynamicArrayKeys =
@@ -17,32 +18,38 @@ type DynamicArrayKeys =
   | "meals"
   | "accommodation";
 
-export function ItinerarySection({ formData, setFormData }: Props) {
+export function ItinerarySection({ formData, setFormData, locale }: Props) {
+  
+  // Helper to append "Ja" to keys when in Japanese mode
+  const getTargetKey = (key: string) => (locale === "ja" ? `${key}Ja` : key) as keyof ItineraryItem;
+
   const handleItineraryChange = (index: number, key: keyof ItineraryItem, value: any) => {
+    const targetKey = getTargetKey(key);
     const updated = [...formData.itinerary];
-    updated[index] = { ...updated[index], [key]: value };
+    updated[index] = { ...updated[index], [targetKey]: value };
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
-  // Helper for dynamic string arrays
   const handleArrayItemChange = (
     dayIndex: number,
     arrayKey: DynamicArrayKeys,
     itemIndex: number,
     value: string
   ) => {
+    const targetKey = getTargetKey(arrayKey);
     const updated = [...formData.itinerary];
-    const currentArray = [...(updated[dayIndex][arrayKey] || [])];
+    const currentArray = [...((updated[dayIndex][targetKey] as string[]) || [])];
     currentArray[itemIndex] = value;
-    updated[dayIndex] = { ...updated[dayIndex], [arrayKey]: currentArray };
+    updated[dayIndex] = { ...updated[dayIndex], [targetKey]: currentArray };
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
   const addArrayItem = (dayIndex: number, arrayKey: DynamicArrayKeys) => {
+    const targetKey = getTargetKey(arrayKey);
     const updated = [...formData.itinerary];
-    const currentArray = [...(updated[dayIndex][arrayKey] || [])];
+    const currentArray = [...((updated[dayIndex][targetKey] as string[]) || [])];
     currentArray.push("");
-    updated[dayIndex] = { ...updated[dayIndex], [arrayKey]: currentArray };
+    updated[dayIndex] = { ...updated[dayIndex], [targetKey]: currentArray };
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
@@ -51,10 +58,11 @@ export function ItinerarySection({ formData, setFormData }: Props) {
     arrayKey: DynamicArrayKeys,
     itemIndex: number
   ) => {
+    const targetKey = getTargetKey(arrayKey);
     const updated = [...formData.itinerary];
-    const currentArray = [...(updated[dayIndex][arrayKey] || [])];
+    const currentArray = [...((updated[dayIndex][targetKey] as string[]) || [])];
     currentArray.splice(itemIndex, 1);
-    updated[dayIndex] = { ...updated[dayIndex], [arrayKey]: currentArray };
+    updated[dayIndex] = { ...updated[dayIndex], [targetKey]: currentArray };
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
@@ -74,7 +82,16 @@ export function ItinerarySection({ formData, setFormData }: Props) {
           activities: [""],
           meals: [""],
           accommodation: [""],
-        },
+          // Include Japanese defaults to prevent controlled input warnings
+          titleJa: "",
+          locationsJa: [""],
+          routeJa: [""],
+          detailsJa: [""],
+          scenicStopsJa: [""],
+          activitiesJa: [""],
+          mealsJa: [""],
+          accommodationJa: [""],
+        } as any, // Cast to any to avoid strict type issues if your ItineraryItem doesn't have Ja fields yet
       ],
     }));
   };
@@ -88,10 +105,16 @@ export function ItinerarySection({ formData, setFormData }: Props) {
     }));
   };
 
+  // Helper to read the correct array for rendering
+  const getArray = (item: ItineraryItem, key: DynamicArrayKeys): string[] => {
+    const targetKey = getTargetKey(key);
+    return (item[targetKey] as string[]) || [""];
+  };
+
   return (
     <div className="space-y-6 pt-4 border-t border-slate-100">
       <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-        <Calendar className="w-4 h-4 text-indigo-500" /> Itinerary
+        <Calendar className="w-4 h-4 text-indigo-500" /> Itinerary ({locale === "en" ? "English" : "Japanese"})
       </h3>
 
       {formData.itinerary.map((item, idx) => (
@@ -125,7 +148,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
               <input
                 type="text"
                 placeholder="e.g. Polonnaruwa Ancient Kingdom Half-Day Tour"
-                value={item.title}
+                value={locale === "en" ? item.title : ((item as any).titleJa || "")}
                 onChange={(e) => handleItineraryChange(idx, "title", e.target.value)}
                 className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
               />
@@ -147,7 +170,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             {/* Meals */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Meals</label>
-              {(item.meals || []).map((m, mIdx) => (
+              {getArray(item, "meals").map((m, mIdx) => (
                 <div key={mIdx} className="flex items-center gap-2">
                   <input
                     type="text"
@@ -177,7 +200,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             {/* Accommodation */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Accommodation</label>
-              {(item.accommodation || []).map((acc, aIdx) => (
+              {getArray(item, "accommodation").map((acc, aIdx) => (
                 <div key={aIdx} className="flex items-center gap-2">
                   <input
                     type="text"
@@ -207,7 +230,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             {/* Locations */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Locations</label>
-              {(item.locations || []).map((loc, lIdx) => (
+              {getArray(item, "locations").map((loc, lIdx) => (
                 <div key={lIdx} className="flex items-center gap-2">
                   <input
                     type="text"
@@ -237,7 +260,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             {/* Route Flow */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Route Flow</label>
-              {(item.route || []).map((rt, rIdx) => (
+              {getArray(item, "route").map((rt, rIdx) => (
                 <div key={rIdx} className="flex items-center gap-2">
                   <input
                     type="text"
@@ -267,7 +290,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             {/* Detailed Schedule Bullet Points */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80 md:col-span-2">
               <label className="block text-[11px] font-bold text-slate-700">Detailed Schedule Bullet Points</label>
-              {(item.details || []).map((det, dIdx) => (
+              {getArray(item, "details").map((det, dIdx) => (
                 <div key={dIdx} className="flex items-center gap-2">
                   <input
                     type="text"
@@ -297,7 +320,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             {/* Scenic Stops */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Scenic Stops (Optional)</label>
-              {(item.scenicStops || []).map((st, sIdx) => (
+              {getArray(item, "scenicStops").map((st, sIdx) => (
                 <div key={sIdx} className="flex items-center gap-2">
                   <input
                     type="text"
@@ -327,7 +350,7 @@ export function ItinerarySection({ formData, setFormData }: Props) {
             {/* Activities */}
             <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200/80">
               <label className="block text-[11px] font-bold text-slate-700">Activities (Optional)</label>
-              {(item.activities || []).map((act, aIdx) => (
+              {getArray(item, "activities").map((act, aIdx) => (
                 <div key={aIdx} className="flex items-center gap-2">
                   <input
                     type="text"

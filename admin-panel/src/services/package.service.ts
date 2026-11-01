@@ -56,6 +56,77 @@ export const packageService = {
       JSON.stringify(formData.excludes.filter((e) => e.trim() !== ""))
     );
 
+    // ── localized scalar fields (optional — only append when present) ──
+    // English (falls back to legacy fields on the server if omitted)
+    if (formData.titleEn !== undefined && formData.titleEn !== null) {
+      data.append("titleEn", formData.titleEn);
+    }
+    if (formData.titleEmphasisEn !== undefined && formData.titleEmphasisEn !== null) {
+      data.append("titleEmphasisEn", formData.titleEmphasisEn);
+    }
+    if (formData.leadTitleEn !== undefined && formData.leadTitleEn !== null) {
+      data.append("leadTitleEn", formData.leadTitleEn);
+    }
+    if (formData.leadDescriptionEn !== undefined && formData.leadDescriptionEn !== null) {
+      data.append("leadDescriptionEn", formData.leadDescriptionEn);
+    }
+    if (formData.descriptionEn !== undefined && formData.descriptionEn !== null) {
+      data.append("descriptionEn", formData.descriptionEn);
+    }
+    if (formData.highlightsEn !== undefined && formData.highlightsEn !== null) {
+      data.append(
+        "highlightsEn",
+        JSON.stringify(formData.highlightsEn.filter((h) => h.trim() !== ""))
+      );
+    }
+    if (formData.includesEn !== undefined && formData.includesEn !== null) {
+      data.append(
+        "includesEn",
+        JSON.stringify(formData.includesEn.filter((i) => i.trim() !== ""))
+      );
+    }
+    if (formData.excludesEn !== undefined && formData.excludesEn !== null) {
+      data.append(
+        "excludesEn",
+        JSON.stringify(formData.excludesEn.filter((e) => e.trim() !== ""))
+      );
+    }
+
+    // Japanese (optional — absence means read-time falls back to English)
+    if (formData.titleJa !== undefined && formData.titleJa !== null) {
+      data.append("titleJa", formData.titleJa);
+    }
+    if (formData.titleEmphasisJa !== undefined && formData.titleEmphasisJa !== null) {
+      data.append("titleEmphasisJa", formData.titleEmphasisJa);
+    }
+    if (formData.leadTitleJa !== undefined && formData.leadTitleJa !== null) {
+      data.append("leadTitleJa", formData.leadTitleJa);
+    }
+    if (formData.leadDescriptionJa !== undefined && formData.leadDescriptionJa !== null) {
+      data.append("leadDescriptionJa", formData.leadDescriptionJa);
+    }
+    if (formData.descriptionJa !== undefined && formData.descriptionJa !== null) {
+      data.append("descriptionJa", formData.descriptionJa);
+    }
+    if (formData.highlightsJa !== undefined && formData.highlightsJa !== null) {
+      data.append(
+        "highlightsJa",
+        JSON.stringify(formData.highlightsJa.filter((h) => h.trim() !== ""))
+      );
+    }
+    if (formData.includesJa !== undefined && formData.includesJa !== null) {
+      data.append(
+        "includesJa",
+        JSON.stringify(formData.includesJa.filter((i) => i.trim() !== ""))
+      );
+    }
+    if (formData.excludesJa !== undefined && formData.excludesJa !== null) {
+      data.append(
+        "excludesJa",
+        JSON.stringify(formData.excludesJa.filter((e) => e.trim() !== ""))
+      );
+    }
+
     images.forEach((file) => {
       data.append("images", file);
     });
@@ -90,6 +161,13 @@ export const packageService = {
   },
 
   async updatePackageTextOnly(slug: string, formData: PackageFormData) {
+    // Spread carries the localized `_en` / `_ja` keys through to the
+    // backend automatically — no explicit mapping needed here, because
+    // `updatePackageTextOnly` sends a plain JSON body (not FormData),
+    // and the backend DTO already accepts the new optional fields.
+    //
+    // `price` / `discount` are coerced to Number *after* the spread,
+    // so the localized arrays/strings are untouched.
     const payload = {
       ...formData,
       price: Number(formData.price),
