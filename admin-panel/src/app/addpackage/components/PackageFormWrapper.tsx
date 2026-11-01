@@ -16,7 +16,6 @@ export default function PackageFormWrapper() {
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   
-  // NEW: Language toggle state
   const [locale, setLocale] = useState<"en" | "ja">("en");
 
   const [formData, setFormData] = useState<PackageFormData>({
@@ -26,23 +25,24 @@ export default function PackageFormWrapper() {
     duration: "",
     badge: "new_arrival",
     slug: "",
-    
-    // Legacy/English defaults
-    titleEmphasis: "",
-    title: "",
     price: "",
     discount: "0",
     provider: "",
-    leadTitle: "",
-    leadDescription: "",
-    description: "",
-    highlights: [""],
-    includes: [""],
-    excludes: [""],
-    
-    // NEW: Japanese defaults (empty strings for React controlled inputs)
-    titleEmphasisJa: "",
+    destinations: [],
+
+    // English Defaults
+    titleEn: "",
+    titleEmphasisEn: "",
+    leadTitleEn: "",
+    leadDescriptionEn: "",
+    descriptionEn: "",
+    highlightsEn: [""],
+    includesEn: [""],
+    excludesEn: [""],
+
+    // Japanese Defaults
     titleJa: "",
+    titleEmphasisJa: "",
     leadTitleJa: "",
     leadDescriptionJa: "",
     descriptionJa: "",
@@ -50,22 +50,37 @@ export default function PackageFormWrapper() {
     includesJa: [""],
     excludesJa: [""],
 
-    activityDetails: [{ title: "", description: "" }],
+    // Nested English/Japanese Defaults
+    activityDetails: [{ 
+      titleEn: "", 
+      descriptionEn: "",
+      titleJa: "",
+      descriptionJa: ""
+    }],
+    
     itinerary: [
       {
         day: 1,
-        title: "",
         travelTime: "",
-        locations: [""],
-        route: [""],
-        details: [""],
-        scenicStops: [""],
-        activities: [""],
-        meals: [""],
-        accommodation: [""],
+        titleEn: "",
+        locationsEn: [""],
+        routeEn: [""],
+        detailsEn: [""],
+        scenicStopsEn: [""],
+        activitiesEn: [""],
+        mealsEn: [""],
+        accommodationEn: [""],
+        
+        titleJa: "",
+        locationsJa: [""],
+        routeJa: [""],
+        detailsJa: [""],
+        scenicStopsJa: [""],
+        activitiesJa: [""],
+        mealsJa: [""],
+        accommodationJa: [""],
       },
     ],
-    destinations: [],
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +92,6 @@ export default function PackageFormWrapper() {
 
     setLoading(true);
     try {
-      // The service file handles the mapping to _en and _ja
       const result = await packageService.createPackage(formData, selectedFiles);
       alert(`Success! Package created with ID: ${result.id}`);
       setSelectedFiles([]);
@@ -130,7 +144,7 @@ export default function PackageFormWrapper() {
       {/* Pass `locale` to the text-heavy sections */}
       <BasicOverviewSection formData={formData} setFormData={setFormData} locale={locale} />
 
-      {/* Lead Header Info (Moved into a wrapper to handle locale) */}
+      {/* Lead Header Info */}
       <div className="space-y-4 pt-4 border-t border-slate-100">
         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
           <Layers className="w-4 h-4 text-indigo-500" /> Lead Header Information ({locale === "en" ? "English" : "Japanese"})
@@ -141,10 +155,10 @@ export default function PackageFormWrapper() {
             <input
               type="text"
               required={locale === "en"}
-              value={locale === "en" ? formData.leadTitle : (formData.leadTitleJa || "")}
+              value={locale === "en" ? formData.leadTitleEn : (formData.leadTitleJa || "")}
               onChange={(e) => {
                 const val = e.target.value;
-                setFormData((prev) => ({ ...prev, [locale === "en" ? "leadTitle" : "leadTitleJa"]: val }));
+                setFormData((prev) => ({ ...prev, [locale === "en" ? "leadTitleEn" : "leadTitleJa"]: val }));
               }}
               className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
             />
@@ -154,10 +168,10 @@ export default function PackageFormWrapper() {
             <input
               type="text"
               required={locale === "en"}
-              value={locale === "en" ? formData.leadDescription : (formData.leadDescriptionJa || "")}
+              value={locale === "en" ? formData.leadDescriptionEn : (formData.leadDescriptionJa || "")}
               onChange={(e) => {
                 const val = e.target.value;
-                setFormData((prev) => ({ ...prev, [locale === "en" ? "leadDescription" : "leadDescriptionJa"]: val }));
+                setFormData((prev) => ({ ...prev, [locale === "en" ? "leadDescriptionEn" : "leadDescriptionJa"]: val }));
               }}
               className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
             />
@@ -165,12 +179,13 @@ export default function PackageFormWrapper() {
         </div>
       </div>
 
-      {/* These stay exactly as they are (No translation needed inside) */}
+      {/* These stay exactly as they are */}
       <PricingSection formData={formData} setFormData={setFormData} />
       <GallerySection selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} />
       <PackageDestinationPicker
         selectedDestinations={formData.destinations}
         onChange={(destinations) => setFormData({ ...formData, destinations })}
+        locale={locale}
       />
 
       {/* Pass `locale` to these sections */}
@@ -184,10 +199,10 @@ export default function PackageFormWrapper() {
         <textarea
           rows={4}
           required={locale === "en"}
-          value={locale === "en" ? formData.description : (formData.descriptionJa || "")}
+          value={locale === "en" ? formData.descriptionEn : (formData.descriptionJa || "")}
           onChange={(e) => {
             const val = e.target.value;
-            setFormData((prev) => ({ ...prev, [locale === "en" ? "description" : "descriptionJa"]: val }));
+            setFormData((prev) => ({ ...prev, [locale === "en" ? "descriptionEn" : "descriptionJa"]: val }));
           }}
           className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none resize-y"
         />

@@ -6,7 +6,7 @@ import { PackageFormData, PackageBadge } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
-  locale: "en" | "ja"; // <-- Added
+  locale: "en" | "ja";
 }
 
 export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
@@ -25,8 +25,8 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
   const handleTitle1Change = (val: string) => {
     // Only regenerate slug when editing English (Slug stays consistent)
     if (locale === "en") {
-      const newSlug = updateSlug(val, formData.titleEmphasis);
-      setFormData((prev) => ({ ...prev, title: val, slug: newSlug }));
+      const newSlug = updateSlug(val, formData.titleEmphasisEn);
+      setFormData((prev) => ({ ...prev, titleEn: val, slug: newSlug }));
     } else {
       setFormData((prev) => ({ ...prev, titleJa: val }));
     }
@@ -34,8 +34,8 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
 
   const handleTitle2Change = (val: string) => {
     if (locale === "en") {
-      const newSlug = updateSlug(formData.title, val);
-      setFormData((prev) => ({ ...prev, titleEmphasis: val, slug: newSlug }));
+      const newSlug = updateSlug(formData.titleEn, val);
+      setFormData((prev) => ({ ...prev, titleEmphasisEn: val, slug: newSlug }));
     } else {
       setFormData((prev) => ({ ...prev, titleEmphasisJa: val }));
     }
@@ -111,7 +111,7 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
           <input
             type="text"
             required={locale === "en"}
-            value={locale === "en" ? formData.title : (formData.titleJa || "")}
+            value={locale === "en" ? formData.titleEn : (formData.titleJa || "")}
             onChange={(e) => handleTitle1Change(e.target.value)}
             placeholder={locale === "en" ? "e.g. Ancient Kingdom" : "例：古代王国"}
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
@@ -124,7 +124,7 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
           <input
             type="text"
             required={locale === "en"}
-            value={locale === "en" ? formData.titleEmphasis : (formData.titleEmphasisJa || "")}
+            value={locale === "en" ? formData.titleEmphasisEn : (formData.titleEmphasisJa || "")}
             onChange={(e) => handleTitle2Change(e.target.value)}
             placeholder={locale === "en" ? "e.g. Exclusive" : "例：限定"}
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"

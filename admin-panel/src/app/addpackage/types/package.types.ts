@@ -3,21 +3,37 @@ export type PackageType = "oneday" | "multiday";
 export type PackageBadge = "new_arrival" | "discounted" | "popular" | "featured";
 
 export interface ActivityDetail {
-  title: string;
-  description: string;
+  titleEn: string;
+  descriptionEn: string;
+  
+  // Localized additions
+  titleJa?: string;
+  descriptionJa?: string;
 }
 
 export interface ItineraryItem {
   day: number;
-  title: string;
   travelTime: string;
-  locations: string[];
-  route: string[];
-  details: string[];
-  scenicStops?: string[];
-  activities?: string[];
-  meals: string[];
-  accommodation: string[];
+
+  // English Fields
+  titleEn: string;
+  locationsEn: string[];
+  routeEn: string[];
+  detailsEn: string[];
+  scenicStopsEn?: string[];
+  activitiesEn?: string[];
+  mealsEn: string[];
+  accommodationEn: string[];
+
+  // Japanese Fields
+  titleJa?: string;
+  locationsJa?: string[];
+  routeJa?: string[];
+  detailsJa?: string[];
+  scenicStopsJa?: string[];
+  activitiesJa?: string[];
+  mealsJa?: string[];
+  accommodationJa?: string[];
 }
 
 export interface DestinationSnapshot {
@@ -33,53 +49,31 @@ export interface PackageFormData {
   badge?: PackageBadge;
   slug: string;
 
-  // ── legacy (kept — existing form fields, existing reads) ──
-  titleEmphasis: string;
-  title: string;
+  // Shared fields
   price: string;
   discount: string;
   provider: string;
-  leadTitle: string;
-  leadDescription: string;
   activityDetails: ActivityDetail[];
-  highlights: string[];
-  description: string;
   itinerary: ItineraryItem[];
   destinations: DestinationSnapshot[];
-  includes: string[];
-  excludes: string[];
 
-  // ═══════════════════════════════════════════════════════════
-  // ADDED: localized scalar/array fields.
-  // All optional — old `PackageFormData` objects (e.g. from
-  // getPackageBySlug before the backend widens its response)
-  // still satisfy this type, so nothing breaks during rollout.
-  //
-  // Conventions:
-  //  - `En` = English variant (falls back to legacy field on write)
-  //  - `Ja` = Japanese variant (absent → read-time falls back to En)
-  // ═══════════════════════════════════════════════════════════
-  titleEn?: string;
+  // ── Localized English Fields (Required) ──
+  titleEn: string;
+  titleEmphasisEn: string;
+  leadTitleEn: string;
+  leadDescriptionEn: string;
+  descriptionEn: string;
+  highlightsEn: string[];
+  includesEn: string[];
+  excludesEn: string[];
+
+  // ── Localized Japanese Fields (Optional) ──
   titleJa?: string;
-
-  titleEmphasisEn?: string;
   titleEmphasisJa?: string;
-
-  leadTitleEn?: string;
   leadTitleJa?: string;
-
-  leadDescriptionEn?: string;
   leadDescriptionJa?: string;
-
-  descriptionEn?: string;
   descriptionJa?: string;
-
-  highlightsEn?: string[];
   highlightsJa?: string[];
-
-  includesEn?: string[];
   includesJa?: string[];
-
-  excludesEn?: string[];
   excludesJa?: string[];
 }

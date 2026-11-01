@@ -1,34 +1,37 @@
 "use client";
 
 import { Sparkles, Trash2, Plus } from "lucide-react";
-import { PackageFormData } from "../../types/package.types";
+import { PackageFormData, ActivityDetail } from "../../types/package.types";
 
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
-  locale: "en" | "ja"; // <-- Added
+  locale: "en" | "ja";
 }
 
 export function ActivitiesSection({ formData, setFormData, locale }: Props) {
   
   const handleActivityChange = (index: number, key: "title" | "description", value: string) => {
-    const targetKey = locale === "ja" ? `${key}Ja` : key;
+    const targetKey = locale === "ja" ? `${key}Ja` : `${key}En`;
     const updated = [...formData.activityDetails];
     
-    // TypeScript assertion to safely set the dynamic key
+    // TypeScript knows ActivityDetail has titleEn, titleJa, descriptionEn, descriptionJa
     (updated[index] as any)[targetKey] = value;
     
     setFormData((prev) => ({ ...prev, activityDetails: updated }));
   };
 
   const addActivity = () => {
-    const newActivity = locale === "ja" 
-      ? { title: "", description: "", titleJa: "", descriptionJa: "" }
-      : { title: "", description: "" };
+    const newActivity: ActivityDetail = { 
+      titleEn: "", 
+      descriptionEn: "",
+      titleJa: "",
+      descriptionJa: ""
+    };
       
     setFormData((prev) => ({
       ...prev,
-      activityDetails: [...prev.activityDetails, newActivity as any],
+      activityDetails: [...prev.activityDetails, newActivity],
     }));
   };
 
@@ -62,14 +65,14 @@ export function ActivitiesSection({ formData, setFormData, locale }: Props) {
             <input
               type="text"
               placeholder="Activity Title"
-              value={locale === "en" ? activity.title : ((activity as any).titleJa || "")}
+              value={locale === "en" ? activity.titleEn : (activity.titleJa || "")}
               onChange={(e) => handleActivityChange(idx, "title", e.target.value)}
               className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
             />
             <input
               type="text"
               placeholder="Activity Description"
-              value={locale === "en" ? activity.description : ((activity as any).descriptionJa || "")}
+              value={locale === "en" ? activity.descriptionEn : (activity.descriptionJa || "")}
               onChange={(e) => handleActivityChange(idx, "description", e.target.value)}
               className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
             />

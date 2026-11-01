@@ -6,20 +6,17 @@ import { PackageFormData } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
-  locale: "en" | "ja"; // <-- Added
+  locale: "en" | "ja";
 }
 
 type ListField = "highlights" | "includes" | "excludes";
-type LocaleField = "highlightsJa" | "includesJa" | "excludesJa";
 
 export function HighlightsAndExtras({ formData, setFormData, locale }: Props) {
   
-  // Resolve which array to map to based on locale
+  // Resolve which array to map to based on locale (e.g., 'highlightsEn' or 'highlightsJa')
   const getFieldKey = (field: ListField): keyof PackageFormData => {
-    if (locale === "ja") {
-      return (field + "Ja") as keyof PackageFormData;
-    }
-    return field;
+    const suffix = locale === "ja" ? "Ja" : "En";
+    return `${field}${suffix}` as keyof PackageFormData;
   };
 
   const handleSimpleArrayChange = (field: ListField, index: number, value: string) => {
@@ -47,6 +44,7 @@ export function HighlightsAndExtras({ formData, setFormData, locale }: Props) {
 
   const renderList = (field: ListField, title: string) => {
     const targetKey = getFieldKey(field);
+    // Fallback to [""] so the user always sees at least one input box
     const items = (formData[targetKey] as string[]) || [""];
 
     return (

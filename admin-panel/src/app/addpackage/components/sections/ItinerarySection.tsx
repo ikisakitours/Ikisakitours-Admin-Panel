@@ -6,7 +6,7 @@ import { PackageFormData, ItineraryItem } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
-  locale: "en" | "ja"; // <-- Added
+  locale: "en" | "ja";
 }
 
 type DynamicArrayKeys =
@@ -20,12 +20,22 @@ type DynamicArrayKeys =
 
 export function ItinerarySection({ formData, setFormData, locale }: Props) {
   
-  // Helper to append "Ja" to keys when in Japanese mode
-  const getTargetKey = (key: string) => (locale === "ja" ? `${key}Ja` : key) as keyof ItineraryItem;
+  // Helper to append "En" or "Ja" to array keys
+  const getTargetKey = (key: DynamicArrayKeys) => {
+    return (locale === "ja" ? `${key}Ja` : `${key}En`) as keyof ItineraryItem;
+  };
 
-  const handleItineraryChange = (index: number, key: keyof ItineraryItem, value: any) => {
-    const targetKey = getTargetKey(key);
+  const handleItineraryChange = (index: number, key: "title" | "day" | "travelTime", value: any) => {
     const updated = [...formData.itinerary];
+    let targetKey: keyof ItineraryItem = key as keyof ItineraryItem;
+
+    // Handle title specifically since it has an En/Ja toggle
+    if (key === "title") {
+      targetKey = locale === "ja" ? "titleJa" : "titleEn";
+    }
+
+    // day and travelTime are shared fields, so they don't change based on locale
+    
     updated[index] = { ...updated[index], [targetKey]: value };
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
@@ -67,32 +77,32 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
   };
 
   const addItineraryDay = () => {
+    // Initialize with both En and Ja fields to prevent React uncontrolled input warnings
+    const newDay: ItineraryItem = {
+      day: formData.itinerary.length + 1,
+      travelTime: "",
+      titleEn: "",
+      locationsEn: [""],
+      routeEn: [""],
+      detailsEn: [""],
+      scenicStopsEn: [""],
+      activitiesEn: [""],
+      mealsEn: [""],
+      accommodationEn: [""],
+      
+      titleJa: "",
+      locationsJa: [""],
+      routeJa: [""],
+      detailsJa: [""],
+      scenicStopsJa: [""],
+      activitiesJa: [""],
+      mealsJa: [""],
+      accommodationJa: [""],
+    };
+
     setFormData((prev) => ({
       ...prev,
-      itinerary: [
-        ...prev.itinerary,
-        {
-          day: prev.itinerary.length + 1,
-          title: "",
-          travelTime: "",
-          locations: [""],
-          route: [""],
-          details: [""],
-          scenicStops: [""],
-          activities: [""],
-          meals: [""],
-          accommodation: [""],
-          // Include Japanese defaults to prevent controlled input warnings
-          titleJa: "",
-          locationsJa: [""],
-          routeJa: [""],
-          detailsJa: [""],
-          scenicStopsJa: [""],
-          activitiesJa: [""],
-          mealsJa: [""],
-          accommodationJa: [""],
-        } as any, // Cast to any to avoid strict type issues if your ItineraryItem doesn't have Ja fields yet
-      ],
+      itinerary: [...prev.itinerary, newDay],
     }));
   };
 
@@ -148,7 +158,7 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
               <input
                 type="text"
                 placeholder="e.g. Polonnaruwa Ancient Kingdom Half-Day Tour"
-                value={locale === "en" ? item.title : ((item as any).titleJa || "")}
+                value={locale === "en" ? item.titleEn : (item.titleJa || "")}
                 onChange={(e) => handleItineraryChange(idx, "title", e.target.value)}
                 className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
               />
