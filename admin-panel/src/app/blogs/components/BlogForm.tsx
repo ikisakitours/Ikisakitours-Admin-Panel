@@ -74,10 +74,14 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                 imageUrls = await blogService.uploadImages(selectedFiles, "blogs");
             }
 
+            const finalSlug = 
+            slugify(formData.slug.trim() ? formData.slug : formData.title) || 
+            `blog-${Date.now()}`;
+
             // 2. Submit pure JSON containing R2 image URLs & metadata
             const blogData = {
                 title: formData.title,
-                slug: formData.slug || slugify(formData.title),
+                slug: finalSlug,
                 summary: formData.summary,
                 category: formData.category,
                 readTime: formData.readTime,
