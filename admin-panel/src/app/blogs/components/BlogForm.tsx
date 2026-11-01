@@ -26,9 +26,9 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
     // Helper function to turn strings into URL-friendly slugs
     const slugify = (text: string) => {
         return text
-            .toLowerCase()
             .trim()
-            .replace(/[^\w\s-]/g, "")
+            .toLowerCase()
+            .replace(/[^\p{L}\p{N}\s-]/gu, "")
             .replace(/[\s_-]+/g, "-")
             .replace(/^-+|-+$/g, "");
     };
