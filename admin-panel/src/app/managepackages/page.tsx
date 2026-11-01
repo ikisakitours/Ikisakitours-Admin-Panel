@@ -9,7 +9,7 @@ import { PricingSection } from "@/app/addpackage/components/sections/PricingSect
 import { ActivitiesSection } from "@/app/addpackage/components/sections/ActivitiesSection";
 import { ItinerarySection } from "@/app/addpackage/components/sections/ItinerarySection";
 import { HighlightsAndExtras } from "@/app/addpackage/components/sections/HighlightsAndExtras";
-import { ArrowLeft, Save, Globe } from "lucide-react"; // <-- Added Globe
+import { ArrowLeft, Save, Globe } from "lucide-react";
 import { PackageDestinationPicker } from "../addpackage/components/sections/PackageDestinationPicker";
 
 export default function ManagePackagesPage() {
@@ -18,7 +18,6 @@ export default function ManagePackagesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<PackageFormData | null>(null);
 
-  // NEW: Locale state for editing
   const [locale, setLocale] = useState<"en" | "ja">("en");
 
   // Triggered when user clicks "Edit" in the table
@@ -31,6 +30,7 @@ export default function ManagePackagesPage() {
       // Ensure Ja fields exist so React doesn't complain about uncontrolled inputs
       setFormData({
         ...data,
+        // En fields are required by the type now, but we ensure Ja has fallbacks
         titleJa: data.titleJa || "",
         titleEmphasisJa: data.titleEmphasisJa || "",
         leadTitleJa: data.leadTitleJa || "",
@@ -161,7 +161,7 @@ export default function ManagePackagesPage() {
               <ItinerarySection formData={formData} setFormData={safeSetFormData} locale={locale} />
               <HighlightsAndExtras formData={formData} setFormData={safeSetFormData} locale={locale} />
 
-              {/* Lead Header Info (Added to edit page as well) */}
+              {/* Lead Header Info */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
                 <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                   Lead Header Information ({locale === "en" ? "English" : "Japanese"})
@@ -172,10 +172,10 @@ export default function ManagePackagesPage() {
                     <input
                       type="text"
                       required={locale === "en"}
-                      value={locale === "en" ? formData.leadTitle : (formData.leadTitleJa || "")}
+                      value={locale === "en" ? formData.leadTitleEn : (formData.leadTitleJa || "")}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setFormData((prev: any) => ({ ...prev, [locale === "en" ? "leadTitle" : "leadTitleJa"]: val }));
+                        setFormData((prev: any) => ({ ...prev, [locale === "en" ? "leadTitleEn" : "leadTitleJa"]: val }));
                       }}
                       className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
                     />
@@ -185,10 +185,10 @@ export default function ManagePackagesPage() {
                     <input
                       type="text"
                       required={locale === "en"}
-                      value={locale === "en" ? formData.leadDescription : (formData.leadDescriptionJa || "")}
+                      value={locale === "en" ? formData.leadDescriptionEn : (formData.leadDescriptionJa || "")}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setFormData((prev: any) => ({ ...prev, [locale === "en" ? "leadDescription" : "leadDescriptionJa"]: val }));
+                        setFormData((prev: any) => ({ ...prev, [locale === "en" ? "leadDescriptionEn" : "leadDescriptionJa"]: val }));
                       }}
                       className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
                     />
@@ -202,10 +202,10 @@ export default function ManagePackagesPage() {
                 <textarea
                   rows={4}
                   required={locale === "en"}
-                  value={locale === "en" ? formData.description : (formData.descriptionJa || "")}
+                  value={locale === "en" ? formData.descriptionEn : (formData.descriptionJa || "")}
                   onChange={(e) => {
                     const val = e.target.value;
-                    setFormData((prev: any) => ({ ...prev, [locale === "en" ? "description" : "descriptionJa"]: val }));
+                    setFormData((prev: any) => ({ ...prev, [locale === "en" ? "descriptionEn" : "descriptionJa"]: val }));
                   }}
                   className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none resize-y"
                 />

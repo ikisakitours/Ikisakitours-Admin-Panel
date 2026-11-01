@@ -20,22 +20,37 @@ export const packageService = {
       data.append("badge", formData.badge);
     }
     data.append("slug", formData.slug);
-    data.append("titleEmphasis", formData.titleEmphasis);
-    data.append("title", formData.title);
     data.append("price", formData.price);
     data.append("discount", formData.discount || "0");
     data.append("provider", formData.provider);
-    data.append("leadTitle", formData.leadTitle);
-    data.append("leadDescription", formData.leadDescription);
-    data.append("description", formData.description);
 
+    // ── Localized English scalar fields ──
+    data.append("titleEn", formData.titleEn);
+    data.append("titleEmphasisEn", formData.titleEmphasisEn);
+    data.append("leadTitleEn", formData.leadTitleEn);
+    data.append("leadDescriptionEn", formData.leadDescriptionEn);
+    data.append("descriptionEn", formData.descriptionEn);
+
+    // ── Localized English arrays ──
     data.append(
-      "activityDetails",
-      JSON.stringify(formData.activityDetails.filter((a) => a.title.trim() !== ""))
+      "highlightsEn",
+      JSON.stringify(formData.highlightsEn.filter((h) => h.trim() !== ""))
     );
     data.append(
-      "highlights",
-      JSON.stringify(formData.highlights.filter((h) => h.trim() !== ""))
+      "includesEn",
+      JSON.stringify(formData.includesEn.filter((i) => i.trim() !== ""))
+    );
+    data.append(
+      "excludesEn",
+      JSON.stringify(formData.excludesEn.filter((e) => e.trim() !== ""))
+    );
+
+    // ── JSONB Fields ──
+    data.append(
+      "activityDetails",
+      JSON.stringify(
+        formData.activityDetails.filter((a) => a.titleEn.trim() !== "")
+      )
     );
     data.append(
       "itinerary",
@@ -47,80 +62,27 @@ export const packageService = {
       "destinations",
       JSON.stringify(formData.destinations.filter((d) => d.id))
     );
-    data.append(
-      "includes",
-      JSON.stringify(formData.includes.filter((i) => i.trim() !== ""))
-    );
-    data.append(
-      "excludes",
-      JSON.stringify(formData.excludes.filter((e) => e.trim() !== ""))
-    );
 
-    // ── localized scalar fields (optional — only append when present) ──
-    // English (falls back to legacy fields on the server if omitted)
-    if (formData.titleEn !== undefined && formData.titleEn !== null) {
-      data.append("titleEn", formData.titleEn);
-    }
-    if (formData.titleEmphasisEn !== undefined && formData.titleEmphasisEn !== null) {
-      data.append("titleEmphasisEn", formData.titleEmphasisEn);
-    }
-    if (formData.leadTitleEn !== undefined && formData.leadTitleEn !== null) {
-      data.append("leadTitleEn", formData.leadTitleEn);
-    }
-    if (formData.leadDescriptionEn !== undefined && formData.leadDescriptionEn !== null) {
-      data.append("leadDescriptionEn", formData.leadDescriptionEn);
-    }
-    if (formData.descriptionEn !== undefined && formData.descriptionEn !== null) {
-      data.append("descriptionEn", formData.descriptionEn);
-    }
-    if (formData.highlightsEn !== undefined && formData.highlightsEn !== null) {
-      data.append(
-        "highlightsEn",
-        JSON.stringify(formData.highlightsEn.filter((h) => h.trim() !== ""))
-      );
-    }
-    if (formData.includesEn !== undefined && formData.includesEn !== null) {
-      data.append(
-        "includesEn",
-        JSON.stringify(formData.includesEn.filter((i) => i.trim() !== ""))
-      );
-    }
-    if (formData.excludesEn !== undefined && formData.excludesEn !== null) {
-      data.append(
-        "excludesEn",
-        JSON.stringify(formData.excludesEn.filter((e) => e.trim() !== ""))
-      );
-    }
+    // ── Localized Japanese fields (Optional) ──
+    if (formData.titleJa) data.append("titleJa", formData.titleJa);
+    if (formData.titleEmphasisJa) data.append("titleEmphasisJa", formData.titleEmphasisJa);
+    if (formData.leadTitleJa) data.append("leadTitleJa", formData.leadTitleJa);
+    if (formData.leadDescriptionJa) data.append("leadDescriptionJa", formData.leadDescriptionJa);
+    if (formData.descriptionJa) data.append("descriptionJa", formData.descriptionJa);
 
-    // Japanese (optional — absence means read-time falls back to English)
-    if (formData.titleJa !== undefined && formData.titleJa !== null) {
-      data.append("titleJa", formData.titleJa);
-    }
-    if (formData.titleEmphasisJa !== undefined && formData.titleEmphasisJa !== null) {
-      data.append("titleEmphasisJa", formData.titleEmphasisJa);
-    }
-    if (formData.leadTitleJa !== undefined && formData.leadTitleJa !== null) {
-      data.append("leadTitleJa", formData.leadTitleJa);
-    }
-    if (formData.leadDescriptionJa !== undefined && formData.leadDescriptionJa !== null) {
-      data.append("leadDescriptionJa", formData.leadDescriptionJa);
-    }
-    if (formData.descriptionJa !== undefined && formData.descriptionJa !== null) {
-      data.append("descriptionJa", formData.descriptionJa);
-    }
-    if (formData.highlightsJa !== undefined && formData.highlightsJa !== null) {
+    if (formData.highlightsJa) {
       data.append(
         "highlightsJa",
         JSON.stringify(formData.highlightsJa.filter((h) => h.trim() !== ""))
       );
     }
-    if (formData.includesJa !== undefined && formData.includesJa !== null) {
+    if (formData.includesJa) {
       data.append(
         "includesJa",
         JSON.stringify(formData.includesJa.filter((i) => i.trim() !== ""))
       );
     }
-    if (formData.excludesJa !== undefined && formData.excludesJa !== null) {
+    if (formData.excludesJa) {
       data.append(
         "excludesJa",
         JSON.stringify(formData.excludesJa.filter((e) => e.trim() !== ""))
@@ -161,13 +123,6 @@ export const packageService = {
   },
 
   async updatePackageTextOnly(slug: string, formData: PackageFormData) {
-    // Spread carries the localized `_en` / `_ja` keys through to the
-    // backend automatically — no explicit mapping needed here, because
-    // `updatePackageTextOnly` sends a plain JSON body (not FormData),
-    // and the backend DTO already accepts the new optional fields.
-    //
-    // `price` / `discount` are coerced to Number *after* the spread,
-    // so the localized arrays/strings are untouched.
     const payload = {
       ...formData,
       price: Number(formData.price),

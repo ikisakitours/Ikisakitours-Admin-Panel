@@ -6,21 +6,24 @@ import { destinationService } from "@/services/destination.service";
 import { DestinationSnapshot } from "../../types/package.types";
 
 // What the picker needs to DISPLAY a destination.
-// This is the shape returned by GET /destinations/previews.
+// Updated to support both English and Japanese titles from the destination API.
 interface DestinationPreview {
   id: string;
-  title: string;
+  titleEn: string;
+  titleJa?: string;
   slug: string;
-  summary: string;
+  summaryEn: string;
+  summaryJa?: string;
   heroImage: string | null;
 }
 
 interface Props {
   selectedDestinations: DestinationSnapshot[];
   onChange: (destinations: DestinationSnapshot[]) => void;
+  locale?: "en" | "ja"; // <-- Added to match the form's current language
 }
 
-export function PackageDestinationPicker({ selectedDestinations, onChange }: Props) {
+export function PackageDestinationPicker({ selectedDestinations, onChange, locale = "en" }: Props) {
   const [allPreviews, setAllPreviews] = useState<DestinationPreview[]>([]);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -29,23 +32,31 @@ export function PackageDestinationPicker({ selectedDestinations, onChange }: Pro
   useEffect(() => {
     destinationService
       .getPreviews()
-      .then((data) => setAllPreviews(data))
+      .then((data) => setAllPreviews(data as any)) // Cast in case the old service type still expects 'title'
       .catch((err) => console.error("Failed to load destination previews", err));
   }, []);
 
+  // Helper to resolve the title based on the active locale
+  const getLocalizedTitle = (dest: DestinationPreview) => {
+    return locale === "ja" ? (dest.titleJa || dest.titleEn) : dest.titleEn;
+  };
+
+  const getLocalizedSummary = (dest: DestinationPreview) => {
+    return locale === "ja" ? (dest.summaryJa || dest.summaryEn) : dest.summaryEn;
+  };
+
   const filteredDestinations = allPreviews.filter(
     (dest) =>
-      dest.title.toLowerCase().includes(query.toLowerCase()) &&
+      getLocalizedTitle(dest).toLowerCase().includes(query.toLowerCase()) &&
       !selectedDestinations.some((selected) => selected.id === dest.id),
   );
 
   // Look up a selected snapshot's display data from the previews cache.
-  // Falls back gracefully if the preview hasn't loaded yet (or in edit mode).
   const getPreview = (id: string) =>
     allPreviews.find((p) => p.id === id);
 
   const addDestination = (dest: DestinationPreview) => {
-    // Store ONLY id + slug — nothing else goes to the database
+    // Store ONLY id + slug — nothing else goes to the package database
     onChange([...selectedDestinations, { id: dest.id, slug: dest.slug }]);
     setQuery("");
     setIsOpen(false);
@@ -58,15 +69,15 @@ export function PackageDestinationPicker({ selectedDestinations, onChange }: Pro
   return (
     <div className="space-y-4 pt-4 border-t border-slate-100">
       <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-        <Building className="w-4 h-4 text-indigo-500" /> Destinations Covered
+        <Building className="w-4 h-4 text-indigo-500" /> Destinations Covered ({locale === "en" ? "English" : "Japanese"})
       </h3>
 
       {/* Selected Destinations Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {selectedDestinations.map((dest) => {
           const preview = getPreview(dest.id);
-          const displayTitle = preview?.title ?? dest.slug;
-          const displaySummary = preview?.summary ?? "";
+          const displayTitle = preview ? getLocalizedTitle(preview) : dest.slug;
+          const displaySummary = preview ? getLocalizedSummary(preview) : "";
 
           return (
             <div
@@ -112,7 +123,7 @@ export function PackageDestinationPicker({ selectedDestinations, onChange }: Pro
       <div className="relative">
         <input
           type="text"
-          placeholder="Search and attach destinations from database..."
+          placeholder={`Search and attach destinations (${locale === "en" ? "English" : "Japanese"})...`}
           value={query}
           onFocus={() => setIsOpen(true)}
           onChange={(e) => {
@@ -130,7 +141,7 @@ export function PackageDestinationPicker({ selectedDestinations, onChange }: Pro
                 onClick={() => addDestination(dest)}
                 className="flex items-center justify-between px-3 py-2.5 hover:bg-slate-50 cursor-pointer text-xs border-b border-slate-50 last:border-none"
               >
-                <span className="font-semibold text-slate-700">{dest.title}</span>
+                <span className="font-semibold text-slate-700">{getLocalizedTitle(dest)}</span>
                 <span className="flex items-center gap-1 text-indigo-600 font-medium">
                   <Plus className="w-3 h-3" /> Attach
                 </span>
