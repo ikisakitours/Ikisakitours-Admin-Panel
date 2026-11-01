@@ -6,21 +6,23 @@ import { destinationService } from "@/services/destination.service";
 import { DestinationSnapshot } from "../../types/package.types";
 
 // What the picker needs to DISPLAY a destination.
-// Updated to support both English and Japanese titles from the destination API.
+// We use 'any' for the API response so it works with both old ('title') and new ('titleEn') APIs.
 interface DestinationPreview {
   id: string;
-  titleEn: string;
+  titleEn?: string;
   titleJa?: string;
+  title?: string; // Fallback for old API
   slug: string;
-  summaryEn: string;
+  summaryEn?: string;
   summaryJa?: string;
+  summary?: string; // Fallback for old API
   heroImage: string | null;
 }
 
 interface Props {
   selectedDestinations: DestinationSnapshot[];
   onChange: (destinations: DestinationSnapshot[]) => void;
-  locale?: "en" | "ja"; // <-- Added to match the form's current language
+  locale?: "en" | "ja";
 }
 
 export function PackageDestinationPicker({ selectedDestinations, onChange, locale = "en" }: Props) {
@@ -32,24 +34,34 @@ export function PackageDestinationPicker({ selectedDestinations, onChange, local
   useEffect(() => {
     destinationService
       .getPreviews()
-      .then((data) => setAllPreviews(data as any)) // Cast in case the old service type still expects 'title'
+      .then((data) => setAllPreviews(data as any))
       .catch((err) => console.error("Failed to load destination previews", err));
   }, []);
 
-  // Helper to resolve the title based on the active locale
+  // Safe helper to resolve the title based on the active locale
   const getLocalizedTitle = (dest: DestinationPreview) => {
-    return locale === "ja" ? (dest.titleJa || dest.titleEn) : dest.titleEn;
+    const enTitle = dest.titleEn || dest.title || "";
+    const jaTitle = dest.titleJa || "";
+    return locale === "ja" ? (jaTitle || enTitle) : enTitle;
   };
 
   const getLocalizedSummary = (dest: DestinationPreview) => {
-    return locale === "ja" ? (dest.summaryJa || dest.summaryEn) : dest.summaryEn;
+    const enSummary = dest.summaryEn || dest.summary || "";
+    const jaSummary = dest.summaryJa || "";
+    return locale === "ja" ? (jaSummary || enSummary) : enSummary;
   };
 
-  const filteredDestinations = allPreviews.filter(
-    (dest) =>
-      getLocalizedTitle(dest).toLowerCase().includes(query.toLowerCase()) &&
-      !selectedDestinations.some((selected) => selected.id === dest.id),
-  );
+  // Safe filter function to prevent 'toLowerCase' of undefined crashes
+  const filteredDestinations = allPreviews.filter((dest) => {
+    const title = getLocalizedTitle(dest);
+    const safeTitle = title ? title.toLowerCase() : "";
+    const safeQuery = query ? query.toLowerCase() : "";
+    
+    return (
+      safeTitle.includes(safeQuery) &&
+      !selectedDestinations.some((selected) => selected.id === dest.id)
+    );
+  });
 
   // Look up a selected snapshot's display data from the previews cache.
   const getPreview = (id: string) =>
@@ -93,7 +105,8 @@ export function PackageDestinationPicker({ selectedDestinations, onChange, local
                   />
                 ) : (
                   <div className="w-10 h-10 bg-slate-200 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold text-slate-500">
-                    {displayTitle.charAt(0)}
+                    {/* Safe fallback for charAt if displayTitle is empty */}
+                    {displayTitle ? displayTitle.charAt(0) : "?"}
                   </div>
                 )}
                 <div className="truncate">
