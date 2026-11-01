@@ -1,24 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { destinationService } from "@/services/destination.service";
-import { Trash2, Calendar, Sun } from "lucide-react";
-
-interface DestinationPreview {
-  id: string;
-  title: string;
-  slug: string;
-  summary: string;
-  heroImage: string | null;
-  bestTimeToVisit: string;
-  climate: string;
-}
+import { destinationService, DestinationPreview } from "@/services/destination.service";
+import { Trash2, Calendar, Sun, Globe } from "lucide-react";
 
 interface DestinationListProps {
   refreshKey?: number; // Used to re-fetch when a new destination is published
+  currentLang: string; // ✅ Added currentLang prop for filtering
 }
 
-export default function DestinationList({ refreshKey }: DestinationListProps) {
+export default function DestinationList({ refreshKey, currentLang }: DestinationListProps) {
   const [destinations, setDestinations] = useState<DestinationPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -26,7 +17,8 @@ export default function DestinationList({ refreshKey }: DestinationListProps) {
   const fetchDestinations = async () => {
     try {
       setLoading(true);
-      const data = await destinationService.getPreviews();
+      // Pass the selected language filter to the service
+      const data = await destinationService.getPreviews(currentLang);
       setDestinations(data);
     } catch (err: any) {
       alert(`Failed to load destinations: ${err.message}`);
@@ -37,7 +29,7 @@ export default function DestinationList({ refreshKey }: DestinationListProps) {
 
   useEffect(() => {
     fetchDestinations();
-  }, [refreshKey]);
+  }, [refreshKey, currentLang]); // Re-fetch whenever refreshKey or currentLang changes
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
@@ -57,7 +49,7 @@ export default function DestinationList({ refreshKey }: DestinationListProps) {
   if (loading) {
     return (
       <div className="p-6 bg-white rounded-xl border border-slate-200 text-center text-xs text-slate-500">
-        Loading travel destinations...
+        Loading travel destinations ({currentLang.toUpperCase()})...
       </div>
     );
   }
@@ -65,18 +57,24 @@ export default function DestinationList({ refreshKey }: DestinationListProps) {
   if (destinations.length === 0) {
     return (
       <div className="p-6 bg-white rounded-xl border border-slate-200 text-center text-xs text-slate-500">
-        No travel destinations found. Create your first destination using the form above.
+        No travel destinations found for <span className="uppercase font-semibold">{currentLang}</span>. Create your first destination using the form above.
       </div>
     );
   }
 
   return (
     <div className="p-6 bg-white rounded-xl border border-slate-200 space-y-4">
-      <div className="pb-4 border-b">
-        <h2 className="text-lg font-bold text-slate-900">All Travel Destinations</h2>
-        <p className="text-xs text-slate-500 mt-1">
-          Manage your live destination guides or remove outdated spots.
-        </p>
+      <div className="pb-4 border-b flex justify-between items-center">
+        <div>
+          <h2 className="text-lg font-bold text-slate-900">All Travel Destinations</h2>
+          <p className="text-xs text-slate-500 mt-1">
+            Manage your live destination guides for <span className="uppercase font-semibold">{currentLang}</span> or remove outdated spots.
+          </p>
+        </div>
+        <span className="flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-xs font-bold uppercase">
+          <Globe className="w-3.5 h-3.5" />
+          {currentLang}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -101,16 +99,6 @@ export default function DestinationList({ refreshKey }: DestinationListProps) {
             {/* Metadata & Content */}
             <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-[10px] font-medium text-slate-500 gap-2 mb-1">
-                  <span className="flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">
-                    <Calendar className="w-3 h-3" />
-                    {dest.bestTimeToVisit}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Sun className="w-3 h-3" />
-                    {dest.climate}
-                  </span>
-                </div>
 
                 <h3 className="text-sm font-bold text-slate-900 line-clamp-1">
                   {dest.title}

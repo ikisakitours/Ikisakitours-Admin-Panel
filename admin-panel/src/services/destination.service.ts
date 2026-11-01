@@ -1,6 +1,10 @@
+
+export type DestinationLanguage = "en" | "ja" | "fr";
+
 export interface DestinationPayload {
   title: string;
   slug?: string;
+  language: DestinationLanguage;
   summary: string;
   description: string;
   province: string;
@@ -20,6 +24,7 @@ export interface DestinationPreview {
   id: string;
   title: string;
   slug: string;
+  language: DestinationLanguage;
   summary: string;
   heroImage: string | null;
   coordinates: {
@@ -69,8 +74,9 @@ class DestinationService {
   }
 
   // Fetch all destination previews (for admin list or preview cards)
-  async getPreviews() {
-    const res = await fetch(`${this.API_URL}/destinations/previews`);
+  async getPreviews(lang?: string): Promise<DestinationPreview[]> {
+    const url = lang ? `${this.API_URL}/destinations/previews?lang=${lang}` : `${this.API_URL}/destinations/previews`;
+    const res = await fetch(url);
 
     if (!res.ok) {
       const error = await res.json();
