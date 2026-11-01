@@ -28,8 +28,11 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
         return text
             .trim()
             .toLowerCase()
-            .replace(/[^\p{L}\p{N}\s-]/gu, "")
-            .replace(/[\s_-]+/g, "-")
+            // 1. Replace everything that is NOT a Unicode letter or number with a hyphen
+            .replace(/[^\p{L}\p{N}]+/gu, "-")
+            // 2. Collapse multiple consecutive hyphens into a single hyphen
+            .replace(/-+/g, "-")
+            // 3. Trim leading and trailing hyphens
             .replace(/^-+|-+$/g, "");
     };
 
