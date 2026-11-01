@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { blogService } from "@/services/blog.service";
+import { BlogLanguage, blogService } from "@/services/blog.service";
 import { Save, Image as ImageIcon, X } from "lucide-react";
 
 interface BlogFormProps {
-  onSuccess?: () => void;
+    onSuccess?: () => void;
 }
 
 export default function BlogForm({ onSuccess }: BlogFormProps) {
@@ -19,6 +19,7 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
         category: "",
         readTime: "",
         author: "",
+        language: "en",
         blog: "",
     });
 
@@ -78,12 +79,17 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                 category: formData.category,
                 readTime: formData.readTime,
                 author: formData.author,
+                language: formData.language as BlogLanguage,
                 blog: formData.blog,
                 images: imageUrls,
             };
 
             const newPost = await blogService.createBlog(blogData);
             alert(`Blog created successfully! ID: ${newPost.id}`);
+
+            if (onSuccess) {
+                onSuccess();
+            }
 
             // Reset form
             setSelectedFiles([]);
@@ -95,6 +101,7 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                 category: "",
                 readTime: "",
                 author: "",
+                language: "en",
                 blog: "",
             });
         } catch (err: any) {
@@ -146,8 +153,8 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                 </div>
             </div>
 
-            {/* Author, Category, Read Time Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Author, Category, Read Time, Language Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label className="block text-xs font-semibold mb-1">Author</label>
                     <input
@@ -182,6 +189,19 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                         className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
                         placeholder="e.g. 5 min read"
                     />
+                </div>
+
+                <div>
+                    <label className="block text-xs font-semibold mb-1">Language</label>
+                    <select
+                        value={formData.language}
+                        onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                        className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500 bg-white"
+                    >
+                        <option value="en">English (en)</option>
+                        <option value="ja">Japanese (ja)</option>
+                        <option value="fr">French (fr)</option>
+                    </select>
                 </div>
             </div>
 

@@ -1,3 +1,4 @@
+export type BlogLanguage = 'en' | 'ja' | 'fr';
 export interface BlogPayload {
   title: string;
   slug?: string;
@@ -6,6 +7,7 @@ export interface BlogPayload {
   readTime: string;
   blog: string;
   author: string;
+  language: BlogLanguage;
   images?: string[];
 }
 
@@ -50,8 +52,9 @@ class BlogService {
   }
 
   // Fetch all blog previews (for admin list or preview cards)
-  async getPreviews() {
-    const res = await fetch(`${this.API_URL}/blogs/previews`);
+  async getPreviews(lang?: string) {
+    const query = lang ? `?lang=${lang}` : '';
+    const res = await fetch(`${this.API_URL}/blogs/previews${query}`);
 
     if (!res.ok) {
       const error = await res.json();
