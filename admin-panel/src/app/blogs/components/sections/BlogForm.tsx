@@ -21,7 +21,7 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
         title: { en: "", ja: "" } as Record<string, string>,
         slug: "",
         summary: { en: "", ja: "" } as Record<string, string>,
-        category: "",
+        category: { en: "", ja: "" } as Record<string, string>,
         readTime: { en: "", ja: "" } as Record<string, string>,
         author: "",
         blog: { en: "", ja: "" } as Record<string, string>,
@@ -40,8 +40,9 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
         setFormData((prev) => ({
             ...prev,
             slug: jsonContent.slug || prev.slug,
-            category: jsonContent.category || prev.category,
             author: jsonContent.author || prev.author,
+            // Handle category as either an object or fallback string
+            category: typeof jsonContent.category === "object" ? jsonContent.category : { en: jsonContent.category || "" },
             title: typeof jsonContent.title === "object" ? jsonContent.title : { en: jsonContent.title || "" },
             summary: typeof jsonContent.summary === "object" ? jsonContent.summary : { en: jsonContent.summary || "" },
             readTime: typeof jsonContent.readTime === "object" ? jsonContent.readTime : { en: jsonContent.readTime || "" },
@@ -92,8 +93,8 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
             }
 
             const englishTitle = formData.title["en"] || Object.values(formData.title)[0] || "";
-            const finalSlug = 
-                slugify(formData.slug.trim() ? formData.slug : englishTitle) || 
+            const finalSlug =
+                slugify(formData.slug.trim() ? formData.slug : englishTitle) ||
                 `blog-${Date.now()}`;
 
             const blogPayload = {
@@ -120,7 +121,7 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                 title: { en: "", ja: "" },
                 slug: "",
                 summary: { en: "", ja: "" },
-                category: "",
+                category: { en: "", ja: "" },
                 readTime: { en: "", ja: "" },
                 author: "",
                 blog: { en: "", ja: "" },
