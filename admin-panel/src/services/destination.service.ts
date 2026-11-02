@@ -1,19 +1,17 @@
-
 export type DestinationLanguage = "en" | "ja" | "fr";
 
 export interface DestinationPayload {
-  title: string;
+  title: Record<string, string>;
   slug?: string;
-  language: DestinationLanguage;
-  summary: string;
-  description: string;
-  province: string;
-  highlights: string[];
+  summary: Record<string, string>;
+  description: Record<string, string>;
+  province: Record<string, string>;
+  highlights: Record<string, string[]>;
   images?: string[];
-  bestTimeToVisit: string;
-  climate: string;
-  primaryLanguage: string;
-  localCurrency: string;
+  bestTimeToVisit: Record<string, string>;
+  climate: Record<string, string>;
+  primaryLanguage: Record<string, string>;
+  localCurrency: Record<string, string>;
   coordinates: {
     lat: number;
     lng: number;
@@ -24,13 +22,12 @@ export interface DestinationPreview {
   id: string;
   title: string;
   slug: string;
-  language: DestinationLanguage;
+  language: string;
   summary: string;
+  province: string;
+  bestTimeToVisit: string;
+  climate: string;
   heroImage: string | null;
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
 }
 
 class DestinationService {
