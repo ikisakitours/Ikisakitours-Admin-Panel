@@ -5,7 +5,7 @@ interface MultilingualEditorProps {
         title: Record<string, string>;
         slug: string;
         summary: Record<string, string>;
-        category: string;
+        category: Record<string, string>;
         readTime: Record<string, string>;
         author: string;
         blog: Record<string, string>;
@@ -38,11 +38,10 @@ export default function MultilingualEditor({
                             type="button"
                             key={lang}
                             onClick={() => setActiveLang(lang)}
-                            className={`px-3 py-1 text-xs font-semibold rounded-lg uppercase transition-colors ${
-                                activeLang === lang
+                            className={`px-3 py-1 text-xs font-semibold rounded-lg uppercase transition-colors ${activeLang === lang
                                     ? "bg-indigo-600 text-white"
                                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            }`}
+                                }`}
                         >
                             {lang}
                         </button>
@@ -96,12 +95,17 @@ export default function MultilingualEditor({
                 </div>
 
                 <div>
-                    <label className="block text-xs font-semibold mb-1">Category</label>
+                    <label className="block text-xs font-semibold mb-1">Category ({activeLang.toUpperCase()})</label>
                     <input
                         type="text"
                         required
-                        value={formData.category}
-                        onChange={(e) => onChange("category", e.target.value)}
+                        value={formData.category[activeLang] || ""}
+                        onChange={(e) =>
+                            onChange("category", {
+                                ...formData.category,
+                                [activeLang]: e.target.value,
+                            })
+                        }
                         className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
                         placeholder="e.g. Travel, Engineering"
                     />

@@ -4,7 +4,7 @@ export interface BlogPayload {
   slug?: string;
   title: Record<string, string>;      // e.g., { en: "Hello", ja: "こんにちは" }
   summary: Record<string, string>;    // e.g., { en: "Summary", ja: "要約" }
-  category: string;
+  category: Record<string, string>;
   readTime: Record<string, string>;   // e.g., { en: "5 min", ja: "5分" }
   blog: Record<string, string>;       // e.g., { en: "Content...", ja: "コンテンツ..." }
   author: string;
