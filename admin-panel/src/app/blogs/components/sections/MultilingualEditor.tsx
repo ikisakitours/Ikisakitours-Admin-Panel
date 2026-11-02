@@ -25,12 +25,15 @@ export default function MultilingualEditor({
     handleSlugChange,
     handleTitleChange,
 }: MultilingualEditorProps) {
+    // Dynamically extract all available language keys from the title object (e.g. ['en', 'ja'])
+    const availableLangs = Object.keys(formData.title).length > 0 ? Object.keys(formData.title) : ["en"];
+
     return (
         <div className="space-y-6">
-            {/* Language Switcher Tabs */}
+            {/* Dynamic Language Switcher Tabs based on JSON keys */}
             <div className="flex items-center justify-between border-b pb-2">
                 <div className="flex gap-2">
-                    {["en", "ja", "fr"].map((lang) => (
+                    {availableLangs.map((lang) => (
                         <button
                             type="button"
                             key={lang}
