@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import BlogForm from "./components/BlogForm";
+import BlogForm from "./components/sections/BlogForm";
 import BlogList from "./components/BlogList";
 
 export default function BlogsPage() {
