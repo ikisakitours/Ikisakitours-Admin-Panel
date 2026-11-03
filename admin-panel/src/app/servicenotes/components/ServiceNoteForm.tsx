@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Plus, Save, X, ClipboardList, Globe } from "lucide-react";
 import { ServiceNotePayload } from "@/services/service-notes.service";
 
@@ -27,7 +27,7 @@ export default function ServiceNoteForm({
 }: Props) {
     const [submitting, setSubmitting] = useState<boolean>(false);
 
-    // Helper for record-based string fields if any are added later, or regular values
+    // Helper for record-based string fields or regular values
     const handleRecordChange = (field: keyof ServiceNotePayload, value: any) => {
         setFormData((prev) => ({
             ...prev,
@@ -173,15 +173,41 @@ export default function ServiceNoteForm({
                         />
                     </div>
 
-                    {/* Driver Option */}
+                    {/* With Driver Price */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-600 mb-1">Driver Option</label>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1">With Driver Price</label>
                         <input
                             type="text"
                             required
-                            value={formData.driverOption}
-                            onChange={(e) => handleRecordChange("driverOption", e.target.value)}
-                            placeholder="e.g., English Speaking Driver Included"
+                            value={formData.withDriverPrice}
+                            onChange={(e) => handleRecordChange("withDriverPrice", e.target.value)}
+                            placeholder="e.g., $60"
+                            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+                        />
+                    </div>
+
+                    {/* With Guide Price */}
+                    <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1">With Guide Price</label>
+                        <input
+                            type="text"
+                            required
+                            value={formData.withGuidePrice}
+                            onChange={(e) => handleRecordChange("withGuidePrice", e.target.value)}
+                            placeholder="e.g., $75"
+                            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+                        />
+                    </div>
+
+                    {/* With Driver & Guide Price */}
+                    <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1">With Driver & Guide Price</label>
+                        <input
+                            type="text"
+                            required
+                            value={formData.withDriverAndGuidePrice}
+                            onChange={(e) => handleRecordChange("withDriverAndGuidePrice", e.target.value)}
+                            placeholder="e.g., $95"
                             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
                         />
                     </div>
