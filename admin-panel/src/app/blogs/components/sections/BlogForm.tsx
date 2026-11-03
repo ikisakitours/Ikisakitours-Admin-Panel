@@ -37,13 +37,24 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
     };
 
     const handleLoadJson = (jsonContent: any) => {
+        if (!jsonContent) return;
+
+        const titleObj = typeof jsonContent.title === "object" && jsonContent.title !== null
+            ? jsonContent.title
+            : { en: jsonContent.title || "" };
+
+        // Automatically select the first available language from the JSON
+        const detectedLangs = Object.keys(titleObj);
+        if (detectedLangs.length > 0) {
+            setActiveLang(detectedLangs[0]);
+        }
+
         setFormData((prev) => ({
             ...prev,
             slug: jsonContent.slug || prev.slug,
             author: jsonContent.author || prev.author,
-            // Handle category as either an object or fallback string
             category: typeof jsonContent.category === "object" ? jsonContent.category : { en: jsonContent.category || "" },
-            title: typeof jsonContent.title === "object" ? jsonContent.title : { en: jsonContent.title || "" },
+            title: titleObj,
             summary: typeof jsonContent.summary === "object" ? jsonContent.summary : { en: jsonContent.summary || "" },
             readTime: typeof jsonContent.readTime === "object" ? jsonContent.readTime : { en: jsonContent.readTime || "" },
             blog: typeof jsonContent.blog === "object" ? jsonContent.blog : { en: jsonContent.blog || "" },
