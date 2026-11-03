@@ -71,7 +71,26 @@ export function PackageDestinationPicker({
   const getPreview = (id: string) => allPreviews.find((p) => p.id === id);
 
   const addDestination = (dest: DestinationPreview) => {
-    onChange([...selectedDestinations, { id: dest.id, slug: dest.slug }]);
+    // Build Record<string, string> objects for title and summary to satisfy backend validation
+    const titleObj =
+      typeof dest.title === "object" && dest.title !== null
+        ? dest.title
+        : { en: dest.titleEn || (typeof dest.title === "string" ? dest.title : ""), ja: dest.titleJa || "" };
+
+    const summaryObj =
+      typeof dest.summary === "object" && dest.summary !== null
+        ? dest.summary
+        : { en: dest.summaryEn || (typeof dest.summary === "string" ? dest.summary : ""), ja: dest.summaryJa || "" };
+
+    onChange([
+      ...selectedDestinations,
+      {
+        id: dest.id,
+        slug: dest.slug,
+        title: titleObj,
+        summary: summaryObj,
+      },
+    ]);
     setQuery("");
     setIsOpen(false);
   };
