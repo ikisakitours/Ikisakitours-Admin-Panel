@@ -5,9 +5,7 @@ import { Plus, Save, X, ClipboardList, Globe } from "lucide-react";
 import { ServiceNotePayload } from "@/services/service-notes.service";
 
 const ALLOWED_SERVICE_TYPES = [
-    "round_tours",
-    "day_tours",
-    "airport_transfers",
+    "custom", "chauffeur", "transfer"
 ];
 
 interface Props {
