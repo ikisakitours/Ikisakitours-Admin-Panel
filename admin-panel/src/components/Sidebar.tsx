@@ -15,7 +15,8 @@ import {
   HelpCircle,
   FileCode,
   Image as ImageIcon,
-  ListOrdered
+  ListOrdered,
+  ClipboardList
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -28,6 +29,7 @@ export default function Sidebar() {
     { href: "/users", label: "Registed Users", icon: Users },
     { href: "/tours", label: "Package Bookings", icon: CalendarCheck },
     { href: "/tourservices", label: "Tour Services", icon: Briefcase },
+    { href: "/servicenotes", label: "Service Notes", icon: ClipboardList },
     { href: "/comments", label: "Comments & Reviews", icon: MessageSquareText },
     { href: "/contact", label: "Contact", icon: Mail },
     { href: "/adminlogs", label: "Audit Logs", icon: FileCode },
