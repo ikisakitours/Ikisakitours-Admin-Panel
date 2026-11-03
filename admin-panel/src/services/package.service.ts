@@ -13,9 +13,11 @@ export const packageService = {
     const data = new FormData();
 
     data.append("type", formData.type);
-    data.append("category", formData.category);
-    data.append("origin", formData.origin);
-    data.append("duration", formData.duration);
+    // Translatable dictionary objects sent as JSON strings via FormData
+    data.append("category", JSON.stringify(formData.category));
+    data.append("origin", JSON.stringify(formData.origin));
+    data.append("duration", JSON.stringify(formData.duration));
+
     if (formData.badge) {
       data.append("badge", formData.badge);
     }
@@ -24,33 +26,22 @@ export const packageService = {
     data.append("discount", formData.discount || "0");
     data.append("provider", formData.provider);
 
-    // ── Localized English scalar fields ──
-    data.append("titleEn", formData.titleEn);
-    data.append("titleEmphasisEn", formData.titleEmphasisEn);
-    data.append("leadTitleEn", formData.leadTitleEn);
-    data.append("leadDescriptionEn", formData.leadDescriptionEn);
-    data.append("descriptionEn", formData.descriptionEn);
+    // ── Multilingual JSONB Text Fields (Records) ──
+    data.append("title", JSON.stringify(formData.title));
+    data.append("titleEmphasis", JSON.stringify(formData.titleEmphasis));
+    data.append("leadTitle", JSON.stringify(formData.leadTitle));
+    data.append("leadDescription", JSON.stringify(formData.leadDescription));
+    data.append("description", JSON.stringify(formData.description));
 
-    // ── Localized English arrays ──
-    data.append(
-      "highlightsEn",
-      JSON.stringify(formData.highlightsEn.filter((h) => h.trim() !== ""))
-    );
-    data.append(
-      "includesEn",
-      JSON.stringify(formData.includesEn.filter((i) => i.trim() !== ""))
-    );
-    data.append(
-      "excludesEn",
-      JSON.stringify(formData.excludesEn.filter((e) => e.trim() !== ""))
-    );
+    // ── Multilingual JSONB Arrays (Records of string arrays) ──
+    data.append("highlights", JSON.stringify(formData.highlights));
+    data.append("includes", JSON.stringify(formData.includes));
+    data.append("excludes", JSON.stringify(formData.excludes));
 
     // ── JSONB Fields ──
     data.append(
       "activityDetails",
-      JSON.stringify(
-        formData.activityDetails.filter((a) => a.titleEn.trim() !== "")
-      )
+      JSON.stringify(formData.activityDetails)
     );
     data.append(
       "itinerary",
@@ -62,32 +53,6 @@ export const packageService = {
       "destinations",
       JSON.stringify(formData.destinations.filter((d) => d.id))
     );
-
-    // ── Localized Japanese fields (Optional) ──
-    if (formData.titleJa) data.append("titleJa", formData.titleJa);
-    if (formData.titleEmphasisJa) data.append("titleEmphasisJa", formData.titleEmphasisJa);
-    if (formData.leadTitleJa) data.append("leadTitleJa", formData.leadTitleJa);
-    if (formData.leadDescriptionJa) data.append("leadDescriptionJa", formData.leadDescriptionJa);
-    if (formData.descriptionJa) data.append("descriptionJa", formData.descriptionJa);
-
-    if (formData.highlightsJa) {
-      data.append(
-        "highlightsJa",
-        JSON.stringify(formData.highlightsJa.filter((h) => h.trim() !== ""))
-      );
-    }
-    if (formData.includesJa) {
-      data.append(
-        "includesJa",
-        JSON.stringify(formData.includesJa.filter((i) => i.trim() !== ""))
-      );
-    }
-    if (formData.excludesJa) {
-      data.append(
-        "excludesJa",
-        JSON.stringify(formData.excludesJa.filter((e) => e.trim() !== ""))
-      );
-    }
 
     images.forEach((file) => {
       data.append("images", file);

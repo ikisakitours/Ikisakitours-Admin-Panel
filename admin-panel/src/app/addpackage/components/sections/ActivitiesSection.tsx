@@ -6,29 +6,30 @@ import { PackageFormData, ActivityDetail } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
-  locale: "en" | "ja";
+  locale: string;
 }
 
 export function ActivitiesSection({ formData, setFormData, locale }: Props) {
-  
+
   const handleActivityChange = (index: number, key: "title" | "description", value: string) => {
-    const targetKey = locale === "ja" ? `${key}Ja` : `${key}En`;
     const updated = [...formData.activityDetails];
-    
-    // TypeScript knows ActivityDetail has titleEn, titleJa, descriptionEn, descriptionJa
-    (updated[index] as any)[targetKey] = value;
-    
+    const currentActivity = updated[index];
+
+    // Update the specific language key inside the Record<string, string> dictionary
+    currentActivity[key] = {
+      ...(currentActivity[key] || {}),
+      [locale]: value,
+    };
+
     setFormData((prev) => ({ ...prev, activityDetails: updated }));
   };
 
   const addActivity = () => {
-    const newActivity: ActivityDetail = { 
-      titleEn: "", 
-      descriptionEn: "",
-      titleJa: "",
-      descriptionJa: ""
+    const newActivity: ActivityDetail = {
+      title: {},
+      description: {},
     };
-      
+
     setFormData((prev) => ({
       ...prev,
       activityDetails: [...prev.activityDetails, newActivity],
@@ -45,7 +46,7 @@ export function ActivitiesSection({ formData, setFormData, locale }: Props) {
   return (
     <div className="space-y-4 pt-4 border-t border-slate-100">
       <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-indigo-500" /> Activity Details ({locale === "en" ? "English" : "Japanese"})
+        <Sparkles className="w-4 h-4 text-indigo-500" /> Activity Details ({locale.toUpperCase()})
       </h3>
       {formData.activityDetails.map((activity, idx) => (
         <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
@@ -65,14 +66,14 @@ export function ActivitiesSection({ formData, setFormData, locale }: Props) {
             <input
               type="text"
               placeholder="Activity Title"
-              value={locale === "en" ? activity.titleEn : (activity.titleJa || "")}
+              value={activity.title?.[locale] || ""}
               onChange={(e) => handleActivityChange(idx, "title", e.target.value)}
               className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
             />
             <input
               type="text"
               placeholder="Activity Description"
-              value={locale === "en" ? activity.descriptionEn : (activity.descriptionJa || "")}
+              value={activity.description?.[locale] || ""}
               onChange={(e) => handleActivityChange(idx, "description", e.target.value)}
               className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
             />

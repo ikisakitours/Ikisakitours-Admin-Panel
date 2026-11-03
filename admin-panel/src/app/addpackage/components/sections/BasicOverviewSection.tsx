@@ -6,11 +6,11 @@ import { PackageFormData, PackageBadge } from "../../types/package.types";
 interface Props {
   formData: PackageFormData;
   setFormData: React.Dispatch<React.SetStateAction<PackageFormData>>;
-  locale: "en" | "ja";
+  locale: string;
 }
 
 export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
-  
+
   // Helper to generate a slug from combined Title 1 and Title 2
   const updateSlug = (title1: string, title2: string) => {
     const combined = `${title1} ${title2}`;
@@ -22,29 +22,39 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
       .replace(/^-+|-+$/g, "");
   };
 
+  const handleRecordChange = (field: keyof PackageFormData, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: {
+        ...(prev[field] as Record<string, string> || {}),
+        [locale]: value,
+      },
+    }));
+  };
+
   const handleTitle1Change = (val: string) => {
-    // Only regenerate slug when editing English (Slug stays consistent)
-    if (locale === "en") {
-      const newSlug = updateSlug(val, formData.titleEmphasisEn);
-      setFormData((prev) => ({ ...prev, titleEn: val, slug: newSlug }));
-    } else {
-      setFormData((prev) => ({ ...prev, titleJa: val }));
+    handleRecordChange("title", val);
+    // Only regenerate slug when editing English or if slug is empty
+    if (locale === "en" || !formData.slug) {
+      const emphasisVal = formData.titleEmphasis?.[locale] || formData.titleEmphasis?.["en"] || "";
+      const newSlug = updateSlug(val, emphasisVal);
+      setFormData((prev) => ({ ...prev, slug: newSlug }));
     }
   };
 
   const handleTitle2Change = (val: string) => {
-    if (locale === "en") {
-      const newSlug = updateSlug(formData.titleEn, val);
-      setFormData((prev) => ({ ...prev, titleEmphasisEn: val, slug: newSlug }));
-    } else {
-      setFormData((prev) => ({ ...prev, titleEmphasisJa: val }));
+    handleRecordChange("titleEmphasis", val);
+    if (locale === "en" || !formData.slug) {
+      const titleVal = formData.title?.[locale] || formData.title?.["en"] || "";
+      const newSlug = updateSlug(titleVal, val);
+      setFormData((prev) => ({ ...prev, slug: newSlug }));
     }
   };
 
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-        <Tag className="w-4 h-4 text-indigo-500" /> Basic Overview & Metadata
+        <Tag className="w-4 h-4 text-indigo-500" /> Basic Overview & Metadata ({locale.toUpperCase()})
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
@@ -59,34 +69,34 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">Category ({locale.toUpperCase()})</label>
           <input
             type="text"
             required
-            value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            value={formData.category?.[locale] || ""}
+            onChange={(e) => handleRecordChange("category", e.target.value)}
             placeholder="e.g. Wildlife, Adventure"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">Origin / Departure</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">Origin / Departure ({locale.toUpperCase()})</label>
           <input
             type="text"
             required
-            value={formData.origin}
-            onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
+            value={formData.origin?.[locale] || ""}
+            onChange={(e) => handleRecordChange("origin", e.target.value)}
             placeholder="e.g. Colombo, Kandy"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">Duration</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">Duration ({locale.toUpperCase()})</label>
           <input
             type="text"
             required
-            value={formData.duration}
-            onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+            value={formData.duration?.[locale] || ""}
+            onChange={(e) => handleRecordChange("duration", e.target.value)}
             placeholder="e.g. 4 Days / 8 Hours"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
@@ -106,32 +116,32 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">
-            Title 1 (Main Title) - {locale === "en" ? "English" : "Japanese"}
+            Title 1 (Main Title) - {locale.toUpperCase()}
           </label>
           <input
             type="text"
             required={locale === "en"}
-            value={locale === "en" ? formData.titleEn : (formData.titleJa || "")}
+            value={formData.title?.[locale] || ""}
             onChange={(e) => handleTitle1Change(e.target.value)}
-            placeholder={locale === "en" ? "e.g. Ancient Kingdom" : "例：古代王国"}
+            placeholder="e.g. Ancient Kingdom"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">
-            Title 2 (Highlight) - {locale === "en" ? "English" : "Japanese"}
+            Title 2 (Highlight) - {locale.toUpperCase()}
           </label>
           <input
             type="text"
             required={locale === "en"}
-            value={locale === "en" ? formData.titleEmphasisEn : (formData.titleEmphasisJa || "")}
+            value={formData.titleEmphasis?.[locale] || ""}
             onChange={(e) => handleTitle2Change(e.target.value)}
-            placeholder={locale === "en" ? "e.g. Exclusive" : "例：限定"}
+            placeholder="e.g. Exclusive"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1">URL Slug (Auto: Title 1 + Title 2)</label>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">URL Slug (Auto)</label>
           <input
             type="text"
             readOnly

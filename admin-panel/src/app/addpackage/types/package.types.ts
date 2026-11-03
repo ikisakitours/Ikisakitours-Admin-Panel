@@ -3,49 +3,37 @@ export type PackageType = "oneday" | "multiday";
 export type PackageBadge = "new_arrival" | "discounted" | "popular" | "featured";
 
 export interface ActivityDetail {
-  titleEn: string;
-  descriptionEn: string;
-  
-  // Localized additions
-  titleJa?: string;
-  descriptionJa?: string;
+  title: Record<string, string>;
+  description: Record<string, string>;
 }
 
 export interface ItineraryItem {
   day: number;
-  travelTime: string;
+  travelTime?: Record<string, string>;
 
-  // English Fields
-  titleEn: string;
-  locationsEn: string[];
-  routeEn: string[];
-  detailsEn: string[];
-  scenicStopsEn?: string[];
-  activitiesEn?: string[];
-  mealsEn: string[];
-  accommodationEn: string[];
-
-  // Japanese Fields
-  titleJa?: string;
-  locationsJa?: string[];
-  routeJa?: string[];
-  detailsJa?: string[];
-  scenicStopsJa?: string[];
-  activitiesJa?: string[];
-  mealsJa?: string[];
-  accommodationJa?: string[];
+  // Multilingual JSONB Text & Array Fields
+  title: Record<string, string>;
+  locations?: Record<string, string[]>;
+  route?: Record<string, string[]>;
+  details?: Record<string, string[]>;
+  scenicStops?: Record<string, string[]>;
+  activities?: Record<string, string[]>;
+  meals?: Record<string, string>;
+  accommodation?: Record<string, string>;
 }
 
 export interface DestinationSnapshot {
   id: string;
   slug: string;
+  title?: Record<string, string>;
+  summary?: Record<string, string>;
 }
 
 export interface PackageFormData {
   type: PackageType;
-  category: string;
-  origin: string;
-  duration: string;
+  category: Record<string, string>;
+  origin: Record<string, string>;
+  duration: Record<string, string>;
   badge?: PackageBadge;
   slug: string;
 
@@ -57,23 +45,15 @@ export interface PackageFormData {
   itinerary: ItineraryItem[];
   destinations: DestinationSnapshot[];
 
-  // ── Localized English Fields (Required) ──
-  titleEn: string;
-  titleEmphasisEn: string;
-  leadTitleEn: string;
-  leadDescriptionEn: string;
-  descriptionEn: string;
-  highlightsEn: string[];
-  includesEn: string[];
-  excludesEn: string[];
+  // ── Multilingual JSONB Text Fields (Records) ──
+  title: Record<string, string>;
+  titleEmphasis: Record<string, string>;
+  leadTitle: Record<string, string>;
+  leadDescription: Record<string, string>;
+  description: Record<string, string>;
 
-  // ── Localized Japanese Fields (Optional) ──
-  titleJa?: string;
-  titleEmphasisJa?: string;
-  leadTitleJa?: string;
-  leadDescriptionJa?: string;
-  descriptionJa?: string;
-  highlightsJa?: string[];
-  includesJa?: string[];
-  excludesJa?: string[];
+  // ── Multilingual JSONB Array Fields (Records of string arrays) ──
+  highlights: Record<string, string[]>;
+  includes: Record<string, string[]>;
+  excludes: Record<string, string[]>;
 }

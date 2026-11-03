@@ -9,7 +9,7 @@ import { PricingSection } from "@/app/addpackage/components/sections/PricingSect
 import { ActivitiesSection } from "@/app/addpackage/components/sections/ActivitiesSection";
 import { ItinerarySection } from "@/app/addpackage/components/sections/ItinerarySection";
 import { HighlightsAndExtras } from "@/app/addpackage/components/sections/HighlightsAndExtras";
-import { ArrowLeft, Save, Globe } from "lucide-react";
+import { ArrowLeft, Save, Globe, Plus } from "lucide-react";
 import { PackageDestinationPicker } from "../addpackage/components/sections/PackageDestinationPicker";
 
 export default function ManagePackagesPage() {
@@ -18,7 +18,9 @@ export default function ManagePackagesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<PackageFormData | null>(null);
 
-  const [locale, setLocale] = useState<"en" | "ja">("en");
+  // Dynamic language management
+  const [locale, setLocale] = useState<string>("en");
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en", "ja"]);
 
   // Triggered when user clicks "Edit" in the table
   const handleStartEdit = async (slug: string) => {
@@ -26,36 +28,23 @@ export default function ManagePackagesPage() {
     setLoadingPackage(true);
     try {
       const data = await packageService.getPackageBySlug(slug);
-      
-      // Ensure Ja fields exist so React doesn't complain about uncontrolled inputs
-      setFormData({
-        ...data,
-        // En fields are required by the type now, but we ensure Ja has fallbacks
-        titleJa: data.titleJa || "",
-        titleEmphasisJa: data.titleEmphasisJa || "",
-        leadTitleJa: data.leadTitleJa || "",
-        leadDescriptionJa: data.leadDescriptionJa || "",
-        descriptionJa: data.descriptionJa || "",
-        highlightsJa: data.highlightsJa || [""],
-        includesJa: data.includesJa || [""],
-        excludesJa: data.excludesJa || [""],
-        activityDetails: data.activityDetails.map((a: any) => ({
-          ...a,
-          titleJa: a.titleJa || "",
-          descriptionJa: a.descriptionJa || ""
-        })),
-        itinerary: data.itinerary.map((i: any) => ({
-          ...i,
-          titleJa: i.titleJa || "",
-          locationsJa: i.locationsJa || [""],
-          routeJa: i.routeJa || [""],
-          detailsJa: i.detailsJa || [""],
-          scenicStopsJa: i.scenicStopsJa || [""],
-          activitiesJa: i.activitiesJa || [""],
-          mealsJa: i.mealsJa || [""],
-          accommodationJa: i.accommodationJa || [""],
-        }))
-      });
+
+      // Extract any additional languages dynamically present in the fetched record dictionaries
+      const discoveredLangs = new Set<string>(["en", "ja"]);
+      const checkObj = (obj: any) => {
+        if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+          Object.keys(obj).forEach((k) => {
+            if (k.length <= 5) discoveredLangs.add(k);
+          });
+        }
+      };
+
+      checkObj(data.title);
+      checkObj(data.leadTitle);
+      checkObj(data.description);
+
+      setAvailableLanguages(Array.from(discoveredLangs));
+      setFormData(data);
     } catch (err: any) {
       alert("Failed to load package details: " + err.message);
       setEditingSlug(null);
@@ -82,12 +71,34 @@ export default function ManagePackagesPage() {
     }
   };
 
+  const handleRecordChange = (
+    field: "leadTitle" | "leadDescription" | "description",
+    value: string
+  ) => {
+    if (!formData) return;
+    setFormData({
+      ...formData,
+      [field]: {
+        ...(formData[field] || {}),
+        [locale]: value,
+      },
+    });
+  };
+
+  const addCustomLanguage = () => {
+    const lang = prompt("Enter new language code (e.g. fr, de, es, zh):")?.toLowerCase().trim();
+    if (lang && !availableLanguages.includes(lang)) {
+      setAvailableLanguages((prev) => [...prev, lang]);
+      setLocale(lang);
+    }
+  };
+
   // Helper type-safe setter for sub-components
   const safeSetFormData = setFormData as React.Dispatch<React.SetStateAction<PackageFormData>>;
 
   return (
     <div className="p-6 sm:p-10 max-w-6xl mx-auto space-y-6">
-      
+
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/60 pb-5">
         <div>
@@ -102,23 +113,30 @@ export default function ManagePackagesPage() {
         </div>
 
         {editingSlug && (
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            {/* Language Toggle for Edit Mode */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+          <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
+            {/* Dynamic Language Toggle for Edit Mode */}
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 flex-wrap">
               <Globe className="w-4 h-4 text-slate-500 ml-2" />
+              {availableLanguages.map((langKey) => (
+                <button
+                  key={langKey}
+                  type="button"
+                  onClick={() => setLocale(langKey)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${locale === langKey
+                      ? "bg-white text-indigo-600 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                    }`}
+                >
+                  {langKey}
+                </button>
+              ))}
               <button
                 type="button"
-                onClick={() => setLocale("en")}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${locale === "en" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                onClick={addCustomLanguage}
+                className="p-1.5 text-slate-500 hover:text-indigo-600 text-xs flex items-center gap-0.5 font-semibold cursor-pointer"
+                title="Add new language code"
               >
-                English
-              </button>
-              <button
-                type="button"
-                onClick={() => setLocale("ja")}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${locale === "ja" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-              >
-                Japanese
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -137,7 +155,7 @@ export default function ManagePackagesPage() {
 
       {/* VIEW STATE 1: TABLE VIEW */}
       {!editingSlug && (
-        <PackagesTable onEdit={handleStartEdit} />
+        <PackagesTable onEdit={handleStartEdit} locale={locale} />
       )}
 
       {/* VIEW STATE 2: EDIT FORM VIEW */}
@@ -149,13 +167,14 @@ export default function ManagePackagesPage() {
             </div>
           ) : (
             <form onSubmit={handleUpdate} className="w-full space-y-8 p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 shadow-xs">
-              
+
               {/* Pass locale down to all sections */}
               <BasicOverviewSection formData={formData} setFormData={safeSetFormData} locale={locale} />
               <PricingSection formData={formData} setFormData={safeSetFormData} />
               <PackageDestinationPicker
                 selectedDestinations={formData.destinations}
                 onChange={(destinations) => setFormData({ ...formData, destinations })}
+                locale={locale}
               />
               <ActivitiesSection formData={formData} setFormData={safeSetFormData} locale={locale} />
               <ItinerarySection formData={formData} setFormData={safeSetFormData} locale={locale} />
@@ -164,32 +183,30 @@ export default function ManagePackagesPage() {
               {/* Lead Header Info */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
                 <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                  Lead Header Information ({locale === "en" ? "English" : "Japanese"})
+                  Lead Header Information ({locale.toUpperCase()})
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Lead Title</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">
+                      Lead Title ({locale.toUpperCase()})
+                    </label>
                     <input
                       type="text"
                       required={locale === "en"}
-                      value={locale === "en" ? formData.leadTitleEn : (formData.leadTitleJa || "")}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setFormData((prev: any) => ({ ...prev, [locale === "en" ? "leadTitleEn" : "leadTitleJa"]: val }));
-                      }}
+                      value={formData.leadTitle?.[locale] || ""}
+                      onChange={(e) => handleRecordChange("leadTitle", e.target.value)}
                       className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Lead Description</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">
+                      Lead Description ({locale.toUpperCase()})
+                    </label>
                     <input
                       type="text"
                       required={locale === "en"}
-                      value={locale === "en" ? formData.leadDescriptionEn : (formData.leadDescriptionJa || "")}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setFormData((prev: any) => ({ ...prev, [locale === "en" ? "leadDescriptionEn" : "leadDescriptionJa"]: val }));
-                      }}
+                      value={formData.leadDescription?.[locale] || ""}
+                      onChange={(e) => handleRecordChange("leadDescription", e.target.value)}
                       className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
                     />
                   </div>
@@ -198,15 +215,14 @@ export default function ManagePackagesPage() {
 
               {/* Detailed Description */}
               <div className="space-y-2 pt-4 border-t border-slate-100">
-                <label className="block text-xs font-semibold text-slate-600">Detailed Description ({locale === "en" ? "English" : "Japanese"})</label>
+                <label className="block text-xs font-semibold text-slate-600">
+                  Detailed Description ({locale.toUpperCase()})
+                </label>
                 <textarea
                   rows={4}
                   required={locale === "en"}
-                  value={locale === "en" ? formData.descriptionEn : (formData.descriptionJa || "")}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFormData((prev: any) => ({ ...prev, [locale === "en" ? "descriptionEn" : "descriptionJa"]: val }));
-                  }}
+                  value={formData.description?.[locale] || ""}
+                  onChange={(e) => handleRecordChange("description", e.target.value)}
                   className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none resize-y"
                 />
               </div>
