@@ -6,9 +6,10 @@ import { Edit2, Trash2, RefreshCw } from "lucide-react";
 
 interface Props {
   onEdit: (slug: string) => void;
+  locale?: string;
 }
 
-export function PackagesTable({ onEdit }: Props) {
+export function PackagesTable({ onEdit, locale = "en" }: Props) {
   const [packages, setPackages] = useState<PackageListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
@@ -29,8 +30,16 @@ export function PackagesTable({ onEdit }: Props) {
     fetchPackages();
   }, []);
 
-  const handleDelete = async (slug: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
+  // Helper to resolve title whether it's a string or a multilingual Record<string, string>
+  const resolveTitle = (titleField: any): string => {
+    if (!titleField) return "Untitled Package";
+    if (typeof titleField === "string") return titleField;
+    return titleField[locale] || titleField["en"] || Object.values(titleField)[0] || "Untitled Package";
+  };
+
+  const handleDelete = async (slug: string, rawTitle: any) => {
+    const displayTitle = resolveTitle(rawTitle);
+    if (!confirm(`Are you sure you want to delete "${displayTitle}"?`)) return;
 
     setDeletingSlug(slug);
     try {
@@ -50,6 +59,7 @@ export function PackagesTable({ onEdit }: Props) {
           All Stored Packages ({packages.length})
         </span>
         <button
+          type="button"
           onClick={fetchPackages}
           className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-lg transition-all cursor-pointer"
           title="Refresh List"
@@ -64,7 +74,7 @@ export function PackagesTable({ onEdit }: Props) {
         </div>
       ) : packages.length === 0 ? (
         <div className="p-10 text-center text-xs text-slate-400">
-          No packages found. Create one using the "Add New Package" menu!
+          No packages found. Create one using the &quot;Add New Package&quot; menu!
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -76,33 +86,36 @@ export function PackagesTable({ onEdit }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {packages.map((pkg) => (
-                <tr key={pkg.slug} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 font-bold text-slate-900">
-                    {pkg.title}
-                    <span className="block text-[11px] font-normal text-slate-400 font-mono mt-0.5">
-                      /{pkg.slug}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-right space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => onEdit(pkg.slug)}
-                      className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold rounded-lg transition-all inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" /> Edit
-                    </button>
-                    <button
-                      type="button"
-                      disabled={deletingSlug === pkg.slug}
-                      onClick={() => handleDelete(pkg.slug, pkg.title)}
-                      className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-lg transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" /> {deletingSlug === pkg.slug ? "..." : "Delete"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {packages.map((pkg) => {
+                const titleString = resolveTitle(pkg.title);
+                return (
+                  <tr key={pkg.slug} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      {titleString}
+                      <span className="block text-[11px] font-normal text-slate-400 font-mono mt-0.5">
+                        /{pkg.slug}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => onEdit(pkg.slug)}
+                        className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold rounded-lg transition-all inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" /> Edit
+                      </button>
+                      <button
+                        type="button"
+                        disabled={deletingSlug === pkg.slug}
+                        onClick={() => handleDelete(pkg.slug, pkg.title)}
+                        className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-lg transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> {deletingSlug === pkg.slug ? "..." : "Delete"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
