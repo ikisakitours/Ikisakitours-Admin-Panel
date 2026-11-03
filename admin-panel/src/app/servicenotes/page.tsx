@@ -57,7 +57,9 @@ export default function ServiceNotesPage() {
             startingPrice: item.startingPrice,
             vehicleCapacity: item.vehicleCapacity,
             luggages: item.luggages,
-            driverOption: item.driverOption,
+            withDriverPrice: item.withDriverPrice,
+            withGuidePrice: item.withGuidePrice,
+            withDriverAndGuidePrice: item.withDriverAndGuidePrice,
             notes: item.notes || { en: [""], ja: [""] },
         });
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -76,7 +78,7 @@ export default function ServiceNotesPage() {
                     Service Notes Management
                 </h1>
                 <p className="text-xs text-slate-500 mt-1">
-                    Configure multi-language vehicle parameters, capacities, pricing rules, and note bullet points.
+                    Configure multi-language vehicle parameters, capacities, pricing tiers, and note bullet points.
                 </p>
             </div>
 
@@ -119,10 +121,12 @@ export default function ServiceNotesPage() {
                                     <h3 className="text-sm font-bold text-slate-900 mb-2">{item.vehicleType}</h3>
 
                                     <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-3">
-                                        <div><span className="font-semibold text-slate-700">Price:</span> {item.startingPrice}</div>
+                                        <div><span className="font-semibold text-slate-700">Starting Price:</span> {item.startingPrice}</div>
                                         <div><span className="font-semibold text-slate-700">Capacity:</span> {item.vehicleCapacity}</div>
                                         <div><span className="font-semibold text-slate-700">Luggage:</span> {item.luggages}</div>
-                                        <div><span className="font-semibold text-slate-700">Driver:</span> {item.driverOption}</div>
+                                        <div><span className="font-semibold text-slate-700">With Driver:</span> {item.withDriverPrice}</div>
+                                        <div><span className="font-semibold text-slate-700">With Guide:</span> {item.withGuidePrice}</div>
+                                        <div><span className="font-semibold text-slate-700">Driver & Guide:</span> {item.withDriverAndGuidePrice}</div>
                                     </div>
 
                                     <div className="border-t border-slate-200/60 pt-2">

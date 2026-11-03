@@ -26,12 +26,14 @@ export default function ServiceNoteFormWrapper({
     const [locale, setLocale] = useState<string>("en");
     const [formData, setFormData] = useState<ServiceNotePayload>(
         initialData || {
-            serviceType: "round_tours",
+            serviceType: "custom",
             vehicleType: "",
             startingPrice: "",
             vehicleCapacity: "",
             luggages: "",
-            driverOption: "",
+            withDriverPrice: "",
+            withGuidePrice: "",
+            withDriverAndGuidePrice: "",
             notes: {
                 en: [""],
                 ja: [""],
@@ -65,10 +67,11 @@ export default function ServiceNoteFormWrapper({
                             key={l.code}
                             type="button"
                             onClick={() => setLocale(l.code)}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${locale === l.code
-                                ? "bg-indigo-600 text-white shadow-sm"
-                                : "text-slate-600 hover:text-slate-900"
-                                }`}
+                            className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                                locale === l.code
+                                    ? "bg-indigo-600 text-white shadow-sm"
+                                    : "text-slate-600 hover:text-slate-900"
+                            }`}
                         >
                             {l.label} ({l.code.toUpperCase()})
                         </button>

@@ -4,7 +4,9 @@ export interface ServiceNotePayload {
   startingPrice: string;
   vehicleCapacity: string;
   luggages: string;
-  driverOption: string;
+  withDriverPrice: string;
+  withGuidePrice: string;
+  withDriverAndGuidePrice: string;
   notes: Record<string, string[]>;
 }
 
