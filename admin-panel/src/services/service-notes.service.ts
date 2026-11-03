@@ -13,7 +13,7 @@ class ServiceNotesService {
 
   // Create a new service note
   async createServiceNote(payload: ServiceNotePayload) {
-    const res = await fetch(`${this.API_URL}/notes`, {
+    const res = await fetch(`${this.API_URL}/services/notes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,7 +36,7 @@ class ServiceNotesService {
     if (lang) params.append("lang", lang);
 
     const query = params.toString() ? `?${params.toString()}` : "";
-    const res = await fetch(`${this.API_URL}/notes${query}`);
+    const res = await fetch(`${this.API_URL}/services/notes${query}`);
 
     if (!res.ok) {
       const error = await res.json();
@@ -48,7 +48,7 @@ class ServiceNotesService {
 
   // Update an existing service note
   async updateServiceNote(id: string | number, payload: Partial<ServiceNotePayload>) {
-    const res = await fetch(`${this.API_URL}/notes/${id}`, {
+    const res = await fetch(`${this.API_URL}/services/notes/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
