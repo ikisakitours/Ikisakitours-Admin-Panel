@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto_Mono, Geist } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
+import { DesktopOnlyGuard } from "@/components/DesktopOnlyGuard";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -23,19 +24,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("h-full antialiased", "font-sans", geist.variable)}>
-      {/* 2. Apply the font class directly to the body so it inherits everywhere */}
+      {/* Apply the font class directly to the body so it inherits everywhere */}
       <body className={`${robotoMono.className} min-h-full bg-slate-50 text-slate-900`}>
-        <div className="flex min-h-screen">
+        <DesktopOnlyGuard>
+          <div className="flex min-h-screen">
 
-          {/* Static Sidebar: locked in place, never reloads */}
-          <Sidebar />
+            {/* Static Sidebar: locked in place, never reloads */}
+            <Sidebar />
 
-          {/* Dynamic Content Area: Only this section reloads when you change pages */}
-          <main className="flex-1 p-8">
-            {children}
-          </main>
+            {/* Dynamic Content Area: Only this section reloads when you change pages */}
+            <main className="flex-1 p-8">
+              {children}
+            </main>
 
-        </div>
+          </div>
+        </DesktopOnlyGuard>
       </body>
     </html>
   );
