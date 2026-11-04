@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { destinationService, DestinationPayload } from "@/services/destination.service";
-import { Save } from "lucide-react";
+import { Save, Plus } from "lucide-react";
 import DestinationBasicInfo from "./DestinationBasicInfo";
 import DestinationContent from "./DestinationContent";
 import DestinationMedia from "./DestinationMedia";
@@ -66,14 +66,25 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
       .replace(/^-+|-+$/g, "");
   };
 
+  // Add custom language handler
+  const addCustomLanguage = () => {
+    const lang = prompt("Enter new language code (e.g. fr, de, es, zh):")?.toLowerCase().trim();
+    if (lang && !availableLanguages.includes(lang)) {
+      setAvailableLanguages((prev) => [...prev, lang]);
+      setActiveLang(lang);
+    }
+  };
+
   // Handle JSON Import
   const handleJsonLoaded = (data: any) => {
     if (!data) return;
 
     // Detect available languages from title or fallback keys
     const detectedLangs = data.title ? Object.keys(data.title) : ["en"];
-    setAvailableLanguages(detectedLangs.length > 0 ? detectedLangs : ["en"]);
-    setActiveLang(detectedLangs[0] || "en");
+    if (detectedLangs.length > 0) {
+      setAvailableLanguages((prev) => Array.from(new Set([...prev, ...detectedLangs])));
+      setActiveLang(detectedLangs[0]);
+    }
 
     if (data.slug) {
       setSlug(slugify(data.slug));
@@ -237,14 +248,41 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
     <form onSubmit={handleSubmit} className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 space-y-6">
       <div className="flex justify-between items-center pb-4 border-b dark:border-gray-800">
         <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Create Travel Destination</h2>
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
-        >
-          <Save className="w-4 h-4" />
-          {loading ? "Saving..." : "Publish"}
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Dynamic Language Switcher with Add Button */}
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-gray-800 p-1 rounded-lg border border-slate-200 dark:border-gray-700 flex-wrap">
+            {availableLanguages.map((langKey) => (
+              <button
+                key={langKey}
+                type="button"
+                onClick={() => setActiveLang(langKey)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${activeLang === langKey
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700"
+                  }`}
+              >
+                {langKey}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={addCustomLanguage}
+              className="p-1.5 text-slate-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs flex items-center gap-0.5 font-semibold cursor-pointer"
+              title="Add new language code"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
+          >
+            <Save className="w-4 h-4" />
+            {loading ? "Saving..." : "Publish"}
+          </button>
+        </div>
       </div>
 
       {/* JSON File Uploader Section */}

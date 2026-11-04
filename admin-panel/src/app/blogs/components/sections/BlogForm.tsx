@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { blogService } from "@/services/blog.service";
-import { Save } from "lucide-react";
+import { Save, Plus } from "lucide-react";
 import JsonImporter from "./JsonImporter";
 import MultilingualEditor from "./MultilingualEditor";
 import ImageUploader from "./ImageUploader";
@@ -15,7 +15,10 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
     const [loading, setLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isCustomSlug, setIsCustomSlug] = useState(false);
+
+    // Dynamic language management
     const [activeLang, setActiveLang] = useState<string>("en");
+    const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en", "ja"]);
 
     const [formData, setFormData] = useState({
         title: { en: "", ja: "" } as Record<string, string>,
@@ -36,6 +39,14 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
             .replace(/^-+|-+$/g, "");
     };
 
+    const addCustomLanguage = () => {
+        const lang = prompt("Enter new language code (e.g. fr, de, es, zh):")?.toLowerCase().trim();
+        if (lang && !availableLanguages.includes(lang)) {
+            setAvailableLanguages((prev) => [...prev, lang]);
+            setActiveLang(lang);
+        }
+    };
+
     const handleLoadJson = (jsonContent: any) => {
         if (!jsonContent) return;
 
@@ -43,9 +54,10 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
             ? jsonContent.title
             : { en: jsonContent.title || "" };
 
-        // Automatically select the first available language from the JSON
+        // Automatically merge or detect available languages from the JSON
         const detectedLangs = Object.keys(titleObj);
         if (detectedLangs.length > 0) {
+            setAvailableLanguages((prev) => Array.from(new Set([...prev, ...detectedLangs])));
             setActiveLang(detectedLangs[0]);
         }
 
@@ -129,6 +141,7 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
             setSelectedFiles([]);
             setIsCustomSlug(false);
             setActiveLang("en");
+            setAvailableLanguages(["en", "ja"]);
             setFormData({
                 title: { en: "", ja: "" },
                 slug: "",
@@ -152,14 +165,41 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                     <h2 className="text-lg font-bold">Create Multilingual Blog Post</h2>
                     <p className="text-xs text-slate-500">Upload a JSON data file or fill out fields manually.</p>
                 </div>
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                >
-                    <Save className="w-4 h-4" />
-                    {loading ? "Saving..." : "Publish"}
-                </button>
+                <div className="flex items-center gap-3">
+                    {/* Dynamic Language Switcher with Add Button */}
+                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 flex-wrap">
+                        {availableLanguages.map((langKey) => (
+                            <button
+                                key={langKey}
+                                type="button"
+                                onClick={() => setActiveLang(langKey)}
+                                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${activeLang === langKey
+                                        ? "bg-indigo-600 text-white shadow-sm"
+                                        : "text-slate-600 hover:bg-slate-200"
+                                    }`}
+                            >
+                                {langKey}
+                            </button>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={addCustomLanguage}
+                            className="p-1.5 text-slate-500 hover:text-indigo-600 text-xs flex items-center gap-0.5 font-semibold cursor-pointer"
+                            title="Add new language code"
+                        >
+                            <Plus className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                    >
+                        <Save className="w-4 h-4" />
+                        {loading ? "Saving..." : "Publish"}
+                    </button>
+                </div>
             </div>
 
             {/* Component 1: JSON Importer */}
