@@ -13,61 +13,63 @@ import { ItinerarySection } from "./sections/ItinerarySection";
 import { HighlightsAndExtras } from "./sections/HighlightsAndExtras";
 import { Save, Layers, Plus } from "lucide-react";
 
+const INITIAL_FORM_STATE: PackageFormData = {
+  type: "multiday",
+  category: { en: "", ja: "" },
+  origin: { en: "", ja: "" },
+  duration: { en: "", ja: "" },
+  badge: "new_arrival",
+  slug: "",
+  price: "",
+  discount: "0",
+  provider: "",
+  destinations: [],
+
+  // Multilingual JSONB Text Fields (Records)
+  title: { en: "", ja: "" },
+  titleEmphasis: { en: "", ja: "" },
+  leadTitle: { en: "", ja: "" },
+  leadDescription: { en: "", ja: "" },
+  description: { en: "", ja: "" },
+
+  // Multilingual JSONB Array Fields (Records of string arrays)
+  highlights: { en: [""], ja: [""] },
+  includes: { en: [""], ja: [""] },
+  excludes: { en: [""], ja: [""] },
+
+  // Nested JSONB Structures
+  activityDetails: [
+    {
+      title: { en: "", ja: "" },
+      description: { en: "", ja: "" }
+    }
+  ],
+
+  itinerary: [
+    {
+      day: 1,
+      travelTime: { en: "", ja: "" },
+      title: { en: "", ja: "" },
+      locations: { en: [""], ja: [""] },
+      route: { en: [""], ja: [""] },
+      details: { en: [""], ja: [""] },
+      scenicStops: { en: [""], ja: [""] },
+      activities: { en: [""], ja: [""] },
+      meals: { en: "", ja: "" },
+      accommodation: { en: "", ja: "" },
+    },
+  ],
+};
+
 export default function PackageFormWrapper() {
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  
+
   // Dynamic language management
   const [locale, setLocale] = useState<string>("en");
   const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en", "ja"]);
 
-  const [formData, setFormData] = useState<PackageFormData>({
-    type: "multiday",
-    category: { en: "", ja: "" },
-    origin: { en: "", ja: "" },
-    duration: { en: "", ja: "" },
-    badge: "new_arrival",
-    slug: "",
-    price: "",
-    discount: "0",
-    provider: "",
-    destinations: [],
-
-    // Multilingual JSONB Text Fields (Records)
-    title: { en: "", ja: "" },
-    titleEmphasis: { en: "", ja: "" },
-    leadTitle: { en: "", ja: "" },
-    leadDescription: { en: "", ja: "" },
-    description: { en: "", ja: "" },
-
-    // Multilingual JSONB Array Fields (Records of string arrays)
-    highlights: { en: [""], ja: [""] },
-    includes: { en: [""], ja: [""] },
-    excludes: { en: [""], ja: [""] },
-
-    // Nested JSONB Structures
-    activityDetails: [
-      { 
-        title: { en: "", ja: "" }, 
-        description: { en: "", ja: "" }
-      }
-    ],
-    
-    itinerary: [
-      {
-        day: 1,
-        travelTime: { en: "", ja: "" },
-        title: { en: "", ja: "" },
-        locations: { en: [""], ja: [""] },
-        route: { en: [""], ja: [""] },
-        details: { en: [""], ja: [""] },
-        scenicStops: { en: [""], ja: [""] },
-        activities: { en: [""], ja: [""] },
-        meals: { en: "", ja: "" },
-        accommodation: { en: "", ja: "" },
-      },
-    ],
-  });
+  const [formData, setFormData] = useState<PackageFormData>(INITIAL_FORM_STATE);
 
   const handleRecordChange = (
     field: "leadTitle" | "leadDescription" | "description",
@@ -101,7 +103,10 @@ export default function PackageFormWrapper() {
     try {
       const result = await packageService.createPackage(formData, selectedFiles);
       alert(`Success! Package created with ID: ${result.id}`);
+
+      // Reset form data and uploaded files back to initial empty state
       setSelectedFiles([]);
+      setFormData(INITIAL_FORM_STATE);
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -128,7 +133,7 @@ export default function PackageFormWrapper() {
             <h2 className="text-base font-bold text-slate-900">New Tour Package Configuration</h2>
             <p className="text-xs text-slate-500 mt-0.5">Fill in all details below to publish your tour package.</p>
           </div>
-          
+
           <div className="flex items-center gap-4">
             {/* Dynamic Language Switcher */}
             <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 flex-wrap">
@@ -137,11 +142,10 @@ export default function PackageFormWrapper() {
                   key={langKey}
                   type="button"
                   onClick={() => setLocale(langKey)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${
-                    locale === langKey
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${locale === langKey
                       ? "bg-indigo-600 text-white shadow-sm"
                       : "text-slate-600 hover:bg-slate-200"
-                  }`}
+                    }`}
                 >
                   {langKey}
                 </button>
@@ -205,7 +209,7 @@ export default function PackageFormWrapper() {
         {/* Pricing & Gallery Sections */}
         <PricingSection formData={formData} setFormData={setFormData} />
         <GallerySection selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} />
-        
+
         {/* Destination Sequence Picker */}
         <PackageDestinationPicker
           selectedDestinations={formData.destinations}
