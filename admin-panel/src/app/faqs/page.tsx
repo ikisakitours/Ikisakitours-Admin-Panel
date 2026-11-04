@@ -33,7 +33,7 @@ export default function FaqsAdminPage() {
             FAQ Management
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-mono">
-            Create, manage, and delete customer support questions and answers.
+            Create, manage, and delete multilingual customer support questions and answers.
           </p>
         </div>
       </div>
@@ -43,7 +43,9 @@ export default function FaqsAdminPage() {
 
       {/* Existing FAQs List Component */}
       {loading ? (
-        <p className="text-slate-500 font-mono text-sm">Loading FAQs...</p>
+        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm text-center">
+          <p className="text-slate-400 font-mono text-sm">Loading FAQs...</p>
+        </div>
       ) : (
         <FaqList faqs={faqs} onDeleted={fetchFaqs} />
       )}
