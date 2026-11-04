@@ -23,7 +23,7 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
   const [activeLang, setActiveLang] = useState<string>("en");
 
   // Track languages detected from imported JSON or added manually
-  const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en"]);
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en", "ja"]);
 
   // Multilingual fields stored as Record<string, string>
   const [formData, setFormData] = useState<{
@@ -38,14 +38,14 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
     lat: number;
     lng: number;
   }>({
-    title: { en: "" },
-    summary: { en: "" },
-    description: { en: "" },
-    province: { en: "" },
-    bestTimeToVisit: { en: "" },
-    climate: { en: "" },
-    primaryLanguage: { en: "" },
-    localCurrency: { en: "" },
+    title: { en: "", ja: "" },
+    summary: { en: "", ja: "" },
+    description: { en: "", ja: "" },
+    province: { en: "", ja: "" },
+    bestTimeToVisit: { en: "", ja: "" },
+    climate: { en: "", ja: "" },
+    primaryLanguage: { en: "", ja: "" },
+    localCurrency: { en: "", ja: "" },
     lat: 35.6762,
     lng: 139.6503,
   });
@@ -53,6 +53,7 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
   // Localized highlights map: Record<string, string[]>
   const [highlights, setHighlights] = useState<Record<string, string[]>>({
     en: [""],
+    ja: [""],
   });
 
   // Unicode-aware slugify (supports English, Japanese, French accents)
@@ -209,20 +210,20 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
       setIsCustomSlug(false);
       setSlug("");
       setActiveLang("en");
-      setAvailableLanguages(["en"]);
+      setAvailableLanguages(["en", "ja"]);
       setFormData({
-        title: { en: "" },
-        summary: { en: "" },
-        description: { en: "" },
-        province: { en: "" },
-        bestTimeToVisit: { en: "" },
-        climate: { en: "" },
-        primaryLanguage: { en: "" },
-        localCurrency: { en: "" },
+        title: { en: "", ja: "" },
+        summary: { en: "", ja: "" },
+        description: { en: "", ja: "" },
+        province: { en: "", ja: "" },
+        bestTimeToVisit: { en: "", ja: "" },
+        climate: { en: "", ja: "" },
+        primaryLanguage: { en: "", ja: "" },
+        localCurrency: { en: "", ja: "" },
         lat: 35.6762,
         lng: 139.6503,
       });
-      setHighlights({ en: [""] });
+      setHighlights({ en: [""], ja: [""] });
 
       if (onSuccess) onSuccess();
     } catch (err: any) {
