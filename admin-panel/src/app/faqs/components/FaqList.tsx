@@ -2,12 +2,11 @@
 
 import { faqService } from "@/services/faq.service";
 
-
 export interface FaqItem {
   id: string;
-  category: string;
-  question: string;
-  answer: string;
+  category: Record<string, string>;
+  question: Record<string, string>;
+  answer: Record<string, string>;
 }
 
 export default function FaqList({ faqs, onDeleted }: { faqs: FaqItem[]; onDeleted: () => void }) {
@@ -44,16 +43,48 @@ export default function FaqList({ faqs, onDeleted }: { faqs: FaqItem[]; onDelete
             key={faq.id}
             className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex justify-between items-start gap-6 transition hover:shadow-md"
           >
-            <div className="space-y-3 flex-1">
-              <span className="inline-block bg-indigo-50 text-indigo-600 text-xs px-3 py-1 rounded-lg font-mono font-medium">
-                {faq.category}
-              </span>
-              <h3 className="text-slate-900 font-bold text-lg font-mono tracking-tight">
-                {faq.question}
-              </h3>
-              <p className="text-slate-600 text-sm whitespace-pre-wrap font-mono leading-relaxed">
-                {faq.answer}
-              </p>
+            <div className="space-y-4 flex-1">
+              {/* Category Badges (EN / JA) */}
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-block bg-indigo-50 text-indigo-600 text-xs px-3 py-1 rounded-lg font-mono font-medium">
+                  EN Category: {faq.category?.en || '—'}
+                </span>
+                <span className="inline-block bg-purple-50 text-purple-600 text-xs px-3 py-1 rounded-lg font-mono font-medium">
+                  JA Category: {faq.category?.ja || '—'}
+                </span>
+              </div>
+
+              {/* Questions Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                <div>
+                  <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase">Question (EN)</span>
+                  <h3 className="text-slate-900 font-bold text-base font-mono tracking-tight mt-1">
+                    {faq.question?.en || '—'}
+                  </h3>
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase">Question (JA)</span>
+                  <h3 className="text-slate-900 font-bold text-base font-mono tracking-tight mt-1">
+                    {faq.question?.ja || '—'}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Answers Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                <div>
+                  <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase">Answer (EN)</span>
+                  <p className="text-slate-600 text-sm whitespace-pre-wrap font-mono leading-relaxed mt-1">
+                    {faq.answer?.en || '—'}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase">Answer (JA)</span>
+                  <p className="text-slate-600 text-sm whitespace-pre-wrap font-mono leading-relaxed mt-1">
+                    {faq.answer?.ja || '—'}
+                  </p>
+                </div>
+              </div>
             </div>
 
             <button

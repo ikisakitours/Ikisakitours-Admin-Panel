@@ -1,13 +1,13 @@
 export interface FaqPayload {
-  category: string;
-  question: string;
-  answer: string;
+  category: Record<string, string>;
+  question: Record<string, string>;
+  answer: Record<string, string>;
 }
 
 class FaqService {
   private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-  // Fetch all FAQs
+  // Fetch all FAQs (returns raw multilingual JSONB dictionaries when no lang is passed for the admin panel)
   async getFaqs() {
     const res = await fetch(`${this.API_URL}/faqs`);
 
@@ -19,7 +19,7 @@ class FaqService {
     return res.json();
   }
 
-  // Create a new FAQ (without admin API key header)
+  // Create a new FAQ with multilingual records
   async createFaq(payload: FaqPayload, _adminApiKey?: string) {
     const res = await fetch(`${this.API_URL}/faqs`, {
       method: "POST",
@@ -37,7 +37,7 @@ class FaqService {
     return res.json();
   }
 
-  // Delete FAQ by ID (without admin API key header)
+  // Delete FAQ by ID
   async deleteFaq(id: string) {
     const res = await fetch(`${this.API_URL}/faqs/${id}`, {
       method: "DELETE",
