@@ -103,27 +103,21 @@ export default function TourServiceCard({ item, onStatusChange }: TourServiceCar
                     </div>
                 </div>
 
-                {/* Pricing Info Section (Conditional) */}
-                {(item.startingPrice || item.selectedPrice) && (
-                    <div className="bg-indigo-50/50 p-2.5 rounded-lg border border-indigo-100 flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-indigo-900 font-semibold">
-                            <Tag className="w-3.5 h-3.5 text-indigo-600" />
-                            <span>Pricing Breakdown:</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {item.startingPrice && (
-                                <span className="text-slate-500 text-[11px]">
-                                    Starting: <strong className="text-slate-700">{item.startingPrice}</strong>
-                                </span>
-                            )}
-                            {item.selectedPrice && (
-                                <span className="text-indigo-700 text-[11px]">
-                                    Selected: <strong className="font-bold">{item.selectedPrice}</strong>
-                                </span>
-                            )}
-                        </div>
+                {/* Pricing Info Section (Always Visible) */}
+                <div className="bg-indigo-50/50 p-2.5 rounded-lg border border-indigo-100 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 text-indigo-900 font-semibold">
+                        <Tag className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Pricing:</span>
                     </div>
-                )}
+                    <div className="flex items-center gap-3">
+                        <span className="text-slate-500 text-[11px]">
+                            Starting: <strong className="text-slate-700">{item.startingPrice || "N/A"}</strong>
+                        </span>
+                        <span className="text-indigo-700 text-[11px]">
+                            Selected: <strong className="font-bold">{item.selectedPrice || "N/A"}</strong>
+                        </span>
+                    </div>
+                </div>
 
                 {item.description && (
                     <p className="text-xs text-slate-500 bg-amber-50/50 p-2 rounded-lg border border-amber-100/50 italic">
