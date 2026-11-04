@@ -18,13 +18,13 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
     const [activeLang, setActiveLang] = useState<string>("en");
 
     const [formData, setFormData] = useState({
-        title: { en: "" } as Record<string, string>,
+        title: { en: "", ja: "" } as Record<string, string>,
         slug: "",
-        summary: { en: "" } as Record<string, string>,
-        category: { en: "" } as Record<string, string>,
-        readTime: { en: "" } as Record<string, string>,
+        summary: { en: "", ja: "" } as Record<string, string>,
+        category: { en: "", ja: "" } as Record<string, string>,
+        readTime: { en: "", ja: "" } as Record<string, string>,
         author: "",
-        blog: { en: "" } as Record<string, string>,
+        blog: { en: "", ja: "" } as Record<string, string>,
     });
 
     const slugify = (text: string) => {
@@ -130,13 +130,13 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
             setIsCustomSlug(false);
             setActiveLang("en");
             setFormData({
-                title: { en: "" },
+                title: { en: "", ja: "" },
                 slug: "",
-                summary: { en: "" },
-                category: { en: "" },
-                readTime: { en: "" },
+                summary: { en: "", ja: "" },
+                category: { en: "", ja: "" },
+                readTime: { en: "", ja: "" },
                 author: "",
-                blog: { en: "" },
+                blog: { en: "", ja: "" },
             });
         } catch (err: any) {
             alert(`Error: ${err.message}`);
