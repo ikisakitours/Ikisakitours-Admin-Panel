@@ -15,6 +15,7 @@ interface MultilingualEditorProps {
     setActiveLang: (lang: string) => void;
     handleSlugChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleTitleChange: (val: string) => void;
+    availableLanguages?: string[];
 }
 
 export default function MultilingualEditor({
@@ -24,15 +25,18 @@ export default function MultilingualEditor({
     setActiveLang,
     handleSlugChange,
     handleTitleChange,
+    availableLanguages,
 }: MultilingualEditorProps) {
-    // Dynamically extract all available language keys from the title object (e.g. ['en', 'ja'])
-    const availableLangs = Object.keys(formData.title).length > 0 ? Object.keys(formData.title) : ["en"];
+    // Use passed availableLanguages prop, or fallback to keys from formData.title
+    const availableLangs = availableLanguages && availableLanguages.length > 0
+        ? availableLanguages
+        : (Object.keys(formData.title).length > 0 ? Object.keys(formData.title) : ["en", "ja"]);
 
     return (
         <div className="space-y-6">
-            {/* Dynamic Language Switcher Tabs based on JSON keys */}
+            {/* Dynamic Language Switcher Tabs based on available languages */}
             <div className="flex items-center justify-between border-b pb-2">
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                     {availableLangs.map((lang) => (
                         <button
                             type="button"
@@ -58,7 +62,7 @@ export default function MultilingualEditor({
                     <label className="block text-xs font-semibold mb-1">Title ({activeLang.toUpperCase()})</label>
                     <input
                         type="text"
-                        required
+                        required={activeLang === "en"}
                         value={formData.title[activeLang] || ""}
                         onChange={(e) => handleTitleChange(e.target.value)}
                         className="w-full text-xs border rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-indigo-500"
@@ -98,7 +102,7 @@ export default function MultilingualEditor({
                     <label className="block text-xs font-semibold mb-1">Category ({activeLang.toUpperCase()})</label>
                     <input
                         type="text"
-                        required
+                        required={activeLang === "en"}
                         value={formData.category[activeLang] || ""}
                         onChange={(e) =>
                             onChange("category", {
@@ -115,7 +119,7 @@ export default function MultilingualEditor({
                     <label className="block text-xs font-semibold mb-1">Read Time ({activeLang.toUpperCase()})</label>
                     <input
                         type="text"
-                        required
+                        required={activeLang === "en"}
                         value={formData.readTime[activeLang] || ""}
                         onChange={(e) =>
                             onChange("readTime", {
@@ -134,7 +138,7 @@ export default function MultilingualEditor({
                 <label className="block text-xs font-semibold mb-1">Summary / Excerpt ({activeLang.toUpperCase()})</label>
                 <textarea
                     rows={2}
-                    required
+                    required={activeLang === "en"}
                     value={formData.summary[activeLang] || ""}
                     onChange={(e) =>
                         onChange("summary", {
@@ -152,7 +156,7 @@ export default function MultilingualEditor({
                 <label className="block text-xs font-semibold mb-1">Blog Content ({activeLang.toUpperCase()})</label>
                 <textarea
                     rows={8}
-                    required
+                    required={activeLang === "en"}
                     value={formData.blog[activeLang] || ""}
                     onChange={(e) =>
                         onChange("blog", {
