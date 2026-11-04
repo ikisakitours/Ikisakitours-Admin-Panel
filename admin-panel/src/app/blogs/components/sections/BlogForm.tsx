@@ -174,8 +174,8 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                                 type="button"
                                 onClick={() => setActiveLang(langKey)}
                                 className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${activeLang === langKey
-                                        ? "bg-indigo-600 text-white shadow-sm"
-                                        : "text-slate-600 hover:bg-slate-200"
+                                    ? "bg-indigo-600 text-white shadow-sm"
+                                    : "text-slate-600 hover:bg-slate-200"
                                     }`}
                             >
                                 {langKey}
@@ -213,6 +213,7 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                 setActiveLang={setActiveLang}
                 handleSlugChange={handleSlugChange}
                 handleTitleChange={handleTitleChange}
+                availableLanguages={availableLanguages}
             />
 
             {/* Component 3: Image Uploader */}
