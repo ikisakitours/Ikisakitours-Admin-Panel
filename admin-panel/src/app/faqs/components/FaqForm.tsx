@@ -128,7 +128,6 @@ export default function FaqForm({ onFaqCreated }: { onFaqCreated: () => void }) 
         <div className="space-y-6">
           <div className="flex items-center justify-between text-indigo-600 font-mono font-semibold text-sm">
             <div className="flex items-center gap-2">
-              
               <span>FAQ Details</span>
             </div>
             <span className="text-xs text-slate-400 font-normal">
