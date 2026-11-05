@@ -41,8 +41,8 @@ const INITIAL_FORM_STATE: PackageFormData = {
   activityDetails: [
     {
       title: { en: "", ja: "" },
-      description: { en: "", ja: "" }
-    }
+      description: { en: "", ja: "" },
+    },
   ],
 
   itinerary: [
@@ -71,10 +71,7 @@ export default function PackageFormWrapper() {
 
   const [formData, setFormData] = useState<PackageFormData>(INITIAL_FORM_STATE);
 
-  const handleRecordChange = (
-    field: "leadTitle" | "leadDescription" | "description",
-    value: string
-  ) => {
+  const handleRecordChange = (field: "leadTitle" | "leadDescription" | "description", value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: {
@@ -126,7 +123,10 @@ export default function PackageFormWrapper() {
         setAvailableLanguages={setAvailableLanguages}
       />
 
-      <form onSubmit={handleSubmit} className="w-full space-y-8 p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 shadow-xs">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full space-y-8 p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 shadow-xs"
+      >
         {/* Top Action Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
           <div>
@@ -142,10 +142,9 @@ export default function PackageFormWrapper() {
                   key={langKey}
                   type="button"
                   onClick={() => setLocale(langKey)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${locale === langKey
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-200"
-                    }`}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${
+                    locale === langKey ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-slate-200"
+                  }`}
                 >
                   {langKey}
                 </button>
@@ -176,9 +175,9 @@ export default function PackageFormWrapper() {
         {/* Lead Header Info */}
         <div className="space-y-4 pt-4 border-t border-slate-100">
           <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-indigo-500" /> Lead Header Information ({locale.toUpperCase()})
+            <Layers className="w-4 h-4 text-indigo-500" /> Lead Header Information(For User Attraction) ({locale.toUpperCase()})
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">
                 Lead Title ({locale.toUpperCase()})
@@ -195,12 +194,12 @@ export default function PackageFormWrapper() {
               <label className="block text-xs font-semibold text-slate-600 mb-1">
                 Lead Description ({locale.toUpperCase()})
               </label>
-              <input
-                type="text"
+              <textarea
                 required={locale === "en"}
                 value={formData.leadDescription?.[locale] || ""}
                 onChange={(e) => handleRecordChange("leadDescription", e.target.value)}
-                className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+                rows={2}
+                className="w-full text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none resize-y min-h-10 focus:border-slate-300 transition-colors"
               />
             </div>
           </div>
