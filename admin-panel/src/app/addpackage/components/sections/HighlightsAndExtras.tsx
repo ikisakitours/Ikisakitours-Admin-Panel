@@ -12,7 +12,6 @@ interface Props {
 type ListField = "highlights" | "includes" | "excludes";
 
 export function HighlightsAndExtras({ formData, setFormData, locale }: Props) {
-
   const handleSimpleArrayChange = (field: ListField, index: number, value: string) => {
     const record = formData[field] || {};
     const currentArray = [...(record[locale] || [])];
@@ -96,7 +95,7 @@ export function HighlightsAndExtras({ formData, setFormData, locale }: Props) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
       {renderList("highlights", "Highlights")}
       {renderList("includes", "Includes")}
       {renderList("excludes", "Excludes")}
