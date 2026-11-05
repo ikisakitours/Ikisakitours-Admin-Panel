@@ -10,7 +10,6 @@ interface Props {
 }
 
 export function ActivitiesSection({ formData, setFormData, locale }: Props) {
-
   const handleActivityChange = (index: number, key: "title" | "description", value: string) => {
     const updated = [...formData.activityDetails];
     const currentActivity = updated[index];
@@ -62,7 +61,7 @@ export function ActivitiesSection({ formData, setFormData, locale }: Props) {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <input
               type="text"
               placeholder="Activity Title"
@@ -72,7 +71,7 @@ export function ActivitiesSection({ formData, setFormData, locale }: Props) {
             />
             <input
               type="text"
-              placeholder="Activity Description"
+              placeholder="Activity Small Description"
               value={activity.description?.[locale] || ""}
               onChange={(e) => handleActivityChange(idx, "description", e.target.value)}
               className="text-xs border border-slate-200 bg-white rounded-lg p-2.5 outline-none"
