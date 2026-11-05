@@ -6,6 +6,7 @@ export interface PackageListItem {
   id: string;
   slug: string;
   title: string;
+  type: string;
 }
 
 export const packageService = {
