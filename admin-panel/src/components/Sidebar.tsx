@@ -74,8 +74,26 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer Branding */}
-      <div className="p-4 border-t border-white/5 text-[10px] uppercase tracking-widest text-slate-500 font-bold text-center flex-shrink-0">
-        Powered by Shehan_W
+      <div className="shrink-0 border-t border-white/5 px-4 py-3">
+        <div className="group flex cursor-default items-center gap-2.5">
+          {/* Logo mark */}
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-emerald-400 to-teal-500 text-[11px] font-black leading-none text-slate-950 shadow-sm shadow-emerald-500/30 transition-transform duration-300 group-hover:scale-110">
+            A
+          </span>
+
+          {/* Text */}
+          <div className="min-w-0 leading-[1.2]">
+            <p className="truncate text-[10px] font-medium text-slate-500">
+              Powered by{" "}
+              <span className="font-bold tracking-wide text-slate-300 transition-colors duration-300 group-hover:text-emerald-300">
+                Aetheria Labs
+              </span>
+            </p>
+            <p className="truncate text-[10px] text-slate-600">
+              with <span className="text-slate-400">Shehan_W</span>
+            </p>
+          </div>
+        </div>
       </div>
     </aside>
   );
