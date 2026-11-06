@@ -197,7 +197,7 @@ export default function Sidebar() {
                 </span>
               </p>
               <p className="text-[10px] text-slate-600">
-                with <span className="text-slate-400">Shehan_W</span>
+                Engineered by <span className="text-slate-400">Shehan_W</span>
               </p>
             </div>
           </div>
