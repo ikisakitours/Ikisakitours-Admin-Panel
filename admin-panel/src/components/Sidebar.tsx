@@ -97,16 +97,27 @@ export default function Sidebar() {
       >
         {/* Header Brand */}
         <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/5 pl-5.75 pr-4">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-emerald-400 to-teal-500 text-[15px] font-black leading-none text-slate-950 shadow-md shadow-emerald-500/25">
-            T
+          {/* Logo Icon */}
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-emerald-400 to-teal-500 text-[15px] font-black leading-none text-slate-950 shadow-md shadow-emerald-500/25">
+            IT
           </span>
-          <span
-            className={`whitespace-nowrap bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-lg font-black tracking-wider text-transparent transition-opacity duration-300 ${
+
+          {/* Text Container */}
+          <div
+            className={`flex flex-col justify-center transition-opacity duration-300 ${
               isExpanded ? "opacity-100 delay-100" : "opacity-0"
             }`}
           >
-            TOUR ADMIN
-          </span>
+            {/* Main Title */}
+            <span className="whitespace-nowrap bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-base md:text-lg font-black tracking-wider text-transparent leading-tight">
+              IKISAKI TOURS
+            </span>
+
+            {/* Subtitle (Admin Panel) */}
+            <span className="whitespace-nowrap text-[12px] font-bold tracking-[0.25em] text-teal-500/80 uppercase leading-tight mt-0.5">
+              Admin Panel
+            </span>
+          </div>
         </div>
 
         {/* Scrollable Navigation Area with Hidden Scrollbars */}
@@ -181,7 +192,7 @@ export default function Sidebar() {
           <div className="group flex cursor-default items-center gap-2.5">
             {/* Logo mark */}
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-emerald-400 to-teal-500 text-[11px] font-black leading-none text-slate-950 shadow-sm shadow-emerald-500/30 transition-transform duration-300 group-hover:scale-110">
-              A
+              AL
             </span>
 
             {/* Text */}
