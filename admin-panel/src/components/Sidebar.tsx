@@ -76,7 +76,11 @@ export default function Sidebar() {
   const activeStyles = "bg-emerald-500/10 text-emerald-300 font-medium border-emerald-500/20";
   const inactiveStyles = "text-slate-400 hover:text-slate-100 hover:bg-white/5 hover:border-white/5 border-transparent";
 
-  const isRouteActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  // Root ("/") Dashboard auto select
+  const isRouteActive = (href: string) => {
+    if (href === "/dashboard" && (pathname === "/" || pathname === "")) return true;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <aside
@@ -96,10 +100,14 @@ export default function Sidebar() {
         }`}
       >
         {/* Header Brand */}
-        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/5 pl-5.75 pr-4">
+        <div className="group flex h-16 shrink-0 items-center gap-3.5 border-b border-white/5 pl-5.75 pr-4">
           {/* Logo Icon */}
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-emerald-400 to-teal-500 text-[15px] font-black leading-none text-slate-950 shadow-md shadow-emerald-500/25">
-            IT
+          <span className="relative shrink-0">
+            {/* Hover glow */}
+            <span className="absolute inset-0 rounded-xl bg-emerald-400/40 opacity-0 blur-lg transition-opacity duration-500 group-hover:opacity-100" />
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 text-sm font-extrabold leading-none text-slate-950 shadow-lg shadow-emerald-500/20 ring-1 ring-white/25 transition-transform duration-300 group-hover:scale-110">
+              IT
+            </span>
           </span>
 
           {/* Text Container */}
@@ -109,14 +117,20 @@ export default function Sidebar() {
             }`}
           >
             {/* Main Title */}
-            <span className="whitespace-nowrap bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-base md:text-lg font-black tracking-wider text-transparent leading-tight">
-              IKISAKI TOURS
-            </span>
+            <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+              <span className="bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-[15px] font-bold leading-tight tracking-wide text-transparent">
+                IKISAKI
+              </span>
+              <span className="text-[15px] font-light leading-tight tracking-wide text-teal-400/70">TOURS</span>
+            </div>
 
             {/* Subtitle (Admin Panel) */}
-            <span className="whitespace-nowrap text-[12px] font-bold tracking-[0.25em] text-teal-500/80 uppercase leading-tight mt-0.5">
-              Admin Panel
-            </span>
+            <div className="mt-1.5 flex items-center gap-2 whitespace-nowrap">
+              <span className="h-px w-4 bg-linear-to-r from-teal-500/70 to-transparent" />
+              <span className="text-[10px] font-semibold uppercase leading-tight tracking-[0.2em] text-teal-500/80">
+                Admin Panel
+              </span>
+            </div>
           </div>
         </div>
 
@@ -185,29 +199,43 @@ export default function Sidebar() {
 
         {/* Footer Branding */}
         <div
-          className={`shrink-0 border-t border-white/5 py-3 pr-4 transition-[padding] duration-300 ease-out motion-reduce:transition-none ${
+          className={`relative shrink-0 py-3.5 pr-4 transition-[padding] duration-300 ease-out motion-reduce:transition-none ${
             isExpanded ? "pl-4" : "pl-6.75"
           }`}
         >
-          <div className="group flex cursor-default items-center gap-2.5">
+          {/* Gradient top divider */}
+          <span className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/30 to-transparent" />
+
+          <div className="group flex cursor-default items-center gap-3">
             {/* Logo mark */}
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-emerald-400 to-teal-500 text-[11px] font-black leading-none text-slate-950 shadow-sm shadow-emerald-500/30 transition-transform duration-300 group-hover:scale-110">
-              AL
+            <span className="relative shrink-0">
+              <span className="absolute inset-0 rounded-lg bg-emerald-400/40 opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100" />
+              <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-400 to-teal-500 text-xs font-extrabold leading-none text-slate-950 shadow-md shadow-emerald-500/20 ring-1 ring-white/25 transition-transform duration-300 group-hover:scale-110">
+                AL
+              </span>
             </span>
 
             {/* Text */}
             <div
-              className={`min-w-0 whitespace-nowrap leading-[1.2] transition-opacity duration-200 ${
+              className={`flex min-w-0 flex-col justify-center gap-1 whitespace-nowrap transition-opacity duration-200 ${
                 isExpanded ? "opacity-100 delay-100" : "opacity-0"
               }`}
             >
-              <p className="text-[10px] font-medium text-slate-500">
-                Powered by{" "}
-                <span className="font-bold tracking-wide text-slate-300 transition-colors duration-300 group-hover:text-emerald-300">
-                  Aetheria Labs
+              {/* Line 1: Powered by + brand */}
+              <p className="flex items-baseline gap-1.5 leading-none">
+                <span className="text-[10px] font-medium text-slate-500">Powered by</span>
+                <span className="flex items-baseline gap-1">
+                  <span className="text-[12px] font-bold tracking-wide text-slate-300 transition-colors duration-300 group-hover:text-emerald-300">
+                    AETHERIA
+                  </span>
+                  <span className="text-[12px] font-light tracking-wide text-slate-400 transition-colors duration-300 group-hover:text-teal-300/80">
+                    LABS
+                  </span>
                 </span>
               </p>
-              <p className="text-[10px] text-slate-600">
+
+              {/* Line 2: Engineer credit */}
+              <p className="text-[10px] leading-none text-slate-600">
                 Engineered by <span className="text-slate-400">Shehan_W</span>
               </p>
             </div>
