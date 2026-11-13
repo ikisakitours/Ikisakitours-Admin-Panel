@@ -8,6 +8,7 @@ export interface PackageReview {
   packageId: string;
   packageName: string;
   type: CommentType;
+  isPubliclyVisible: boolean;
   fullName: string;
   email: string;
   rating: number;
@@ -21,9 +22,20 @@ export interface ReplyPackageReviewPayload {
   adminReply: string;
 }
 
+export interface UpdateVisibilityPayload {
+  isPubliclyVisible: boolean;
+}
+
 export const PackageReviewsService = {
   // GET /api/comments/package-reviews (Fetch all package reviews for the admin panel)
   getAll: () => fetcher<PackageReview[]>('/comments/package-reviews'),
+
+  // PATCH /api/comments/package-reviews/:id/visibility (Toggle visibility status)
+  updateVisibility: (reviewId: string, payload: UpdateVisibilityPayload) =>
+    fetcher<PackageReview>(`/comments/package-reviews/${reviewId}/visibility`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
 
   // PATCH /api/comments/package-review/:id/reply (Send or update an admin reply)
   reply: (reviewId: string, payload: ReplyPackageReviewPayload) =>

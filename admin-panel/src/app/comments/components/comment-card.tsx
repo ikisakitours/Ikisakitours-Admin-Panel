@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { CommentsService, Comment } from "@/services/comments.service";
-import { PackageReviewsService, PackageReview } from "@/services/package-reviews.service";
+import { CommentsService } from "@/services/comments.service";
+import { PackageReviewsService } from "@/services/package-reviews.service";
 
 export interface CommentCardProps {
   id: string;
-  commentType: "website" | "package-review"; 
-  tourTitle?: string;                             
+  commentType: "website" | "package-review";
+  tourTitle?: string;
   userName: string;
   userAvatar?: string | null;
   commentText: string;
@@ -44,22 +44,27 @@ export default function CommentCard({
   // Get first letter of username for avatar fallback
   const userInitial = userName ? userName.trim().charAt(0).toUpperCase() : "U";
 
-  // Handler for toggle visibility with API sync (Website comments only)
+  // Handler for toggle visibility with API sync (Works for BOTH types now!)
   const handleToggleVisibility = async () => {
-    if (isWebsiteComment) {
-      const newVisibility = !isVisible;
-      setIsVisible(newVisibility);
-      try {
-        setIsUpdatingVisibility(true);
+    const newVisibility = !isVisible;
+    setIsVisible(newVisibility);
+    try {
+      setIsUpdatingVisibility(true);
+
+      if (isWebsiteComment) {
         await CommentsService.toggleVisibility(id, {
           isPubliclyVisible: newVisibility,
         });
-      } catch (error: any) {
-        setIsVisible(!newVisibility);
-        alert(error.message || "Failed to update visibility in database.");
-      } finally {
-        setIsUpdatingVisibility(false);
+      } else {
+        await PackageReviewsService.updateVisibility(id, {
+          isPubliclyVisible: newVisibility,
+        });
       }
+    } catch (error: any) {
+      setIsVisible(!newVisibility); // Revert UI state on failure
+      alert(error.message || "Failed to update visibility in database.");
+    } finally {
+      setIsUpdatingVisibility(false);
     }
   };
 
@@ -98,10 +103,10 @@ export default function CommentCard({
 
   return (
     <div className="w-full bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-6 mb-4 transition-all hover:shadow-md">
-      
+
       {/* Top Section: Comment Type Tag & Visibility Toggle Switch */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-        
+
         {/* Dynamic Type Tag */}
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -110,41 +115,37 @@ export default function CommentCard({
 
           {isWebsiteComment ? (
             <span className="px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 rounded-md border border-blue-100 flex items-center gap-1.5">
-              <span>🌐</span> About Website
+              About Website
             </span>
           ) : (
             <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100 flex items-center gap-1.5">
-              <span>📦</span> Package Review: {tourTitle || "Tour Package"}
+              Package Review: {tourTitle || "Tour Package"}
             </span>
           )}
         </div>
 
-        {/* Visibility Toggle Controls (Active for website comments) */}
-        {isWebsiteComment && (
-          <div className="flex items-center gap-3">
-            <span className={`text-xs font-medium transition-colors ${isVisible ? "text-slate-600" : "text-slate-400"}`}>
-              {isVisible ? "Publicly Visible" : "Hidden on Website"}
-            </span>
-            <button
-              onClick={handleToggleVisibility}
-              disabled={isUpdatingVisibility}
-              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                isVisible ? "bg-emerald-500" : "bg-slate-200"
+        {/* Visibility Toggle Controls (Active for BOTH website comments and package reviews) */}
+        <div className="flex items-center gap-3">
+          <span className={`text-xs font-medium transition-colors ${isVisible ? "text-slate-600" : "text-slate-400"}`}>
+            {isVisible ? "Publicly Visible" : "Hidden on Website"}
+          </span>
+          <button
+            onClick={handleToggleVisibility}
+            disabled={isUpdatingVisibility}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isVisible ? "bg-emerald-500" : "bg-slate-200"
               } ${isUpdatingVisibility ? "opacity-50 cursor-wait" : ""}`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  isVisible ? "translate-x-5" : "translate-x-0"
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isVisible ? "translate-x-5" : "translate-x-0"
                 }`}
-              />
-            </button>
-          </div>
-        )}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Middle Section: User Metadata Profile & The Comment Content */}
       <div className="flex gap-4 items-start mb-4">
-        
+
         {/* User Profile Pic OR Fallback Initial Badge */}
         {userAvatar && !imgError ? (
           <img
@@ -162,7 +163,7 @@ export default function CommentCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-800 mb-0.5">{userName}</h3>
-            
+
             {/* Star Rating Display for Package Reviews */}
             {rating !== null && rating !== undefined && (
               <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
@@ -210,11 +211,10 @@ export default function CommentCard({
               disabled={isWebsiteComment}
               onClick={() => setIsReplying(true)}
               title={isWebsiteComment ? "Replies are disabled for general website feedback" : "Reply to this review"}
-              className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-colors border ${
-                isWebsiteComment
+              className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-colors border ${isWebsiteComment
                   ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
                   : "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700 cursor-pointer"
-              }`}
+                }`}
             >
               <svg className={`w-4 h-4 ${isWebsiteComment ? "text-slate-400" : "text-slate-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
