@@ -10,6 +10,7 @@ import {
   FileText,
   CheckCircle2,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
 import {
   LegalDocument,
@@ -21,6 +22,7 @@ import SectionEditor from "./SectionEditor";
 import DocumentPreviewPanel from "./DocumentPreviewPanel";
 import DocumentMetaModal from "./DocumentMetaModal";
 import { LegalIcon } from "./LegalIcon";
+import { legalDocsService } from "@/services/legaldocs.service";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LegalDocEditor – the main per-document editing pane:
@@ -72,6 +74,7 @@ export default function LegalDocEditor({
   const [activeTab, setActiveTab] = useState<Tab>("editor");
   const [metaOpen, setMetaOpen]   = useState(false);
   const [saved, setSaved]         = useState(false);
+  const [saving, setSaving]       = useState(false);
 
   const badgeClass = ACCENT_BADGE[doc.accent ?? "indigo"] ?? ACCENT_BADGE.indigo;
   const displayTitle = resolveLocalized(doc.title, locale, "Untitled Policy");
@@ -103,11 +106,19 @@ export default function LegalDocEditor({
     onUpdate({ ...doc, sections: doc.sections.filter((_: LegalSection, i: number) => i !== idx) });
   };
 
-  // ── Save (simulate) ──────────────────────────────────────────────────────
+  // ── Save (API Upsert) ─────────────────────────────────────────────────────
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await legalDocsService.saveDocument(doc);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      alert("Failed to save legal document: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -184,13 +195,18 @@ export default function LegalDocEditor({
           <button
             type="button"
             onClick={handleSave}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm ${
+            disabled={saving}
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm cursor-pointer disabled:opacity-60 ${
               saved
                 ? "bg-emerald-500 hover:bg-emerald-600 text-white"
                 : "bg-indigo-600 hover:bg-indigo-700 text-white"
             }`}
           >
-            {saved ? (
+            {saving ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...
+              </>
+            ) : saved ? (
               <>
                 <CheckCircle2 className="w-3.5 h-3.5" /> Saved!
               </>
