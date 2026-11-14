@@ -69,7 +69,7 @@ const navGroups: NavGroup[] = [
     title: "System Update",
 
     items: [
-      { href: "/charterpricing", label: "Pricing Notes", icon: BadgeDollarSign },
+      { href: "/servicepricing", label: "Pricing Notes", icon: BadgeDollarSign },
       { href: "/newupdates", label: "Update Availability", icon: RefreshCw },
       { href: "/servicenotes", label: "Service Notes", icon: ClipboardList },
       { href: "/imageupload", label: "Image Uploads", icon: ImageIcon },
