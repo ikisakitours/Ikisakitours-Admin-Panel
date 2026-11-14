@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Shield, FileText, RefreshCw, Loader2 } from "lucide-react";
+import { Shield, FileText, RefreshCw, Loader2, AlertCircle } from "lucide-react";
 import { LegalDocument } from "../types/legal.types";
 import { legalDocsService } from "@/services/legaldocs.service";
 import DocumentSidebar from "./DocumentSidebar";
@@ -13,6 +13,7 @@ export default function LegalDocManager() {
   const [activeId, setActiveId]   = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading]     = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Dynamic language management (matches PackageFormWrapper & FaqForm)
   const [locale, setLocale]                         = useState<string>("en");
@@ -87,74 +88,92 @@ export default function LegalDocManager() {
   };
 
   const addDocument = async (newDoc: LegalDocument) => {
+    setErrorMessage(null);
     try {
       await legalDocsService.insertDocument(newDoc);
       setDocuments((prev) => [...prev, newDoc]);
       setActiveId(newDoc.id);
     } catch (err: any) {
-      alert("Failed to create document: " + err.message);
+      setErrorMessage(err.message || "Failed to create document.");
     }
   };
 
   const deleteDocument = async (id: string) => {
+    setErrorMessage(null);
     try {
       await legalDocsService.deleteDocument(id);
       const remaining = documents.filter((d) => d.id !== id);
       setDocuments(remaining);
       setActiveId(remaining[0]?.id ?? "");
     } catch (err: any) {
-      alert("Failed to delete document: " + err.message);
+      setErrorMessage(err.message || "Failed to delete document.");
     }
   };
 
   return (
     <div className="w-full space-y-6 relative">
       {/* ── Page Header ──────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600">
-              <Shield className="w-4 h-4" />
-            </span>
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+      <div className="flex flex-col gap-3 pb-5 border-b border-slate-200">
+        <div className="flex items-start gap-3">
+          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 shadow-xs shrink-0 mt-0.5">
+            <Shield className="w-4 h-4" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
               Legal Documents
             </h1>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Create, edit, and manage IkiSaki Tours policy documents across dynamic languages — Terms of Service, Privacy Policy, Booking Policy, Payment Policy, Cookie Policy, and custom policies.
+            </p>
           </div>
-          <p className="text-xs text-slate-500 mt-1 max-w-xl">
-            Create, edit, and manage IkiSaki Tours policy documents across dynamic languages — Terms of Service, Privacy Policy, Booking Policy, Payment Policy, Cookie Policy, and custom policies.
-          </p>
         </div>
 
-        {/* Summary stats & Refresh */}
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+        {/* Buttons & Stats Pills placed below paragraph, aligned to the right */}
+        <div className="flex items-center justify-end gap-2.5 w-full flex-wrap">
           <button
             type="button"
             onClick={loadDocuments}
             disabled={loading}
-            className="p-2 border border-slate-200 hover:bg-slate-100 rounded-xl text-slate-600 transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center justify-center w-9 h-9 border border-slate-200 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-800 transition-all cursor-pointer disabled:opacity-50 shadow-xs"
             title="Reload from Server"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
           </button>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-indigo-50 border border-indigo-100 rounded-xl">
-            <FileText className="w-3.5 h-3.5 text-indigo-500" />
-            <div>
-              <p className="text-[10px] text-indigo-400 font-semibold uppercase">Documents</p>
-              <p className="text-sm font-extrabold text-indigo-700 leading-none">{documents.length}</p>
-            </div>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50/80 border border-indigo-100 rounded-xl text-xs font-semibold text-indigo-700 shadow-xs">
+            <FileText className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            <span>Documents</span>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-600 text-white font-bold text-[11px] tabular-nums shrink-0">
+              {documents.length}
+            </span>
           </div>
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-emerald-50 border border-emerald-100 rounded-xl">
-            <Shield className="w-3.5 h-3.5 text-emerald-500" />
-            <div>
-              <p className="text-[10px] text-emerald-400 font-semibold uppercase">Total Sections</p>
-              <p className="text-sm font-extrabold text-emerald-700 leading-none">
-                {documents.reduce((acc, d) => acc + (d.sections?.length || 0), 0)}
-              </p>
-            </div>
+
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50/80 border border-emerald-100 rounded-xl text-xs font-semibold text-emerald-700 shadow-xs">
+            <Shield className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <span>Total Sections</span>
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-emerald-600 text-white font-bold text-[11px] tabular-nums shrink-0">
+              {documents.reduce((acc, d) => acc + (d.sections?.length || 0), 0)}
+            </span>
           </div>
         </div>
       </div>
+
+      {/* ── Error Alert Banner (only shown if an error occurs) ─────────── */}
+      {errorMessage && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs font-semibold shadow-xs">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMessage(null)}
+            className="text-red-600 hover:text-red-800 text-[11px] font-bold cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* ── Two-column Layout ────────────────────────────────────────────── */}
       <div className="flex flex-col lg:flex-row gap-5 items-start relative">
