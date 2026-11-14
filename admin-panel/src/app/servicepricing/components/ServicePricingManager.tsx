@@ -23,7 +23,7 @@ import {
   charterPricingService,
   ServicePricingAllData,
 } from "@/services/servicepricing.service";
-import CharterRatesForm from "./ChaterServiceRatesForm";
+import CharterRatesForm from "./CharterServiceRatesForm";
 import CustomTourForm from "./CustomTourForm";
 import TransferRatesForm from "./TransferRatesForm";
 
