@@ -75,6 +75,7 @@ export default function LegalDocEditor({
   const [metaOpen, setMetaOpen]   = useState(false);
   const [saved, setSaved]         = useState(false);
   const [saving, setSaving]       = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const badgeClass = ACCENT_BADGE[doc.accent ?? "indigo"] ?? ACCENT_BADGE.indigo;
   const displayTitle = resolveLocalized(doc.title, locale, "Untitled Policy");
@@ -110,12 +111,13 @@ export default function LegalDocEditor({
 
   const handleSave = async () => {
     setSaving(true);
+    setErrorMessage(null);
     try {
       await legalDocsService.saveDocument(doc);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err: any) {
-      alert("Failed to save legal document: " + err.message);
+      setErrorMessage(err.message || "Failed to save legal document.");
     } finally {
       setSaving(false);
     }
@@ -218,6 +220,23 @@ export default function LegalDocEditor({
           </button>
         </div>
       </div>
+
+      {/* ── Error Alert Banner (only shown if an error occurs) ─────────── */}
+      {errorMessage && (
+        <div className="flex items-center justify-between gap-3 px-5 py-3 bg-red-50 border-b border-red-200 text-red-800 text-xs font-semibold">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMessage(null)}
+            className="text-red-600 hover:text-red-800 text-[11px] font-bold cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* ── Tabs ── */}
       <div className="flex border-b border-slate-100 px-5 gap-0">
