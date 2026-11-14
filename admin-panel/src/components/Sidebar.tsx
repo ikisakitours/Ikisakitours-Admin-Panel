@@ -59,18 +59,11 @@ const navGroups: NavGroup[] = [
     title: "Content Managements",
     items: [
       { href: "/managepackages", label: "Manage Packages", icon: ListOrdered },
-<<<<<<< HEAD
-      { href: "/managefaqs", label: "Manage FAQs", icon: ListOrdered },
-      { href: "/manageblogs", label: "Manage Blogs", icon: ListOrdered },
-      { href: "/managedestinations", label: "Manage Destinations", icon: ListOrdered },
-    ],
-=======
     ],
   },
   {
     title: "Legal & Policies",
     items: [{ href: "/legaldocs", label: "Legal Documents", icon: Scale }],
->>>>>>> a633c24 (Merge pull request #81 from ikisakitours/dev/pramod-updates)
   },
   {
     title: "System Update",
