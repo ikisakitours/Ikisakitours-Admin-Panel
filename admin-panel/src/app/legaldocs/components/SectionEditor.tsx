@@ -79,9 +79,28 @@ function SubItemEditor({
   const showIcon = sectionType === "icon-list" || sectionType === "contact";
   const langLabel = locale.toUpperCase();
 
+  const titleLower = (item.title?.en || item.title?.[locale] || "").toLowerCase();
+  const defaultContactIcon =
+    titleLower.includes("phone") || titleLower.includes("whatsapp")
+      ? "Phone"
+      : titleLower.includes("web")
+      ? "Globe"
+      : titleLower.includes("location")
+      ? "MapPin"
+      : titleLower.includes("time")
+      ? "Clock"
+      : titleLower.includes("support") || titleLower.includes("assist")
+      ? "Headset"
+      : titleLower.includes("company")
+      ? "Building"
+      : "Mail";
+
+  const currentIcon = item.icon || (sectionType === "contact" ? defaultContactIcon : "CheckCircle2");
+
   const updateLocalized = (field: "title" | "body", val: string) => {
     onChange({
       ...item,
+      ...(showIcon ? { icon: currentIcon } : {}),
       [field]: {
         ...(item[field] ?? {}),
         [locale]: val,
@@ -102,12 +121,12 @@ function SubItemEditor({
             <div className="flex items-center gap-1.5">
               <span className="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 bg-white text-indigo-600 shrink-0">
                 <LegalIcon
-                  name={item.icon || (sectionType === "contact" ? "Mail" : "CheckCircle2")}
+                  name={currentIcon}
                   className="w-3.5 h-3.5"
                 />
               </span>
               <select
-                value={item.icon || (sectionType === "contact" ? "Mail" : "CheckCircle2")}
+                value={currentIcon}
                 onChange={(e) => onChange({ ...item, icon: e.target.value })}
                 className="w-full text-xs border border-slate-200 rounded-lg p-2 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all cursor-pointer"
               >
