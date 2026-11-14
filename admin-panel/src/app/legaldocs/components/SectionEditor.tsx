@@ -19,13 +19,37 @@ import { LegalIcon, LEGAL_ICON_OPTIONS } from "./LegalIcon";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-const SECTION_TYPE_OPTIONS: { value: SectionType; label: string }[] = [
-  { value: "paragraph", label: "Paragraph" },
-  { value: "checklist", label: "Checklist" },
-  { value: "grid", label: "Card Grid" },
-  { value: "icon-list", label: "Icon List" },
-  { value: "row-list", label: "Row List" },
-  { value: "contact", label: "Contact Details" },
+const SECTION_TYPE_OPTIONS: { value: SectionType; label: string; description: string }[] = [
+  {
+    value: "paragraph",
+    label: "Paragraph — Plain Text / Standard Prose",
+    description: "Best for standard explanatory text, intro clauses, and continuous policy paragraphs.",
+  },
+  {
+    value: "checklist",
+    label: "Checklist — Bullet Points (Conditions & Rules)",
+    description: "Best for simple bulleted points with colored dots (e.g. tour rules, prerequisites, inclusions).",
+  },
+  {
+    value: "icon-list",
+    label: "Icon List — Highlight Features with Custom Icons",
+    description: "Best for key points needing strong visual attention with custom icons (e.g. security measures, payment guarantees).",
+  },
+  {
+    value: "row-list",
+    label: "Row List — Numbered Steps & Procedures (01, 02, 03)",
+    description: "Best for sequential steps, booking procedures, or numbered legal articles inside individual cards.",
+  },
+  {
+    value: "grid",
+    label: "Card Grid — 2-Column Side-by-Side Cards",
+    description: "Best for structured comparison cards, cancellation fee tiers, or categorized clauses.",
+  },
+  {
+    value: "contact",
+    label: "Contact Details — Email, Phone & Support Channels",
+    description: "Best for support channels, emergency WhatsApp/phone numbers, and official communication addresses.",
+  },
 ];
 
 function uid(): string {
@@ -52,6 +76,7 @@ function SubItemEditor({
   onDelete,
 }: SubItemEditorProps) {
   const showTitle = sectionType !== "checklist";
+  const showIcon = sectionType === "icon-list" || sectionType === "contact";
   const langLabel = locale.toUpperCase();
 
   const updateLocalized = (field: "title" | "body", val: string) => {
@@ -69,6 +94,33 @@ function SubItemEditor({
       <GripVertical className="w-3.5 h-3.5 text-slate-300 mt-2.5 shrink-0 cursor-grab" />
 
       <div className="flex-1 grid gap-2">
+        {showIcon && (
+          <div>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">
+              Item Icon
+            </label>
+            <div className="flex items-center gap-1.5">
+              <span className="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 bg-white text-indigo-600 shrink-0">
+                <LegalIcon
+                  name={item.icon || (sectionType === "contact" ? "Mail" : "CheckCircle2")}
+                  className="w-3.5 h-3.5"
+                />
+              </span>
+              <select
+                value={item.icon || (sectionType === "contact" ? "Mail" : "CheckCircle2")}
+                onChange={(e) => onChange({ ...item, icon: e.target.value })}
+                className="w-full text-xs border border-slate-200 rounded-lg p-2 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all cursor-pointer"
+              >
+                {LEGAL_ICON_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
         {showTitle && (
           <div>
             <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">
@@ -107,7 +159,7 @@ function SubItemEditor({
       <button
         type="button"
         onClick={onDelete}
-        className="mt-1 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0"
+        className="mt-1 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 cursor-pointer"
         title="Remove sub-item"
       >
         <X className="w-3.5 h-3.5" />
@@ -153,6 +205,12 @@ export default function SectionEditor({
       id: uid(),
       title: { [locale]: "" },
       body: { [locale]: "" },
+      icon:
+        section.type === "icon-list"
+          ? "CheckCircle2"
+          : section.type === "contact"
+          ? "Mail"
+          : undefined,
     };
     onUpdate({ ...section, subItems: [...(section.subItems ?? []), blank] });
   };
@@ -258,12 +316,12 @@ export default function SectionEditor({
           {/* Row 2 – Section Type */}
           <div>
             <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">
-              Display Type
+              Display Layout &amp; Purpose
             </label>
             <select
               value={section.type}
               onChange={(e) => onUpdate({ ...section, type: e.target.value as SectionType })}
-              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all"
+              className="w-full text-xs font-medium border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all cursor-pointer"
             >
               {SECTION_TYPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -271,6 +329,15 @@ export default function SectionEditor({
                 </option>
               ))}
             </select>
+            {/* Dynamic Purpose Explainer */}
+            <div className="mt-1.5 px-3 py-1.5 bg-indigo-50/70 border border-indigo-100 rounded-lg flex items-start gap-2 text-[11px] text-indigo-700 leading-relaxed">
+              <span className="font-bold shrink-0 uppercase text-[9px] px-1.5 py-0.5 bg-indigo-200/80 rounded text-indigo-900 mt-0.5">
+                Purpose
+              </span>
+              <span>
+                {SECTION_TYPE_OPTIONS.find((opt) => opt.value === section.type)?.description}
+              </span>
+            </div>
           </div>
 
           {/* Row 3 – Content (paragraph) or Sub-Items (all other types) */}
