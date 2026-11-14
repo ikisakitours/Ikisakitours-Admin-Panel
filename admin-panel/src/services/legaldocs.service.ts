@@ -1,7 +1,6 @@
 import {
   LegalDocument,
 } from "@/app/legaldocs/types/legal.types";
-import { INITIAL_LEGAL_DOCUMENTS } from "@/app/legaldocs/data/mockData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -42,7 +41,7 @@ class LegalDocsService {
     }
 
     // Default fallback when DB is empty or first initialized
-    return INITIAL_LEGAL_DOCUMENTS;
+    return [];
   }
 
   // ── 2. Fetch Single Document by ID / Slug ─────────────────────────────────────
@@ -68,9 +67,6 @@ class LegalDocsService {
         // Continue to fallback
       }
     }
-
-    const fallback = INITIAL_LEGAL_DOCUMENTS.find((d) => d.id === id);
-    if (fallback) return fallback;
 
     throw new Error(`Legal document with ID "${id}" not found.`);
   }

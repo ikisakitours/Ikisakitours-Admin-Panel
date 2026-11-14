@@ -3,15 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { Shield, FileText, RefreshCw, Loader2 } from "lucide-react";
 import { LegalDocument } from "../types/legal.types";
-import { INITIAL_LEGAL_DOCUMENTS } from "../data/mockData";
 import { legalDocsService } from "@/services/legaldocs.service";
 import DocumentSidebar from "./DocumentSidebar";
 import LegalDocEditor from "./LegalDocEditor";
 import NewDocumentModal from "./NewDocumentModal";
 
 export default function LegalDocManager() {
-  const [documents, setDocuments] = useState<LegalDocument[]>(INITIAL_LEGAL_DOCUMENTS);
-  const [activeId, setActiveId]   = useState<string>(INITIAL_LEGAL_DOCUMENTS[0]?.id ?? "");
+  const [documents, setDocuments] = useState<LegalDocument[]>([]);
+  const [activeId, setActiveId]   = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading]     = useState<boolean>(true);
 
