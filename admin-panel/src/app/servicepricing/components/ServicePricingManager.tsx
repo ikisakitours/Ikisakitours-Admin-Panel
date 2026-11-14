@@ -20,11 +20,10 @@ import {
   EMPTY_SERVICE_PRICING_CONFIG,
 } from "../types/ServicePricing.types";
 import {
-  servicePricingService,
   charterPricingService,
   ServicePricingAllData,
 } from "@/services/servicepricing.service";
-import CharterRatesForm from "./ServiceRatesForm";
+import CharterRatesForm from "./ChaterServiceRatesForm";
 import CustomTourForm from "./CustomTourForm";
 import TransferRatesForm from "./TransferRatesForm";
 
