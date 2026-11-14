@@ -18,6 +18,8 @@ import {
   Image as ImageIcon,
   ListOrdered,
   ClipboardList,
+  Scale,
+  BadgeDollarSign,
   type LucideIcon,
 } from "lucide-react";
 
@@ -55,12 +57,19 @@ const navGroups: NavGroup[] = [
   },
   {
     title: "Content Managements",
-    items: [{ href: "/managepackages", label: "Manage Packages", icon: ListOrdered }],
+    items: [
+      { href: "/managepackages", label: "Manage Packages", icon: ListOrdered },
+    ],
+  },
+  {
+    title: "Legal & Policies",
+    items: [{ href: "/legaldocs", label: "Legal Documents", icon: Scale }],
   },
   {
     title: "System Update",
 
     items: [
+      { href: "/charterpricing", label: "Pricing Notes", icon: BadgeDollarSign },
       { href: "/newupdates", label: "Update Availability", icon: RefreshCw },
       { href: "/servicenotes", label: "Service Notes", icon: ClipboardList },
       { href: "/imageupload", label: "Image Uploads", icon: ImageIcon },
@@ -95,9 +104,8 @@ export default function Sidebar() {
       }}
     >
       <div
-        className={`absolute inset-y-0 left-0 flex flex-col overflow-hidden border-r border-white/10 bg-slate-950/85 text-slate-300 backdrop-blur-md transition-[width,box-shadow] duration-300 ease-out motion-reduce:transition-none ${
-          isExpanded ? "w-64 shadow-2xl shadow-black/60" : "w-20"
-        }`}
+        className={`absolute inset-y-0 left-0 flex flex-col overflow-hidden border-r border-white/10 bg-slate-950/85 text-slate-300 backdrop-blur-md transition-[width,box-shadow] duration-300 ease-out motion-reduce:transition-none ${isExpanded ? "w-64 shadow-2xl shadow-black/60" : "w-20"
+          }`}
       >
         {/* Header Brand */}
         <div className="group flex h-16 shrink-0 items-center gap-3.5 border-b border-white/5 pl-5.75 pr-4">
@@ -112,9 +120,8 @@ export default function Sidebar() {
 
           {/* Text Container */}
           <div
-            className={`flex flex-col justify-center transition-opacity duration-300 ${
-              isExpanded ? "opacity-100 delay-100" : "opacity-0"
-            }`}
+            className={`flex flex-col justify-center transition-opacity duration-300 ${isExpanded ? "opacity-100 delay-100" : "opacity-0"
+              }`}
           >
             {/* Main Title */}
             <div className="flex items-baseline gap-1.5 whitespace-nowrap">
@@ -144,18 +151,16 @@ export default function Sidebar() {
               {/* Group heading (expanded) / divider line (collapsed) */}
               <div className="relative mb-1 h-5">
                 <span
-                  className={`absolute inset-y-0 left-3.5 flex items-center whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 transition-opacity duration-200 ${
-                    isExpanded ? "opacity-100 delay-100" : "opacity-0"
-                  }`}
+                  className={`absolute inset-y-0 left-3.5 flex items-center whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 transition-opacity duration-200 ${isExpanded ? "opacity-100 delay-100" : "opacity-0"
+                    }`}
                 >
                   {group.title}
                 </span>
                 {groupIndex > 0 && (
                   <span
                     aria-hidden="true"
-                    className={`absolute inset-x-3 top-1/2 h-px bg-white/10 transition-opacity duration-200 ${
-                      isExpanded ? "opacity-0" : "opacity-100"
-                    }`}
+                    className={`absolute inset-x-3 top-1/2 h-px bg-white/10 transition-opacity duration-200 ${isExpanded ? "opacity-0" : "opacity-100"
+                      }`}
                   />
                 )}
               </div>
@@ -171,9 +176,8 @@ export default function Sidebar() {
                       href={item.href}
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => setIsExpanded(false)}
-                      className={`relative flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm transition-all duration-200 ${
-                        isActive ? activeStyles : inactiveStyles
-                      }`}
+                      className={`relative flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm transition-all duration-200 ${isActive ? activeStyles : inactiveStyles
+                        }`}
                     >
                       {isActive && (
                         <span
@@ -183,9 +187,8 @@ export default function Sidebar() {
                       )}
                       <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-emerald-400" : "text-slate-400"}`} />
                       <span
-                        className={`whitespace-nowrap transition-opacity duration-200 ${
-                          isExpanded ? "opacity-100 delay-100" : "opacity-0"
-                        }`}
+                        className={`whitespace-nowrap transition-opacity duration-200 ${isExpanded ? "opacity-100 delay-100" : "opacity-0"
+                          }`}
                       >
                         {item.label}
                       </span>
@@ -199,9 +202,8 @@ export default function Sidebar() {
 
         {/* Footer Branding */}
         <div
-          className={`relative shrink-0 py-3.5 pr-4 transition-[padding] duration-300 ease-out motion-reduce:transition-none ${
-            isExpanded ? "pl-4" : "pl-6.75"
-          }`}
+          className={`relative shrink-0 py-3.5 pr-4 transition-[padding] duration-300 ease-out motion-reduce:transition-none ${isExpanded ? "pl-4" : "pl-6.75"
+            }`}
         >
           {/* Gradient top divider */}
           <span className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/30 to-transparent" />
@@ -217,9 +219,8 @@ export default function Sidebar() {
 
             {/* Text */}
             <div
-              className={`flex min-w-0 flex-col justify-center gap-1 whitespace-nowrap transition-opacity duration-200 ${
-                isExpanded ? "opacity-100 delay-100" : "opacity-0"
-              }`}
+              className={`flex min-w-0 flex-col justify-center gap-1 whitespace-nowrap transition-opacity duration-200 ${isExpanded ? "opacity-100 delay-100" : "opacity-0"
+                }`}
             >
               {/* Line 1: Powered by + brand */}
               <p className="flex items-baseline gap-1.5 leading-none">
