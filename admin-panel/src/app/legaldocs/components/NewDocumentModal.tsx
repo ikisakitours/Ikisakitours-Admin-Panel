@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  X,
-  Plus,
-  FileText,
-} from "lucide-react";
+import { X, Plus, FileText } from "lucide-react";
 import { LegalDocument, ACCENT_OPTIONS, ACCENT_DOT } from "../types/legal.types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -21,19 +17,23 @@ interface Props {
 }
 
 export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }: Props) {
-  const [title, setTitle]             = useState("");
-  const [docId, setDocId]             = useState("");
-  const [eyebrow, setEyebrow]         = useState("Legal & Compliance");
-  const [accent, setAccent]           = useState("indigo");
+  const [title, setTitle] = useState("");
+  const [docId, setDocId] = useState("");
+  const [eyebrow, setEyebrow] = useState("Legal & Compliance");
+  const [accent, setAccent] = useState("indigo");
   const [lastUpdated, setLastUpdated] = useState(
-    new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+    new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
   );
-  const [idError, setIdError]         = useState<string | null>(null);
+  const [idError, setIdError] = useState<string | null>(null);
 
   const langLabel = locale.toUpperCase();
 
   const autoId = (val: string) =>
-    val.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    val
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
@@ -71,7 +71,9 @@ export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
         {/* Header */}
@@ -126,12 +128,8 @@ export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }
                   : "border-slate-200 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100"
               }`}
             />
-            {idError && (
-              <p className="mt-1 text-[10px] text-red-500 font-medium">{idError}</p>
-            )}
-            <p className="mt-1 text-[10px] text-slate-400">
-              Auto-generated from title. Must be unique.
-            </p>
+            {idError && <p className="mt-1 text-[10px] text-red-500 font-medium">{idError}</p>}
+            <p className="mt-1 text-[10px] text-slate-400">Auto-generated from title. Must be unique.</p>
           </div>
 
           <div>
@@ -149,9 +147,7 @@ export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">
-                Accent Colour
-              </label>
+              <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Document Colour</label>
               <div className="flex items-center gap-2">
                 <span
                   className={`w-9 h-9 rounded-xl border border-slate-200 shadow-xs shrink-0 transition-all ${ACCENT_DOT[accent] ?? "bg-indigo-500"}`}
@@ -172,9 +168,7 @@ export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">
-                Last Updated Date
-              </label>
+              <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Last Updated Date</label>
               <input
                 type="text"
                 value={lastUpdated}
@@ -205,9 +199,7 @@ export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }
                           : "hover:scale-110 opacity-75 hover:opacity-100"
                       }`}
                     >
-                      {isSelected && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
-                      )}
+                      {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />}
                     </button>
                   );
                 })}
