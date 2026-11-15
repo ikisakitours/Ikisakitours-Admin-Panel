@@ -9,6 +9,7 @@ import {
   Trash2,
   AlertCircle,
   Plus,
+  X,
 } from "lucide-react";
 import { TOUR_TYPES } from "./availability.constants";
 
@@ -26,6 +27,7 @@ interface DateConfigPanelProps {
   onAddLanguage: () => void;
   onApply: () => void;
   onRemove: () => void;
+  onClose: () => void;
 }
 
 export default function DateConfigPanel({
@@ -42,6 +44,7 @@ export default function DateConfigPanel({
   onAddLanguage,
   onApply,
   onRemove,
+  onClose,
 }: DateConfigPanelProps) {
   if (!selectedDate) {
     return (
@@ -70,15 +73,27 @@ export default function DateConfigPanel({
           </h3>
         </div>
 
-        <span
-          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
-            isSelectedDateClosed
-              ? "bg-red-50 text-red-700 border-red-200"
-              : "bg-emerald-50 text-emerald-700 border-emerald-200"
-          }`}
-        >
-          {isSelectedDateClosed ? "🔴 Restricted" : "🟢 Available"}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+              isSelectedDateClosed
+                ? "bg-red-50 text-red-700 border-red-200"
+                : "bg-emerald-50 text-emerald-700 border-emerald-200"
+            }`}
+          >
+            {isSelectedDateClosed ? "🔴 Restricted" : "🟢 Available"}
+          </span>
+
+          {/* Close Panel Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer"
+            title="Close date configuration"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* 1. Multi-Select Tour Services (Select Multiple Tour Types) */}
