@@ -7,6 +7,7 @@ import {
   LegalSection,
   SubItem,
   resolveLocalized,
+  ACCENT_CLASSES,
 } from "../types/legal.types";
 import { LegalIcon } from "./LegalIcon";
 
@@ -14,49 +15,6 @@ import { LegalIcon } from "./LegalIcon";
 // DocumentPreviewPanel – read-only preview of how the legal document
 // would look on the actual website in the selected language.
 // ─────────────────────────────────────────────────────────────────────────────
-
-const ACCENT_CLASSES: Record<string, { badge: string; border: string; dot: string }> = {
-  emerald: {
-    badge:  "bg-emerald-50 text-emerald-700 border-emerald-200",
-    border: "border-l-emerald-400",
-    dot:    "bg-emerald-400",
-  },
-  indigo: {
-    badge:  "bg-indigo-50 text-indigo-700 border-indigo-200",
-    border: "border-l-indigo-400",
-    dot:    "bg-indigo-400",
-  },
-  blue: {
-    badge:  "bg-blue-50 text-blue-700 border-blue-200",
-    border: "border-l-blue-400",
-    dot:    "bg-blue-400",
-  },
-  amber: {
-    badge:  "bg-amber-50 text-amber-700 border-amber-200",
-    border: "border-l-amber-400",
-    dot:    "bg-amber-400",
-  },
-  rose: {
-    badge:  "bg-rose-50 text-rose-700 border-rose-200",
-    border: "border-l-rose-400",
-    dot:    "bg-rose-400",
-  },
-  violet: {
-    badge:  "bg-violet-50 text-violet-700 border-violet-200",
-    border: "border-l-violet-400",
-    dot:    "bg-violet-400",
-  },
-  sky: {
-    badge:  "bg-sky-50 text-sky-700 border-sky-200",
-    border: "border-l-sky-400",
-    dot:    "bg-sky-400",
-  },
-  orange: {
-    badge:  "bg-orange-50 text-orange-700 border-orange-200",
-    border: "border-l-orange-400",
-    dot:    "bg-orange-400",
-  },
-};
 
 function getAccent(accent?: string) {
   return ACCENT_CLASSES[accent ?? "indigo"] ?? ACCENT_CLASSES.indigo;

@@ -15,7 +15,7 @@ import {
   SectionType,
   resolveLocalized,
 } from "../types/legal.types";
-import { LegalIcon, LEGAL_ICON_OPTIONS } from "./LegalIcon";
+import { LegalIcon, LEGAL_ICON_OPTIONS, LEGAL_ICON_GROUPS } from "./LegalIcon";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -128,12 +128,37 @@ function SubItemEditor({
               <select
                 value={currentIcon}
                 onChange={(e) => onChange({ ...item, icon: e.target.value })}
-                className="w-full text-xs border border-slate-200 rounded-lg p-2 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all cursor-pointer"
+                className="w-full text-xs border border-slate-200 rounded-lg p-2 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all cursor-pointer font-medium text-left"
               >
-                {LEGAL_ICON_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
+                {LEGAL_ICON_GROUPS.map((group) => (
+                  <optgroup
+                    key={group.category}
+                    label={group.category}
+                    className="font-bold text-indigo-700 bg-slate-100 text-left"
+                    style={{
+                      fontWeight: 800,
+                      color: "#4338ca",
+                      backgroundColor: "#f1f5f9",
+                      fontStyle: "normal",
+                      textAlign: "left",
+                    }}
+                  >
+                    {group.options.map((opt) => (
+                      <option
+                        key={opt.value}
+                        value={opt.value}
+                        className="font-normal text-slate-800 bg-white text-left"
+                        style={{
+                          fontWeight: 400,
+                          color: "#1e293b",
+                          backgroundColor: "#ffffff",
+                          textAlign: "left",
+                        }}
+                      >
+                        {opt.label}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </div>
@@ -308,12 +333,37 @@ export default function SectionEditor({
                 <select
                   value={section.sectionIcon || "FileText"}
                   onChange={(e) => onUpdate({ ...section, sectionIcon: e.target.value })}
-                  className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all"
+                  className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all cursor-pointer font-medium text-left"
                 >
-                  {LEGAL_ICON_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
+                  {LEGAL_ICON_GROUPS.map((group) => (
+                    <optgroup
+                      key={group.category}
+                      label={group.category}
+                      className="font-bold text-indigo-700 bg-slate-100 text-left"
+                      style={{
+                        fontWeight: 800,
+                        color: "#4338ca",
+                        backgroundColor: "#f1f5f9",
+                        fontStyle: "normal",
+                        textAlign: "left",
+                      }}
+                    >
+                      {group.options.map((opt) => (
+                        <option
+                          key={opt.value}
+                          value={opt.value}
+                          className="font-normal text-slate-800 bg-white text-left"
+                          style={{
+                            fontWeight: 400,
+                            color: "#1e293b",
+                            backgroundColor: "#ffffff",
+                            textAlign: "left",
+                          }}
+                        >
+                          {opt.label}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>

@@ -2,23 +2,12 @@
 
 import React from "react";
 import { Plus, FileText } from "lucide-react";
-import { LegalDocument, resolveLocalized } from "../types/legal.types";
+import { LegalDocument, resolveLocalized, ACCENT_DOT } from "../types/legal.types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DocumentSidebar – lists all policy documents and allows the admin to
 // select or trigger the creation of a new custom document.
 // ─────────────────────────────────────────────────────────────────────────────
-
-const ACCENT_DOT: Record<string, string> = {
-  emerald: "bg-emerald-400",
-  indigo:  "bg-indigo-400",
-  blue:    "bg-blue-400",
-  amber:   "bg-amber-400",
-  rose:    "bg-rose-400",
-  violet:  "bg-violet-400",
-  sky:     "bg-sky-400",
-  orange:  "bg-orange-400",
-};
 
 interface Props {
   documents: LegalDocument[];
