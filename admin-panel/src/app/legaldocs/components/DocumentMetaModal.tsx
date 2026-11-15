@@ -100,7 +100,7 @@ export default function DocumentMetaModal({ doc, locale, onClose, onSave }: Prop
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">
-                Accent Colour
+                Document Colour
               </label>
               <div className="flex items-center gap-2">
                 <span
