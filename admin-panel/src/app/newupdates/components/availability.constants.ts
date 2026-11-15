@@ -58,14 +58,6 @@ export const TOUR_TYPES = [
     badgeColor: "bg-orange-50 text-orange-800 border-orange-200",
     dotColor: "bg-orange-500",
   },
-  {
-    value: "other",
-    label: "Other",
-    color: "zinc",
-    hex: "#71717a",
-    badgeColor: "bg-zinc-100 text-zinc-800 border-zinc-300",
-    dotColor: "bg-zinc-500",
-  },
 ] as const;
 
 export interface DateConfig {
