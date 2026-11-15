@@ -1,197 +1,380 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Calendar as CalendarIcon, Save, XCircle } from "lucide-react";
-import { availabilityService } from "@/services/availability.service";
+import React, { useState, useEffect } from "react";
+import { Loader2, AlertCircle } from "lucide-react";
+import {
+  availabilityService,
+  AvailabilityPayload,
+  DateDetailItem,
+} from "@/services/availability.service";
+import {
+  TOUR_TYPES,
+  MONTHS,
+  YEARS,
+  DateConfig,
+  getTourTypesForDate,
+} from "./availability.constants";
+import AvailabilityHeader from "./AvailabilityHeader";
+import AvailabilityCalendar from "./AvailabilityCalendar";
+import DateConfigPanel from "./DateConfigPanel";
+import ClosedDatesList from "./ClosedDatesList";
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June", 
-  "July", "August", "September", "October", "November", "December"
-];
-
-const YEARS = [2026, 2027, 2028];
+// Re-export constants & types for backwards compatibility
+export { TOUR_TYPES, MONTHS, YEARS };
+export type { DateConfig };
 
 export default function AvailabilityManager() {
-  const [currentMonth, setCurrentMonth] = useState(7);
+  const [currentMonth, setCurrentMonth] = useState(10); // November (0-indexed: 10)
   const [currentYear, setCurrentYear] = useState(2026);
-  
-  const [closedDates, setClosedDates] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
 
-  // Fetch existing availability on component mount using the service
-  useEffect(() => {
-    async function loadAvailability() {
-      try {
-        const data = await availabilityService.getAvailability();
-        if (data && data.apiClosedDates) {
+  const [closedDates, setClosedDates] = useState<string[]>([]);
+  const [dateDetails, setDateDetails] = useState<Record<string, DateConfig>>({});
+
+  // Dynamic language management (matches LegalDocManager, PackageFormWrapper & FaqForm)
+  const [noteLocale, setNoteLocale] = useState<string>("en");
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en", "ja"]);
+
+  // Selected date on calendar for editing in the side panel
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedTourTypes, setSelectedTourTypes] = useState<string[]>(["all"]);
+  const [selectedNotes, setSelectedNotes] = useState<Record<string, string>>({ en: "", ja: "" });
+
+  // Loading & Saving states
+  const [loading, setLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Discover languages present in dateDetails
+  const discoverLanguages = (details: Record<string, DateConfig>) => {
+    const discovered = new Set<string>(["en", "ja"]);
+    Object.values(details || {}).forEach((item) => {
+      if (item.notes && typeof item.notes === "object") {
+        Object.keys(item.notes).forEach((k) => {
+          if (k.trim()) discovered.add(k.trim().toLowerCase());
+        });
+      }
+    });
+    setAvailableLanguages(Array.from(discovered));
+  };
+
+  const addCustomLanguage = () => {
+    const lang = prompt("Enter new language code (e.g. fr, de, es, zh, it):")?.toLowerCase().trim();
+    if (lang && !availableLanguages.includes(lang)) {
+      setAvailableLanguages((prev) => [...prev, lang]);
+      setNoteLocale(lang);
+    }
+  };
+
+  // Fetch existing availability on component mount
+  const loadAvailability = async () => {
+    setFetching(true);
+    setErrorMessage(null);
+    try {
+      const data = await availabilityService.getAvailability();
+      if (data) {
+        if (Array.isArray(data.apiClosedDates)) {
           setClosedDates(data.apiClosedDates);
         }
-      } catch (err) {
-        console.error("Failed to load availability, defaulting to empty", err);
-      } finally {
-        setFetching(false);
+        if (data.dateDetails) {
+          setDateDetails(data.dateDetails);
+          discoverLanguages(data.dateDetails as Record<string, DateConfig>);
+        }
       }
+      setHasUnsavedChanges(false);
+    } catch (err: any) {
+      console.error("Failed to load availability:", err);
+      setErrorMessage(err.message || "Failed to load availability from server.");
+    } finally {
+      setFetching(false);
     }
+  };
+
+  useEffect(() => {
     loadAvailability();
   }, []);
 
-  const getDaysInMonth = (month: number, year: number) => {
-    return new Date(year, month + 1, 0).getDate();
+  // When selectedDate changes, populate the form
+  useEffect(() => {
+    if (selectedDate) {
+      const existing = dateDetails[selectedDate];
+      if (existing) {
+        const types = getTourTypesForDate(existing);
+        setSelectedTourTypes(types.length > 0 ? types : ["all"]);
+
+        if (existing.notes && typeof existing.notes === "object") {
+          setSelectedNotes({ en: "", ja: "", ...existing.notes });
+        } else if (existing.note) {
+          setSelectedNotes({ en: existing.note, ja: "" });
+        } else {
+          setSelectedNotes({ en: "", ja: "" });
+        }
+      } else {
+        setSelectedTourTypes(["all"]);
+        setSelectedNotes({ en: "", ja: "" });
+      }
+    }
+  }, [selectedDate, dateDetails]);
+
+  // Toggle individual or all tour services for the selected date
+  const toggleTourType = (typeValue: string) => {
+    if (typeValue === "all") {
+      if (selectedTourTypes.includes("all")) {
+        setSelectedTourTypes([]);
+      } else {
+        setSelectedTourTypes(TOUR_TYPES.map((t) => t.value));
+      }
+      return;
+    }
+
+    setSelectedTourTypes((prev) => {
+      let updated: string[];
+      if (prev.includes(typeValue)) {
+        updated = prev.filter((t) => t !== typeValue && t !== "all");
+      } else {
+        updated = [...prev.filter((t) => t !== "all"), typeValue];
+        const nonAllTypes = TOUR_TYPES.filter((t) => t.value !== "all").map((t) => t.value);
+        if (nonAllTypes.every((t) => updated.includes(t))) {
+          updated = ["all", ...nonAllTypes];
+        }
+      }
+      return updated;
+    });
   };
 
-  const getFirstDayOfMonth = (month: number, year: number) => {
-    return new Date(year, month, 1).getDay();
+  const handleSelectAllTourTypes = () => {
+    if (selectedTourTypes.length === TOUR_TYPES.length) {
+      setSelectedTourTypes([]);
+    } else {
+      setSelectedTourTypes(TOUR_TYPES.map((t) => t.value));
+    }
   };
 
-  const formatDateString = (day: number) => {
+  // Selecting a day on calendar opens it in configuration panel
+  const handleSelectDay = (dayNum: number) => {
     const m = String(currentMonth + 1).padStart(2, "0");
-    const d = String(day).padStart(2, "0");
-    return `${currentYear}-${m}-${d}`;
+    const d = String(dayNum).padStart(2, "0");
+    const formatted = `${currentYear}-${m}-${d}`;
+    setSelectedDate(formatted);
   };
 
-  const toggleDate = (day: number) => {
-    const formatted = formatDateString(day);
-    setClosedDates((prev) =>
-      prev.includes(formatted)
-        ? prev.filter((date) => date !== formatted)
-        : [...prev, formatted].sort()
-    );
+  // Apply or update restriction on the selected date
+  const handleApplyRestriction = () => {
+    if (!selectedDate) return;
+
+    if (selectedTourTypes.length === 0) {
+      handleRemoveRestriction(selectedDate);
+      return;
+    }
+
+    if (!closedDates.includes(selectedDate)) {
+      setClosedDates((prev) => [...prev, selectedDate].sort());
+    }
+
+    const matchedTypes = TOUR_TYPES.filter((t) => selectedTourTypes.includes(t.value));
+    const primary = matchedTypes[0] || TOUR_TYPES[0];
+
+    const currentNoteString =
+      selectedNotes[noteLocale] ||
+      selectedNotes["en"] ||
+      Object.values(selectedNotes).find(Boolean) ||
+      "";
+
+    const cleanedNotes: Record<string, string> = {};
+    Object.entries(selectedNotes).forEach(([k, v]) => {
+      if (v?.trim()) cleanedNotes[k] = v.trim();
+    });
+
+    setDateDetails((prev) => ({
+      ...prev,
+      [selectedDate]: {
+        tourType: selectedTourTypes.includes("all") ? "all" : selectedTourTypes.join(", "),
+        tourTypes: selectedTourTypes,
+        color: primary.color,
+        colors: matchedTypes.map((t) => t.color),
+        hex: primary.hex,
+        hexes: matchedTypes.map((t) => t.hex),
+        note: currentNoteString,
+        notes: cleanedNotes,
+      },
+    }));
+    setHasUnsavedChanges(true);
+  };
+
+  // Remove restriction (make date available again)
+  const handleRemoveRestriction = (dateToRemove?: string) => {
+    const target = dateToRemove || selectedDate;
+    if (!target) return;
+
+    setClosedDates((prev) => prev.filter((d) => d !== target));
+    setDateDetails((prev) => {
+      const copy = { ...prev };
+      delete copy[target];
+      return copy;
+    });
+
+    if (selectedDate === target) {
+      setSelectedTourTypes(["all"]);
+      setSelectedNotes({ en: "", ja: "" });
+    }
+    setHasUnsavedChanges(true);
+  };
+
+  // Month navigation helpers
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear((y) => y - 1);
+    } else {
+      setCurrentMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear((y) => y + 1);
+    } else {
+      setCurrentMonth((m) => m + 1);
+    }
   };
 
   const handleSave = async () => {
     setLoading(true);
+    setErrorMessage(null);
     try {
-      await availabilityService.updateAvailability({ apiClosedDates: closedDates });
-      alert("Availability updated successfully!");
+      const closedDateDetails: DateDetailItem[] = closedDates.map((date) => {
+        const detail = dateDetails[date];
+        const types = getTourTypesForDate(detail);
+        const matchedTypes = TOUR_TYPES.filter((t) => types.includes(t.value));
+        const primary = matchedTypes[0] || TOUR_TYPES[0];
+
+        const noteString = detail?.notes
+          ? detail.notes[noteLocale] || detail.notes["en"] || Object.values(detail.notes).find(Boolean) || detail?.note || ""
+          : detail?.note || "";
+
+        return {
+          date,
+          tourType: types.includes("all") ? "all" : types.join(", "),
+          tourTypes: types,
+          color: primary.color,
+          colors: matchedTypes.map((t) => t.color),
+          hex: primary.hex,
+          hexes: matchedTypes.map((t) => t.hex),
+          note: noteString,
+          notes: detail?.notes || (detail?.note ? { en: detail.note } : {}),
+        };
+      });
+
+      const payload: AvailabilityPayload = {
+        apiClosedDates: closedDates,
+        dateDetails,
+        closedDateDetails,
+      };
+
+      await availabilityService.updateAvailability(payload);
+      setSaved(true);
+      setHasUnsavedChanges(false);
+      setTimeout(() => setSaved(false), 2500);
     } catch (err: any) {
-      alert(`Save error: ${err.message || "Could not save changes"}`);
+      setErrorMessage(err.message || "Could not save availability changes.");
     } finally {
       setLoading(false);
     }
   };
 
-  const daysInMonth = getDaysInMonth(currentMonth, currentYear);
-  const startDay = getFirstDayOfMonth(currentMonth, currentYear);
-
   if (fetching) {
-    return <div className="p-8 text-center text-xs text-slate-500">Loading calendar availability...</div>;
+    return (
+      <div className="w-full bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
+        <div className="flex items-center justify-center gap-2.5 text-xs font-semibold text-slate-600">
+          <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+          <span>Loading calendar availability...</span>
+        </div>
+      </div>
+    );
   }
 
+  const isSelectedDateClosed = selectedDate ? closedDates.includes(selectedDate) : false;
+
   return (
-    <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
-      <div className="flex items-center justify-between pb-6 border-b border-slate-100">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 text-indigo-600" /> Tour Date Availability
-          </h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Click dates to toggle between Available and Not Available.
-          </p>
+    <div className="w-full space-y-5">
+      {/* Error Alert Banner */}
+      {errorMessage && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs font-semibold shadow-xs">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMessage(null)}
+            className="text-red-600 hover:text-red-800 text-[11px] font-bold cursor-pointer"
+          >
+            Dismiss
+          </button>
         </div>
+      )}
 
-        <button
-          onClick={handleSave}
-          disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-semibold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
-        >
-          <Save className="w-4 h-4" /> {loading ? "Saving..." : "Save Availability"}
-        </button>
-      </div>
+      {/* Main Card Container */}
+      <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
+        {/* Top Header Bar */}
+        <AvailabilityHeader
+          noteLocale={noteLocale}
+          availableLanguages={availableLanguages}
+          onLocaleChange={setNoteLocale}
+          onAddLanguage={addCustomLanguage}
+          loading={loading}
+          saved={saved}
+          hasUnsavedChanges={hasUnsavedChanges}
+          onReload={loadAvailability}
+          onSave={handleSave}
+        />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6">
-        <div className="lg:col-span-7 bg-slate-50/70 border border-slate-200 p-5 rounded-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <select
-              value={currentMonth}
-              onChange={(e) => setCurrentMonth(Number(e.target.value))}
-              className="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-indigo-500"
-            >
-              {MONTHS.map((m, idx) => (
-                <option key={m} value={idx}>{m}</option>
-              ))}
-            </select>
-
-            <select
-              value={currentYear}
-              onChange={(e) => setCurrentYear(Number(e.target.value))}
-              className="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-indigo-500"
-            >
-              {YEARS.map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
+        {/* Main Two-Column Layout: Calendar (Left) & Date Config / List (Right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6">
+          {/* Left Column: Calendar Grid */}
+          <div className="lg:col-span-7">
+            <AvailabilityCalendar
+              currentMonth={currentMonth}
+              currentYear={currentYear}
+              onMonthChange={setCurrentMonth}
+              onYearChange={setCurrentYear}
+              onPrevMonth={handlePrevMonth}
+              onNextMonth={handleNextMonth}
+              closedDates={closedDates}
+              dateDetails={dateDetails}
+              selectedDate={selectedDate}
+              onSelectDay={handleSelectDay}
+            />
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center mb-2">
-            {["SU", "MO", "TU", "WE", "TH", "FR", "SA"].map((d) => (
-              <span key={d} className="text-[11px] font-bold text-slate-400">
-                {d}
-              </span>
-            ))}
-          </div>
+          {/* Right Column: Selected Date Control & Configured Dates List */}
+          <div className="lg:col-span-5 space-y-5">
+            <DateConfigPanel
+              selectedDate={selectedDate}
+              isSelectedDateClosed={isSelectedDateClosed}
+              selectedTourTypes={selectedTourTypes}
+              onToggleTourType={toggleTourType}
+              onSelectAllTourTypes={handleSelectAllTourTypes}
+              selectedNotes={selectedNotes}
+              onNotesChange={setSelectedNotes}
+              noteLocale={noteLocale}
+              availableLanguages={availableLanguages}
+              onLocaleChange={setNoteLocale}
+              onAddLanguage={addCustomLanguage}
+              onApply={handleApplyRestriction}
+              onRemove={() => handleRemoveRestriction()}
+            />
 
-          <div className="grid grid-cols-7 gap-1.5">
-            {Array.from({ length: startDay }).map((_, i) => (
-              <div key={`blank-${i}`} className="h-9" />
-            ))}
-
-            {Array.from({ length: daysInMonth }).map((_, i) => {
-              const dayNum = i + 1;
-              const formatted = formatDateString(dayNum);
-              const isClosed = closedDates.includes(formatted);
-
-              return (
-                <button
-                  key={dayNum}
-                  type="button"
-                  onClick={() => toggleDate(dayNum)}
-                  className={`h-9 rounded-xl flex items-center justify-center text-xs font-semibold transition-all relative cursor-pointer ${
-                    isClosed
-                      ? "bg-red-50 text-red-400 line-through border border-red-200"
-                      : "bg-white text-slate-700 hover:border-indigo-500 hover:text-indigo-600 border border-slate-200 shadow-2xs"
-                  }`}
-                >
-                  {dayNum}
-                  {isClosed && (
-                    <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="lg:col-span-5 space-y-4">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-            Output Array Payload
-          </h3>
-          
-          <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl font-mono text-xs text-indigo-300 overflow-x-auto">
-            <span className="text-emerald-400">apiClosedDates</span> = {JSON.stringify(closedDates, null, 2)};
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-slate-700">
-              Disabled Dates ({closedDates.length})
-            </h4>
-            <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
-              {closedDates.length === 0 ? (
-                <p className="text-xs text-slate-400 italic">No closed dates selected.</p>
-              ) : (
-                closedDates.map((date) => (
-                  <div
-                    key={date}
-                    className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"
-                  >
-                    <span className="text-slate-800 font-mono font-medium">{date}</span>
-                    <span className="flex items-center gap-1 text-[10px] text-red-600 font-semibold bg-red-50 px-2 py-0.5 rounded-md border border-red-100">
-                      <XCircle className="w-3 h-3" /> Not Available
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
+            <ClosedDatesList
+              closedDates={closedDates}
+              dateDetails={dateDetails}
+              selectedDate={selectedDate}
+              noteLocale={noteLocale}
+              onSelectDate={setSelectedDate}
+              onRemoveDate={handleRemoveRestriction}
+            />
           </div>
         </div>
       </div>
