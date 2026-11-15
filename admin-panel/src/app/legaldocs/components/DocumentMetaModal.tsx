@@ -7,23 +7,12 @@ import {
   Save,
   Calendar,
 } from "lucide-react";
-import { LegalDocument, resolveLocalized } from "../types/legal.types";
+import { LegalDocument, resolveLocalized, ACCENT_OPTIONS, ACCENT_DOT } from "../types/legal.types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DocumentMetaModal – edit the top-level metadata of an existing document
 // (title & eyebrow for the active language, accent colour, last-updated date).
 // ─────────────────────────────────────────────────────────────────────────────
-
-const ACCENT_OPTIONS = [
-  { value: "emerald", label: "Emerald" },
-  { value: "indigo",  label: "Indigo"  },
-  { value: "blue",    label: "Blue"    },
-  { value: "amber",   label: "Amber"   },
-  { value: "rose",    label: "Rose"    },
-  { value: "violet",  label: "Violet"  },
-  { value: "sky",     label: "Sky"     },
-  { value: "orange",  label: "Orange"  },
-];
 
 interface Props {
   doc: LegalDocument;
@@ -110,16 +99,26 @@ export default function DocumentMetaModal({ doc, locale, onClose, onSave }: Prop
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Accent Colour</label>
-              <select
-                value={accent}
-                onChange={(e) => setAccent(e.target.value)}
-                className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all"
-              >
-                {ACCENT_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">
+                Accent Colour
+              </label>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`w-9 h-9 rounded-xl border border-slate-200 shadow-xs shrink-0 transition-all ${ACCENT_DOT[accent] ?? "bg-indigo-500"}`}
+                  title={`Active Accent: ${accent}`}
+                />
+                <select
+                  value={accent}
+                  onChange={(e) => setAccent(e.target.value)}
+                  className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all cursor-pointer font-medium"
+                >
+                  {ACCENT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div>
@@ -134,6 +133,36 @@ export default function DocumentMetaModal({ doc, locale, onClose, onSave }: Prop
                 placeholder="e.g. November 1, 2026"
                 className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-all"
               />
+            </div>
+
+            {/* Visual Color Swatches Palette */}
+            <div className="col-span-2 pt-1 pb-1">
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1.5">
+                Quick Colour Palette
+              </label>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {ACCENT_OPTIONS.map((opt) => {
+                  const isSelected = accent === opt.value;
+                  const dotColor = ACCENT_DOT[opt.value] ?? "bg-slate-400";
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setAccent(opt.value)}
+                      title={opt.label}
+                      className={`w-6 h-6 rounded-full ${dotColor} transition-all cursor-pointer flex items-center justify-center ${
+                        isSelected
+                          ? "ring-2 ring-offset-2 ring-indigo-600 scale-110 shadow-xs"
+                          : "hover:scale-110 opacity-75 hover:opacity-100"
+                      }`}
+                    >
+                      {isSelected && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
