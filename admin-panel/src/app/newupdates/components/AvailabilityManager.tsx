@@ -36,7 +36,7 @@ export default function AvailabilityManager() {
 
   // Selected date on calendar for editing in the side panel
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedTourTypes, setSelectedTourTypes] = useState<string[]>(["all"]);
+  const [selectedTourTypes, setSelectedTourTypes] = useState<string[]>([]);
   const [selectedNotes, setSelectedNotes] = useState<Record<string, string>>({ en: "", ja: "" });
 
   // Loading & Saving states
@@ -111,7 +111,7 @@ export default function AvailabilityManager() {
           setSelectedNotes({ en: "", ja: "" });
         }
       } else {
-        setSelectedTourTypes(["all"]);
+        setSelectedTourTypes([]);
         setSelectedNotes({ en: "", ja: "" });
       }
     }
@@ -215,7 +215,7 @@ export default function AvailabilityManager() {
     });
 
     if (selectedDate === target) {
-      setSelectedTourTypes(["all"]);
+      setSelectedTourTypes([]);
       setSelectedNotes({ en: "", ja: "" });
     }
     setHasUnsavedChanges(true);
