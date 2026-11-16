@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { destinationService, DestinationPayload } from "@/services/destination.service";
 import { Save, Plus } from "lucide-react";
 import DestinationBasicInfo from "./DestinationBasicInfo";
@@ -10,10 +10,14 @@ import DestinationQuickFacts from "./DestinationQuickFacts";
 import DestinationJsonUploader from "./DestinationJsonUploader";
 
 interface DestinationFormProps {
+  initialData?: DestinationPayload | null;
   onSuccess?: () => void;
+  onDestinationCreated?: () => void;
 }
 
-export default function DestinationForm({ onSuccess }: DestinationFormProps) {
+export default function DestinationForm({ initialData, onSuccess, onDestinationCreated }: DestinationFormProps) {
+  const isEditMode = Boolean(initialData?.id);
+
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isCustomSlug, setIsCustomSlug] = useState(false);
@@ -56,6 +60,47 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
     ja: [""],
   });
 
+  // Pre-fill form when initialData is provided (Edit Mode)
+  useEffect(() => {
+    if (initialData) {
+      const detectedLangs = Array.from(
+        new Set([
+          "en",
+          "ja",
+          ...Object.keys(initialData.title || {}),
+          ...Object.keys(initialData.summary || {}),
+          ...Object.keys(initialData.description || {}),
+          ...Object.keys(initialData.province || {}),
+        ])
+      );
+
+      setAvailableLanguages(detectedLangs);
+      setSlug(initialData.slug || "");
+      setIsCustomSlug(true);
+
+      setFormData({
+        title: { en: "", ja: "", ...(initialData.title || {}) },
+        summary: { en: "", ja: "", ...(initialData.summary || {}) },
+        description: { en: "", ja: "", ...(initialData.description || {}) },
+        province: { en: "", ja: "", ...(initialData.province || {}) },
+        bestTimeToVisit: { en: "", ja: "", ...(initialData.bestTimeToVisit || {}) },
+        climate: { en: "", ja: "", ...(initialData.climate || {}) },
+        primaryLanguage: { en: "", ja: "", ...(initialData.primaryLanguage || {}) },
+        localCurrency: { en: "", ja: "", ...(initialData.localCurrency || {}) },
+        lat: initialData.coordinates?.lat ?? 35.6762,
+        lng: initialData.coordinates?.lng ?? 139.6503,
+      });
+
+      if (initialData.highlights) {
+        setHighlights({
+          en: [""],
+          ja: [""],
+          ...initialData.highlights,
+        });
+      }
+    }
+  }, [initialData]);
+
   // Unicode-aware slugify (supports English, Japanese, French accents)
   const slugify = (text: string) => {
     return text
@@ -72,6 +117,21 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
     if (lang && !availableLanguages.includes(lang)) {
       setAvailableLanguages((prev) => [...prev, lang]);
       setActiveLang(lang);
+      setFormData((prev) => ({
+        ...prev,
+        title: { ...prev.title, [lang]: "" },
+        summary: { ...prev.summary, [lang]: "" },
+        description: { ...prev.description, [lang]: "" },
+        province: { ...prev.province, [lang]: "" },
+        bestTimeToVisit: { ...prev.bestTimeToVisit, [lang]: "" },
+        climate: { ...prev.climate, [lang]: "" },
+        primaryLanguage: { ...prev.primaryLanguage, [lang]: "" },
+        localCurrency: { ...prev.localCurrency, [lang]: "" },
+      }));
+      setHighlights((prev) => ({
+        ...prev,
+        [lang]: [""],
+      }));
     }
   };
 
@@ -79,7 +139,6 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
   const handleJsonLoaded = (data: any) => {
     if (!data) return;
 
-    // Detect available languages from title or fallback keys
     const detectedLangs = data.title ? Object.keys(data.title) : ["en"];
     if (detectedLangs.length > 0) {
       setAvailableLanguages((prev) => Array.from(new Set([...prev, ...detectedLangs])));
@@ -202,7 +261,7 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
         description: formData.description,
         province: formData.province,
         highlights: cleanedHighlights,
-        images: imageUrls,
+        ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
         bestTimeToVisit: formData.bestTimeToVisit,
         climate: formData.climate,
         primaryLanguage: formData.primaryLanguage,
@@ -213,30 +272,36 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
         },
       };
 
-      const newDest = await destinationService.createDestination(payload);
-      alert(`Destination created successfully! ID: ${newDest.id}`);
+      if (isEditMode && initialData?.id) {
+        await destinationService.updateDestination(initialData.id, payload);
+        alert("Destination updated successfully!");
+      } else {
+        const newDest = await destinationService.createDestination(payload);
+        alert(`Destination created successfully! ID: ${newDest.id}`);
 
-      // Reset Form
-      setSelectedFiles([]);
-      setIsCustomSlug(false);
-      setSlug("");
-      setActiveLang("en");
-      setAvailableLanguages(["en", "ja"]);
-      setFormData({
-        title: { en: "", ja: "" },
-        summary: { en: "", ja: "" },
-        description: { en: "", ja: "" },
-        province: { en: "", ja: "" },
-        bestTimeToVisit: { en: "", ja: "" },
-        climate: { en: "", ja: "" },
-        primaryLanguage: { en: "", ja: "" },
-        localCurrency: { en: "", ja: "" },
-        lat: 35.6762,
-        lng: 139.6503,
-      });
-      setHighlights({ en: [""], ja: [""] });
+        // Reset Form
+        setSelectedFiles([]);
+        setIsCustomSlug(false);
+        setSlug("");
+        setActiveLang("en");
+        setAvailableLanguages(["en", "ja"]);
+        setFormData({
+          title: { en: "", ja: "" },
+          summary: { en: "", ja: "" },
+          description: { en: "", ja: "" },
+          province: { en: "", ja: "" },
+          bestTimeToVisit: { en: "", ja: "" },
+          climate: { en: "", ja: "" },
+          primaryLanguage: { en: "", ja: "" },
+          localCurrency: { en: "", ja: "" },
+          lat: 35.6762,
+          lng: 139.6503,
+        });
+        setHighlights({ en: [""], ja: [""] });
+      }
 
       if (onSuccess) onSuccess();
+      if (onDestinationCreated) onDestinationCreated();
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -246,8 +311,15 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 space-y-6">
-      <div className="flex justify-between items-center pb-4 border-b dark:border-gray-800">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Create Travel Destination</h2>
+      <div className="flex justify-between items-center pb-4 border-b dark:border-gray-800 flex-wrap gap-4">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            {isEditMode ? "Edit Travel Destination" : "Create Travel Destination"}
+          </h2>
+          <p className="text-xs text-slate-500">
+            {isEditMode ? "Update destination fields and multilingual details." : "Upload a JSON data file or fill out fields manually."}
+          </p>
+        </div>
         <div className="flex items-center gap-3">
           {/* Dynamic Language Switcher with Add Button */}
           <div className="flex items-center gap-1 bg-slate-100 dark:bg-gray-800 p-1 rounded-lg border border-slate-200 dark:border-gray-700 flex-wrap">
@@ -257,8 +329,8 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
                 type="button"
                 onClick={() => setActiveLang(langKey)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all uppercase ${activeLang === langKey
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700"
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700"
                   }`}
               >
                 {langKey}
@@ -280,13 +352,13 @@ export default function DestinationForm({ onSuccess }: DestinationFormProps) {
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
           >
             <Save className="w-4 h-4" />
-            {loading ? "Saving..." : "Publish"}
+            {loading ? "Saving..." : isEditMode ? "Save Changes" : "Publish"}
           </button>
         </div>
       </div>
 
-      {/* JSON File Uploader Section */}
-      <DestinationJsonUploader onDataLoaded={handleJsonLoaded} />
+      {/* JSON File Uploader Section (Hidden in Edit Mode if desired, or kept) */}
+      {!isEditMode && <DestinationJsonUploader onDataLoaded={handleJsonLoaded} />}
 
       {/* Basic Info (Title, Slug, Province & Language tabs) */}
       <DestinationBasicInfo

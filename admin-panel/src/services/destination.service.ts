@@ -1,6 +1,7 @@
 export type DestinationLanguage = "en" | "ja" | "fr";
 
 export interface DestinationPayload {
+  id?: string; // Included when editing an existing destination
   title: Record<string, string>;
   slug?: string;
   summary: Record<string, string>;
@@ -70,7 +71,49 @@ class DestinationService {
     return res.json();
   }
 
-  // Fetch all destination previews (for admin list or preview cards)
+  // ADMIN 1: Fetch all raw multilingual destinations for the admin management list
+  async getAdminDestinations(): Promise<DestinationPayload[]> {
+    const res = await fetch(`${this.API_URL}/destinations/admin`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch admin destinations");
+    }
+
+    return res.json();
+  }
+
+  // ADMIN 2: Fetch a single raw destination by ID to pre-fill the edit form
+  async getAdminDestinationById(id: string): Promise<DestinationPayload> {
+    const res = await fetch(`${this.API_URL}/destinations/admin/${id}`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch destination details");
+    }
+
+    return res.json();
+  }
+
+  // ADMIN 3: Update an existing destination by ID
+  async updateDestination(id: string, payload: DestinationPayload) {
+    const res = await fetch(`${this.API_URL}/destinations/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to update destination");
+    }
+
+    return res.json();
+  }
+
+  // Fetch all destination previews (for frontend cards)
   async getPreviews(lang?: string): Promise<DestinationPreview[]> {
     const url = lang ? `${this.API_URL}/destinations/previews?lang=${lang}` : `${this.API_URL}/destinations/previews`;
     const res = await fetch(url);

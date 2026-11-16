@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { blogService } from "@/services/blog.service";
+import { useState, useEffect } from "react";
+import { blogService, BlogPayload } from "@/services/blog.service";
 import { Save, Plus } from "lucide-react";
 import JsonImporter from "./JsonImporter";
 import MultilingualEditor from "./MultilingualEditor";
 import ImageUploader from "./ImageUploader";
 
 interface BlogFormProps {
+    initialData?: BlogPayload | null;
     onSuccess?: () => void;
+    onBlogCreated?: () => void;
 }
 
-export default function BlogForm({ onSuccess }: BlogFormProps) {
+export default function BlogForm({ initialData, onSuccess, onBlogCreated }: BlogFormProps) {
+    const isEditMode = Boolean(initialData?.id);
+
     const [loading, setLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isCustomSlug, setIsCustomSlug] = useState(false);
@@ -30,6 +34,35 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
         blog: { en: "", ja: "" } as Record<string, string>,
     });
 
+    // Pre-fill form & sync language tabs when initialData is provided (Edit Mode)
+    useEffect(() => {
+        if (initialData) {
+            const detectedLangs = Array.from(
+                new Set([
+                    "en",
+                    "ja",
+                    ...Object.keys(initialData.title || {}),
+                    ...Object.keys(initialData.summary || {}),
+                    ...Object.keys(initialData.category || {}),
+                    ...Object.keys(initialData.readTime || {}),
+                    ...Object.keys(initialData.blog || {}),
+                ])
+            );
+
+            setAvailableLanguages(detectedLangs);
+            setFormData({
+                title: { en: "", ja: "", ...(initialData.title || {}) },
+                slug: initialData.slug || "",
+                summary: { en: "", ja: "", ...(initialData.summary || {}) },
+                category: { en: "", ja: "", ...(initialData.category || {}) },
+                readTime: { en: "", ja: "", ...(initialData.readTime || {}) },
+                author: initialData.author || "",
+                blog: { en: "", ja: "", ...(initialData.blog || {}) },
+            });
+            setIsCustomSlug(true);
+        }
+    }, [initialData]);
+
     const slugify = (text: string) => {
         return text
             .trim()
@@ -44,6 +77,14 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
         if (lang && !availableLanguages.includes(lang)) {
             setAvailableLanguages((prev) => [...prev, lang]);
             setActiveLang(lang);
+            setFormData((prev) => ({
+                ...prev,
+                title: { ...prev.title, [lang]: "" },
+                summary: { ...prev.summary, [lang]: "" },
+                category: { ...prev.category, [lang]: "" },
+                readTime: { ...prev.readTime, [lang]: "" },
+                blog: { ...prev.blog, [lang]: "" },
+            }));
         }
     };
 
@@ -54,7 +95,6 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
             ? jsonContent.title
             : { en: jsonContent.title || "" };
 
-        // Automatically merge or detect available languages from the JSON
         const detectedLangs = Object.keys(titleObj);
         if (detectedLangs.length > 0) {
             setAvailableLanguages((prev) => Array.from(new Set([...prev, ...detectedLangs])));
@@ -128,29 +168,33 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                 readTime: formData.readTime,
                 author: formData.author,
                 blog: formData.blog,
-                images: imageUrls,
+                ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
             };
 
-            const newPost = await blogService.createBlog(blogPayload);
-            alert(`Blog created successfully! ID: ${newPost.id}`);
+            if (isEditMode && initialData?.id) {
+                await blogService.updateBlog(initialData.id, blogPayload);
+                alert("Blog updated successfully!");
+            } else {
+                const newPost = await blogService.createBlog(blogPayload);
+                alert(`Blog created successfully! ID: ${newPost.id}`);
 
-            if (onSuccess) {
-                onSuccess();
+                setSelectedFiles([]);
+                setIsCustomSlug(false);
+                setActiveLang("en");
+                setAvailableLanguages(["en", "ja"]);
+                setFormData({
+                    title: { en: "", ja: "" },
+                    slug: "",
+                    summary: { en: "", ja: "" },
+                    category: { en: "", ja: "" },
+                    readTime: { en: "", ja: "" },
+                    author: "",
+                    blog: { en: "", ja: "" },
+                });
             }
 
-            setSelectedFiles([]);
-            setIsCustomSlug(false);
-            setActiveLang("en");
-            setAvailableLanguages(["en", "ja"]);
-            setFormData({
-                title: { en: "", ja: "" },
-                slug: "",
-                summary: { en: "", ja: "" },
-                category: { en: "", ja: "" },
-                readTime: { en: "", ja: "" },
-                author: "",
-                blog: { en: "", ja: "" },
-            });
+            if (onSuccess) onSuccess();
+            if (onBlogCreated) onBlogCreated();
         } catch (err: any) {
             alert(`Error: ${err.message}`);
         } finally {
@@ -159,11 +203,15 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-xl border border-slate-200 space-y-6">
-            <div className="flex justify-between items-center pb-4 border-b">
+        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-xl border border-slate-200 space-y-6 font-sans">
+            <div className="flex justify-between items-center pb-4 border-b flex-wrap gap-4">
                 <div>
-                    <h2 className="text-lg font-bold">Create Multilingual Blog Post</h2>
-                    <p className="text-xs text-slate-500">Upload a JSON data file or fill out fields manually.</p>
+                    <h2 className="text-lg font-bold">
+                        {isEditMode ? "Edit Multilingual Blog Post" : "Create Multilingual Blog Post"}
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                        {isEditMode ? "Update blog fields and languages." : "Upload a JSON data file or fill out fields manually."}
+                    </p>
                 </div>
                 <div className="flex items-center gap-3">
                     {/* Dynamic Language Switcher with Add Button */}
@@ -194,16 +242,16 @@ export default function BlogForm({ onSuccess }: BlogFormProps) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
                     >
                         <Save className="w-4 h-4" />
-                        {loading ? "Saving..." : "Publish"}
+                        {loading ? "Saving..." : isEditMode ? "Save Changes" : "Publish"}
                     </button>
                 </div>
             </div>
 
-            {/* Component 1: JSON Importer */}
-            <JsonImporter onLoadJson={handleLoadJson} />
+            {/* Component 1: JSON Importer (Hidden or shown when creating) */}
+            {!isEditMode && <JsonImporter onLoadJson={handleLoadJson} />}
 
             {/* Component 2: Multilingual Editor */}
             <MultilingualEditor
