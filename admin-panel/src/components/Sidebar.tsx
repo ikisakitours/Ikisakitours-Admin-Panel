@@ -22,6 +22,9 @@ import {
   ScrollText,
   type LucideIcon,
   FileText,
+  FilePlus2,
+  MessageSquarePlus,
+  MapPinPlus,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
@@ -53,6 +56,27 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    title: "Destinations",
+    items: [
+      { href: "/managedestinations", label: "Manage Destinations", icon: MapPin },
+      { href: "/destinations", label: "Add Destination", icon: MapPinPlus },
+    ],
+  },
+  {
+    title: "Blog Articles",
+    items: [
+      { href: "/manageblogs", label: "Manage Blogs", icon: BookOpen },
+      { href: "/blogs", label: "Add Blog Article", icon: FilePlus2 },
+    ],
+  },
+  {
+    title: "FAQs & Help",
+    items: [
+      { href: "/managefaqs", label: "Manage FAQs", icon: HelpCircle },
+      { href: "/faqs", label: "Add FAQ", icon: MessageSquarePlus },
+    ],
+  },
+  {
     title: "Availability & Rates",
     items: [
       { href: "/newupdates", label: "Date Availability", icon: CalendarOff },
@@ -61,17 +85,9 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: "Content & Media",
+    title: "Media & Engagement",
     items: [
-      { href: "/blogs", label: "Blog Articles", icon: BookOpen },
-      { href: "/destinations", label: "Destinations", icon: MapPin },
-      { href: "/faqs", label: "FAQs & Help", icon: HelpCircle },
       { href: "/imageupload", label: "Media Gallery", icon: Images },
-    ],
-  },
-  {
-    title: "Customer Engagement",
-    items: [
       { href: "/comments", label: "Reviews & Feedback", icon: MessageSquareText },
       { href: "/contact", label: "Contact Inquiries", icon: Mail },
     ],
@@ -81,14 +97,6 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/legaldocs", label: "Legal Documents", icon: Scale },
       { href: "/adminlogs", label: "Audit Logs", icon: ScrollText },
-    ],
-  },
-  {
-    title: "Update Content",
-    items: [
-      { href: "/manageblogs", label: "Manage Blogs", icon: FileText },
-      { href: "/managedestinations", label: "Manage Destinations", icon: MapPin },
-      { href: "/managefaqs", label: "Manage FAQs", icon: HelpCircle },
     ],
   },
 ];
