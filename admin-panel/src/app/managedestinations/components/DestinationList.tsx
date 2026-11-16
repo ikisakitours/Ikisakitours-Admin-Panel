@@ -59,7 +59,7 @@ export function DestinationList() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-xs overflow-hidden font-sans">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-xs overflow-hidden">
       <div className="p-4 border-b border-slate-100 dark:border-gray-800 flex items-center justify-between">
         <span className="text-xs font-bold text-slate-700 dark:text-gray-300 uppercase tracking-wider">
           All Stored Destinations ({destinations.length})

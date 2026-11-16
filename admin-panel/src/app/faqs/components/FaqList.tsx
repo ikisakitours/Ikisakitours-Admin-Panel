@@ -30,7 +30,7 @@ export default function FaqList({ faqs, onDeleted }: { faqs: FaqItem[]; onDelete
   }
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-slate-900 font-mono tracking-tight">
           Existing FAQs ({faqs.length})

@@ -15,7 +15,7 @@ export default function ManageDestinationsPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-8 font-sans">
+    <div className="p-6 max-w-6xl mx-auto space-y-8">
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-gray-100 tracking-tight">Manage Destinations</h1>

@@ -53,7 +53,7 @@ export function BlogList() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden font-sans">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
           All Stored Blogs ({blogs.length})

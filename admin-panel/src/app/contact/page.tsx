@@ -42,7 +42,7 @@ export default function Contact() {
   };
 
   return (
-    <main className="w-full py-8 px-4 sm:px-6 max-w-5xl mx-auto font-sans">
+    <main className="w-full py-8 px-4 sm:px-6 max-w-5xl mx-auto">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
         <div>

@@ -35,7 +35,7 @@ export default function EditBlogPage() {
     }, [id]);
 
     return (
-        <div className="p-6 max-w-5xl mx-auto space-y-6 font-sans">
+        <div className="p-6 max-w-5xl mx-auto space-y-6">
             <div>
                 <Link
                     href="/manageblogs"
