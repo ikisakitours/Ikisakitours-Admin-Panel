@@ -21,6 +21,7 @@ import {
   Images,
   ScrollText,
   type LucideIcon,
+  FileText,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
@@ -82,6 +83,14 @@ const navGroups: NavGroup[] = [
       { href: "/adminlogs", label: "Audit Logs", icon: ScrollText },
     ],
   },
+  {
+    title: "Update Content",
+    items: [
+      { href: "/manageblogs", label: "Manage Blogs", icon: FileText },
+      { href: "/managedestinations", label: "Manage Destinations", icon: MapPin },
+      { href: "/managefaqs", label: "Manage FAQs", icon: HelpCircle },
+    ],
+  },
 ];
 
 export default function Sidebar() {
@@ -112,15 +121,13 @@ export default function Sidebar() {
       }}
     >
       <div
-        className={`absolute inset-y-0 left-0 flex flex-col overflow-hidden border-r border-white/10 bg-slate-950/90 text-slate-300 backdrop-blur-md transition-[width,box-shadow] duration-300 ease-out motion-reduce:transition-none ${
-          isExpanded ? "w-72 shadow-2xl shadow-black/70" : "w-22"
-        }`}
+        className={`absolute inset-y-0 left-0 flex flex-col overflow-hidden border-r border-white/10 bg-slate-950/90 text-slate-300 backdrop-blur-md transition-[width,box-shadow] duration-300 ease-out motion-reduce:transition-none ${isExpanded ? "w-72 shadow-2xl shadow-black/70" : "w-22"
+          }`}
       >
         {/* Header Brand */}
         <div
-          className={`group flex h-16 shrink-0 items-center border-b border-white/5 transition-all duration-300 ${
-            isExpanded ? "justify-start px-5 gap-3.5" : "justify-center px-0"
-          }`}
+          className={`group flex h-16 shrink-0 items-center border-b border-white/5 transition-all duration-300 ${isExpanded ? "justify-start px-5 gap-3.5" : "justify-center px-0"
+            }`}
         >
           {/* Logo Icon (Centered in collapsed mode) */}
           <span className="relative shrink-0 flex items-center justify-center">
@@ -190,11 +197,10 @@ export default function Sidebar() {
                       title={!isExpanded ? item.label : undefined}
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => setIsExpanded(false)}
-                      className={`relative flex items-center rounded-xl border text-sm transition-all duration-200 ${
-                        isExpanded
-                          ? "w-full px-3.5 py-2.5 justify-start gap-3"
-                          : "w-11 h-11 mx-auto justify-center px-0"
-                      } ${isActive ? activeStyles : inactiveStyles}`}
+                      className={`relative flex items-center rounded-xl border text-sm transition-all duration-200 ${isExpanded
+                        ? "w-full px-3.5 py-2.5 justify-start gap-3"
+                        : "w-11 h-11 mx-auto justify-center px-0"
+                        } ${isActive ? activeStyles : inactiveStyles}`}
                     >
                       {/* Active indicator bar on screen edge */}
                       {isActive && (
@@ -206,9 +212,8 @@ export default function Sidebar() {
 
                       {/* Icon */}
                       <Icon
-                        className={`h-4.5 w-4.5 shrink-0 transition-colors ${
-                          isActive ? "text-emerald-300" : "text-slate-400"
-                        }`}
+                        className={`h-4.5 w-4.5 shrink-0 transition-colors ${isActive ? "text-emerald-300" : "text-slate-400"
+                          }`}
                       />
 
                       {/* Label (Expanded only) */}
@@ -228,9 +233,8 @@ export default function Sidebar() {
         {/* Footer Branding */}
         <div className="relative shrink-0 py-3.5 border-t border-white/5 transition-all duration-300">
           <div
-            className={`group flex cursor-default items-center transition-all duration-300 ${
-              isExpanded ? "justify-start px-5 gap-3" : "justify-center px-0"
-            }`}
+            className={`group flex cursor-default items-center transition-all duration-300 ${isExpanded ? "justify-start px-5 gap-3" : "justify-center px-0"
+              }`}
           >
             {/* Logo mark (Centered in collapsed mode) */}
             <span className="relative shrink-0 flex items-center justify-center">
