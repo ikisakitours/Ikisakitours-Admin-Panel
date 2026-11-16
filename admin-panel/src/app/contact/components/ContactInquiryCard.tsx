@@ -32,7 +32,7 @@ export default function ContactInquiryCard({
   const [status, setStatus] = useState(initialStatus);
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-3xl shadow-sm hover:shadow-md transition-all p-6 mb-4 font-sans">
+    <div className="w-full bg-white border border-slate-200 rounded-3xl shadow-sm hover:shadow-md transition-all p-6 mb-4">
       {/* Header: Dynamic Inquiry Type Badge, Date, and Admin Status Dropdown */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-4">
         <div className="flex flex-wrap items-center gap-3">

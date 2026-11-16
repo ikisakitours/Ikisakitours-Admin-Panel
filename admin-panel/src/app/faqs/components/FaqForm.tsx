@@ -112,7 +112,7 @@ export default function FaqForm({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-8 font-sans">
+    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-8">
       <form onSubmit={handleSubmit}>
         {/* Header Section */}
         <div className="flex justify-between items-start mb-6 pb-6 border-b border-slate-100 flex-wrap gap-4">

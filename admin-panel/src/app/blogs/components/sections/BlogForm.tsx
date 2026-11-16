@@ -203,7 +203,7 @@ export default function BlogForm({ initialData, onSuccess, onBlogCreated }: Blog
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-xl border border-slate-200 space-y-6 font-sans">
+        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-xl border border-slate-200 space-y-6">
             <div className="flex justify-between items-center pb-4 border-b flex-wrap gap-4">
                 <div>
                     <h2 className="text-lg font-bold">
