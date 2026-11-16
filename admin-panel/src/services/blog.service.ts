@@ -1,12 +1,13 @@
 export type BlogLanguage = 'en' | 'ja' | 'fr';
 
 export interface BlogPayload {
+  id?: string; // included when editing
   slug?: string;
-  title: Record<string, string>;      // e.g., { en: "Hello", ja: "こんにちは" }
-  summary: Record<string, string>;    // e.g., { en: "Summary", ja: "要約" }
+  title: Record<string, string>;
+  summary: Record<string, string>;
   category: Record<string, string>;
-  readTime: Record<string, string>;   // e.g., { en: "5 min", ja: "5分" }
-  blog: Record<string, string>;       // e.g., { en: "Content...", ja: "コンテンツ..." }
+  readTime: Record<string, string>;
+  blog: Record<string, string>;
   author: string;
   images?: string[];
 }
@@ -51,7 +52,49 @@ class BlogService {
     return res.json();
   }
 
-  // Fetch all blog previews (for admin list or preview cards)
+  // ADMIN 1: Fetch all raw multilingual blogs for admin management list
+  async getAdminBlogs(): Promise<BlogPayload[]> {
+    const res = await fetch(`${this.API_URL}/blogs/admin`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch admin blogs");
+    }
+
+    return res.json();
+  }
+
+  // ADMIN 2: Fetch a single raw blog by ID to pre-fill the edit form
+  async getAdminBlogById(id: string): Promise<BlogPayload> {
+    const res = await fetch(`${this.API_URL}/blogs/admin/${id}`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch blog details");
+    }
+
+    return res.json();
+  }
+
+  // ADMIN 3: Update an existing blog by ID
+  async updateBlog(id: string, payload: BlogPayload) {
+    const res = await fetch(`${this.API_URL}/blogs/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to update blog");
+    }
+
+    return res.json();
+  }
+
+  // Fetch all blog previews (for frontend cards)
   async getPreviews(lang?: string) {
     const query = lang ? `?lang=${lang}` : '';
     const res = await fetch(`${this.API_URL}/blogs/previews${query}`);
