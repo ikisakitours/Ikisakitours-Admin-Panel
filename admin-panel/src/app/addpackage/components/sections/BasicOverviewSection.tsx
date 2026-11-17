@@ -104,14 +104,40 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">Badge</label>
           <select
-            value={formData.badge}
+            value={formData.badge || "none"}
             onChange={(e) => setFormData({ ...formData, badge: e.target.value as PackageBadge })}
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white font-medium text-slate-700"
           >
-            <option value="new_arrival">New Arrival</option>
-            <option value="discounted">Discounted</option>
-            <option value="popular">Popular</option>
-            <option value="featured">Featured</option>
+            <option value="none">No Badge (None)</option>
+
+            <optgroup label="Popular & High Converting">
+              <option value="best_seller">🔥 Best Seller</option>
+              <option value="top_rated">⭐ Top Rated (5.0★)</option>
+              <option value="popular">🌟 Most Popular</option>
+              <option value="featured">✨ Featured Tour</option>
+              <option value="new_arrival">🆕 New Arrival</option>
+              <option value="exclusive">👑 Ikisaki Exclusive</option>
+            </optgroup>
+
+            <optgroup label="Urgency & Availability">
+              <option value="limited_availability">⏳ Limited Availability</option>
+              <option value="likely_to_sell_out">⚡ Likely to Sell Out</option>
+              <option value="instant_confirmation">⚡ Instant Confirmation (Book & Go)</option>
+            </optgroup>
+
+            <optgroup label="Multi-Day Specials">
+              <option value="bucket_list">🏆 Bucket List Tour</option>
+              <option value="all_inclusive">💎 All-Inclusive Package</option>
+              <option value="honeymoon_special">💍 Honeymoon & Couple Special</option>
+              <option value="family_friendly">👨‍👩‍👧 Family Friendly</option>
+              <option value="unesco_heritage">🏛️ UNESCO Heritage Explorer</option>
+            </optgroup>
+
+            <optgroup label="Experience & Style">
+              <option value="private_tour">🚗 Private & Tailor-Made</option>
+              <option value="seasonal">🌴 Seasonal Special</option>
+              <option value="eco_friendly">🌿 Eco & Wildlife Certified</option>
+            </optgroup>
           </select>
         </div>
         <div>

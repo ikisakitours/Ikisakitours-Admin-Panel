@@ -25,6 +25,25 @@ const INITIAL_FORM_STATE: PackageFormData = {
   provider: "",
   destinations: [],
 
+  // ── Unified Dynamic Group Pricing & Custom Add-ons Configuration (Single JSONB Object) ──
+  pricingConfig: {
+    tiers: [
+      { minPax: 1, maxPax: 1, pricePerPerson: 100, label: "Solo (1 Person)" },
+      { minPax: 2, maxPax: 2, pricePerPerson: 65, label: "Couple (2 Persons)" },
+      { minPax: 3, maxPax: 4, pricePerPerson: 45, label: "Small Group (3-4 Persons)" },
+      { minPax: 5, maxPax: 7, pricePerPerson: 35, label: "Medium Group (5-7 Persons)" },
+      { minPax: 8, maxPax: 15, pricePerPerson: 30, label: "Large Group (8+ Persons)" },
+    ],
+    passengerPricing: {
+      couplePricingType: "auto_tier",
+      coupleFixedPrice: 130,
+      childRateType: "percentage",
+      childRateValue: 50,
+      infantPrice: 0,
+    },
+    options: [],
+  },
+
   // Multilingual JSONB Text Fields (Records)
   title: { en: "", ja: "" },
   titleEmphasis: { en: "", ja: "" },
@@ -206,7 +225,7 @@ export default function PackageFormWrapper() {
         </div>
 
         {/* Pricing & Gallery Sections */}
-        <PricingSection formData={formData} setFormData={setFormData} />
+        <PricingSection formData={formData} setFormData={setFormData} locale={locale} />
         <GallerySection selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} />
 
         {/* Destination Sequence Picker */}

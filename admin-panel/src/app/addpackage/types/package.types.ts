@@ -1,6 +1,25 @@
 export type PackageType = "oneday" | "multiday";
 
-export type PackageBadge = "new_arrival" | "discounted" | "popular" | "featured";
+export type PackageBadge =
+  | "none"
+  | "best_seller"
+  | "top_rated"
+  | "popular"
+  | "featured"
+  | "new_arrival"
+  | "exclusive"
+  | "limited_availability"
+  | "likely_to_sell_out"
+  | "instant_confirmation"
+  | "bucket_list"
+  | "all_inclusive"
+  | "family_friendly"
+  | "honeymoon_special"
+  | "unesco_heritage"
+  | "private_tour"
+  | "seasonal"
+  | "eco_friendly"
+  | "discounted"; // kept for legacy DB record compatibility
 
 export interface ActivityDetail {
   title: Record<string, string>;
@@ -29,6 +48,37 @@ export interface DestinationSnapshot {
   summary?: Record<string, string>;
 }
 
+// ── Industry-Standard Group Pricing & Options Types ──
+export interface GroupPricingTier {
+  minPax: number;
+  maxPax: number;
+  pricePerPerson: number;
+  label?: string; // e.g. "1 Person (Solo)", "2 Persons (Couple)", "3-4 Persons"
+}
+
+export interface PassengerCategoryPricing {
+  couplePricingType?: "auto_tier" | "fixed";
+  coupleFixedPrice?: number;
+  childRateType: "percentage" | "fixed";
+  childRateValue: number; // e.g. 50 for 50% or 25 for $25
+  infantPrice: number; // e.g. 0
+}
+
+export interface PackageOptionItem {
+  id: string;
+  name: Record<string, string>; // Multilingual option name (e.g. Single room supplement)
+  price: number;
+  calculationType: "per_person" | "per_room" | "per_booking";
+  description?: Record<string, string>;
+}
+
+// ── Unified Dynamic Group Pricing & Custom Add-ons Configuration (Single JSONB Object) ──
+export interface PricingConfig {
+  tiers: GroupPricingTier[];
+  passengerPricing: PassengerCategoryPricing;
+  options: PackageOptionItem[];
+}
+
 export interface PackageFormData {
   type: PackageType;
   category: Record<string, string>;
@@ -44,6 +94,13 @@ export interface PackageFormData {
   activityDetails: ActivityDetail[];
   itinerary: ItineraryItem[];
   destinations: DestinationSnapshot[];
+
+  // ── Unified Dynamic Pricing Configuration (Stored as single JSONB column) ──
+  pricingConfig?: PricingConfig;
+  // Backward compatibility aliases
+  pricingTiers?: GroupPricingTier[];
+  passengerPricing?: PassengerCategoryPricing;
+  options?: PackageOptionItem[];
 
   // ── Multilingual JSONB Text Fields (Records) ──
   title: Record<string, string>;

@@ -97,7 +97,7 @@ export default function ManagePackagesPage() {
   const safeSetFormData = setFormData as React.Dispatch<React.SetStateAction<PackageFormData>>;
 
   return (
-    <div className="p-6 sm:p-10 max-w-6xl mx-auto space-y-6">
+    <div className="w-full py-8 px-4 sm:px-6 space-y-6">
 
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/60 pb-5">
@@ -170,7 +170,7 @@ export default function ManagePackagesPage() {
 
               {/* Pass locale down to all sections */}
               <BasicOverviewSection formData={formData} setFormData={safeSetFormData} locale={locale} />
-              <PricingSection formData={formData} setFormData={safeSetFormData} />
+              <PricingSection formData={formData} setFormData={safeSetFormData} locale={locale} />
               <PackageDestinationPicker
                 selectedDestinations={formData.destinations}
                 onChange={(destinations) => setFormData({ ...formData, destinations })}
