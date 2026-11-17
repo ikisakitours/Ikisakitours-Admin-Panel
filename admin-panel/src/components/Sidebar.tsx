@@ -20,6 +20,7 @@ import {
   ClipboardList,
   Images,
   ScrollText,
+  BookMarked,
   type LucideIcon,
   FileText,
   FilePlus2,
@@ -97,6 +98,12 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/legaldocs", label: "Legal Documents", icon: Scale },
       { href: "/adminlogs", label: "Audit Logs", icon: ScrollText },
+    ],
+  },
+  {
+    title: "Help & Guide",
+    items: [
+      { href: "/manual", label: "Admin Manual Guide", icon: BookMarked },
     ],
   },
 ];
