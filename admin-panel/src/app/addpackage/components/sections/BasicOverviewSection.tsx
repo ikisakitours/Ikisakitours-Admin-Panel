@@ -11,10 +11,9 @@ interface Props {
 
 export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
 
-  // Helper to generate a slug from combined Title 1 and Title 2
-  const updateSlug = (title1: string, title2: string) => {
-    const combined = `${title1} ${title2}`;
-    return combined
+  // Helper to generate a clean URL slug strictly from Title 1 (Package Title)
+  const generateSlugFromTitle = (title: string) => {
+    return title
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, "")
@@ -34,21 +33,16 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
 
   const handleTitle1Change = (val: string) => {
     handleRecordChange("title", val);
-    // Only regenerate slug when editing English or if slug is empty
+    // Slug is generated ONLY from Title 1 (Package Title)
     if (locale === "en" || !formData.slug) {
-      const emphasisVal = formData.titleEmphasis?.[locale] || formData.titleEmphasis?.["en"] || "";
-      const newSlug = updateSlug(val, emphasisVal);
+      const newSlug = generateSlugFromTitle(val);
       setFormData((prev) => ({ ...prev, slug: newSlug }));
     }
   };
 
   const handleTitle2Change = (val: string) => {
+    // Title 2 (Highlight/Emphasis) is purely stylistic; it does NOT alter the URL slug
     handleRecordChange("titleEmphasis", val);
-    if (locale === "en" || !formData.slug) {
-      const titleVal = formData.title?.[locale] || formData.title?.["en"] || "";
-      const newSlug = updateSlug(titleVal, val);
-      setFormData((prev) => ({ ...prev, slug: newSlug }));
-    }
   };
 
   return (
@@ -142,27 +136,27 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">
-            Title 1 (Main Title) - {locale.toUpperCase()}
+            Package Title ({locale.toUpperCase()})
           </label>
           <input
             type="text"
             required={locale === "en"}
             value={formData.title?.[locale] || ""}
             onChange={(e) => handleTitle1Change(e.target.value)}
-            placeholder="e.g. Ancient Kingdom"
+            placeholder="e.g. The Ultimate Sri Lanka Grand Explorer"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">
-            Title 2 (Highlight) - {locale.toUpperCase()}
+            Highlighted Words in Title ({locale.toUpperCase()})
+            <span className="text-[10px] text-amber-600 font-normal ml-1.5">(Text to highlight in Gold)</span>
           </label>
           <input
             type="text"
-            required={locale === "en"}
             value={formData.titleEmphasis?.[locale] || ""}
             onChange={(e) => handleTitle2Change(e.target.value)}
-            placeholder="e.g. Exclusive"
+            placeholder="e.g. Ultimate Sri Lanka"
             className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
           />
         </div>
