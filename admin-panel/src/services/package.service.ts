@@ -55,6 +55,20 @@ export const packageService = {
       JSON.stringify(formData.destinations.filter((d) => d.id))
     );
 
+    // ── Unified Dynamic Group Pricing & Custom Add-ons (Single JSONB Object) ──
+    const pricingConfig = formData.pricingConfig || {
+      tiers: formData.pricingTiers || [],
+      passengerPricing: formData.passengerPricing || {
+        couplePricingType: "auto_tier",
+        coupleFixedPrice: 0,
+        childRateType: "percentage",
+        childRateValue: 50,
+        infantPrice: 0,
+      },
+      options: formData.options || [],
+    };
+    data.append("pricingConfig", JSON.stringify(pricingConfig));
+
     images.forEach((file) => {
       data.append("images", file);
     });
@@ -89,10 +103,17 @@ export const packageService = {
   },
 
   async updatePackageTextOnly(slug: string, formData: PackageFormData) {
+    const pricingConfig = formData.pricingConfig || {
+      tiers: formData.pricingTiers || [],
+      passengerPricing: formData.passengerPricing,
+      options: formData.options || [],
+    };
+
     const payload = {
       ...formData,
       price: Number(formData.price),
       discount: Number(formData.discount || 0),
+      pricingConfig,
     };
 
     const response = await fetch(`${API_URL}/addpackages/${slug}`, {
