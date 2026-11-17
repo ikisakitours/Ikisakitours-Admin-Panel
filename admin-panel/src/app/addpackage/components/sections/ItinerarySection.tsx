@@ -14,13 +14,15 @@ type DynamicArrayKeys =
   | "route"
   | "details"
   | "scenicStops"
-  | "activities";
+  | "activities"
+  | "meals"
+  | "accommodation";
 
-type DynamicScalarKeys = "meals" | "accommodation" | "travelTime";
+type DynamicScalarKeys = "travelTime";
 
 export function ItinerarySection({ formData, setFormData, locale }: Props) {
 
-  // Helper for single string dictionary updates (meals, accommodation, travelTime)
+  // Helper for single string dictionary updates (travelTime)
   const handleScalarChange = (
     index: number,
     field: DynamicScalarKeys,
@@ -63,6 +65,19 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
     setFormData((prev) => ({ ...prev, itinerary: updated }));
   };
 
+  // Helper to read the array for the active locale with fallback and backward compatibility
+  const getArray = (item: ItineraryItem, key: DynamicArrayKeys): string[] => {
+    const record: any = item[key] || {};
+    const val = record[locale];
+    if (Array.isArray(val)) {
+      return val.length > 0 ? val : [""];
+    }
+    if (typeof val === "string" && val.trim() !== "") {
+      return [val];
+    }
+    return [""];
+  };
+
   // Helper for list dictionary item updates (Record<string, string[]>)
   const handleArrayItemChange = (
     dayIndex: number,
@@ -72,8 +87,8 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
   ) => {
     const updated = [...formData.itinerary];
     const item = updated[dayIndex];
-    const record = item[arrayKey] || {};
-    const currentArray = [...(record[locale] || [])];
+    const record: any = item[arrayKey] || {};
+    const currentArray = [...getArray(item, arrayKey)];
     currentArray[itemIndex] = value;
 
     updated[dayIndex] = {
@@ -90,8 +105,8 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
   const addArrayItem = (dayIndex: number, arrayKey: DynamicArrayKeys) => {
     const updated = [...formData.itinerary];
     const item = updated[dayIndex];
-    const record = item[arrayKey] || {};
-    const currentArray = [...(record[locale] || [])];
+    const record: any = item[arrayKey] || {};
+    const currentArray = [...getArray(item, arrayKey)];
     currentArray.push("");
 
     updated[dayIndex] = {
@@ -112,15 +127,15 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
   ) => {
     const updated = [...formData.itinerary];
     const item = updated[dayIndex];
-    const record = item[arrayKey] || {};
-    const currentArray = [...(record[locale] || [])];
+    const record: any = item[arrayKey] || {};
+    const currentArray = [...getArray(item, arrayKey)];
     currentArray.splice(itemIndex, 1);
 
     updated[dayIndex] = {
       ...item,
       [arrayKey]: {
         ...record,
-        [locale]: currentArray,
+        [locale]: currentArray.length > 0 ? currentArray : [""],
       },
     };
 
@@ -154,13 +169,6 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
         .filter((_, i) => i !== index)
         .map((item, idx) => ({ ...item, day: idx + 1 })),
     }));
-  };
-
-  // Helper to read the array for the active locale with fallback
-  const getArray = (item: ItineraryItem, key: DynamicArrayKeys): string[] => {
-    const record = item[key] || {};
-    const arr = record[locale];
-    return arr && arr.length > 0 ? arr : [""];
   };
 
   return (
@@ -228,13 +236,34 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
               <label className="block text-[11px] font-bold text-slate-700">
                 Meals ({locale.toUpperCase()})
               </label>
-              <input
-                type="text"
-                placeholder="e.g. Breakfast at Hotel"
-                value={item.meals?.[locale] || ""}
-                onChange={(e) => handleScalarChange(idx, "meals", e.target.value)}
-                className="w-full text-xs border border-slate-200 bg-slate-50 rounded-lg p-2 outline-none"
-              />
+              {getArray(item, "meals").map((meal, mIdx) => (
+                <div key={mIdx} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="e.g. Breakfast at Hotel (Included) / Dinner included"
+                    value={meal}
+                    onChange={(e) => handleArrayItemChange(idx, "meals", mIdx, e.target.value)}
+                    className="w-full text-xs border border-slate-200 bg-slate-50 rounded-lg p-2 outline-none"
+                  />
+                  {getArray(item, "meals").length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeArrayItem(idx, "meals", mIdx)}
+                      className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
+                      title="Remove Meal"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addArrayItem(idx, "meals")}
+                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer pt-1"
+              >
+                <Plus className="w-3 h-3" /> Add Meal
+              </button>
             </div>
 
             {/* Accommodation */}
@@ -242,13 +271,34 @@ export function ItinerarySection({ formData, setFormData, locale }: Props) {
               <label className="block text-[11px] font-bold text-slate-700">
                 Accommodation ({locale.toUpperCase()})
               </label>
-              <input
-                type="text"
-                placeholder="e.g. 4-Star Beach Resort"
-                value={item.accommodation?.[locale] || ""}
-                onChange={(e) => handleScalarChange(idx, "accommodation", e.target.value)}
-                className="w-full text-xs border border-slate-200 bg-slate-50 rounded-lg p-2 outline-none"
-              />
+              {getArray(item, "accommodation").map((acc, aIdx) => (
+                <div key={aIdx} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="e.g. 4-Star Beach Resort / Luxury Villa"
+                    value={acc}
+                    onChange={(e) => handleArrayItemChange(idx, "accommodation", aIdx, e.target.value)}
+                    className="w-full text-xs border border-slate-200 bg-slate-50 rounded-lg p-2 outline-none"
+                  />
+                  {getArray(item, "accommodation").length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeArrayItem(idx, "accommodation", aIdx)}
+                      className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
+                      title="Remove Accommodation"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addArrayItem(idx, "accommodation")}
+                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer pt-1"
+              >
+                <Plus className="w-3 h-3" /> Add Accommodation
+              </button>
             </div>
 
             {/* Locations */}

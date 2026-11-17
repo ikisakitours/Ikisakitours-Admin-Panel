@@ -1,0 +1,798 @@
+{
+  "slug": "ultimate-sri-lanka-grand-explorer-odyssey",
+  "type": "multiday",
+  "badge": "bucket_list",
+  "provider": "Ikisaki Tours",
+  "price": "850",
+  "discount": "12",
+  "category": {
+    "en": "Cultural, Wildlife & Scenic Adventure",
+    "ja": "文化・野生動物＆絶景アドベンチャー"
+  },
+  "origin": {
+    "en": "Bandaranaike International Airport (BIA)",
+    "ja": "バンダラナイケ国際空港 (BIA)"
+  },
+  "duration": {
+    "en": "8 Days / 7 Nights",
+    "ja": "8日間 / 7泊"
+  },
+  "title": {
+    "en": "The Ultimate Sri Lanka Grand Explorer",
+    "ja": "究極のスリランカ・グランドエクスプローラー"
+  },
+  "titleEmphasis": {
+    "en": "Heritage, Wildlife & Hill Country Odyssey",
+    "ja": "世界遺産・野生動物・紅茶鉄道の壮大な8日間"
+  },
+  "leadTitle": {
+    "en": "Discover the Soul of Sri Lanka with a Private Chauffeur Guide",
+    "ja": "専属ドライバーガイドと巡る、スリランカの魅力を凝縮した完全プライベートの旅"
+  },
+  "leadDescription": {
+    "en": "Embark on an unforgettable 8-day journey across Sri Lanka's most iconic landscapes. From the ancient monolith fortress of Sigiriya and spiritual temples of Kandy to mist-covered Ella tea trails, thrilling Yala leopard safaris, and the colonial ramparts of Galle Fort.",
+    "ja": "古代巨岩要塞シーギリヤ、古都キャンディの聖なる寺院、エメラルド色の茶畑を走る絶景列車、ヤーラ国立公園でのヒョウ追跡サファリ、世界遺産ゴールの城塞都市まで、スリランカのハイライトを巡る8日間の贅沢な旅。"
+  },
+  "description": {
+    "en": "Embark on the ultimate Sri Lankan adventure with our meticulously crafted 8-Day Grand Explorer tour, designed to plunge you deep into the heart of the island’s immensely diverse landscapes, centuries-old history, and vibrant culture. Your journey begins the moment you touch down at the Bandaranaike International Airport, where our warm Sri Lankan hospitality awaits.\n\nLeaving the bustling coastline behind, venture into the ancient Cultural Triangle to conquer the UNESCO World Heritage Sigiriya Rock Fortress and cycle among royal palaces in Polonnaruwa. Journey into the sacred hill capital of Kandy to witness Buddhist rituals at the Temple of the Tooth and take in vibrant Kandyan fire-dancers. Board the legendary scenic blue train through misty highlands to the hiking haven of Ella, marveling at the Nine Arch Bridge and Little Adam's Peak.\n\nDescend into the wild plains of Yala National Park for an adrenaline-pumping 4WD leopard safari, before relaxing along the golden southern coast and strolling through the cobbled colonial streets of the UNESCO Dutch Fort in Galle. End your journey with a vibrant exploration of Colombo before your smooth airport departure.",
+    "ja": "スリランカの多彩な大自然、千年の歴史、温かい文化を凝縮した最高峰の8日間プライベートツアー。バンダラナイケ国際空港に到着した瞬間から、専用車と専属ガイドによる心温まるおもてなしでお迎えします。\n\n文化三角地帯では、5世紀の巨岩要塞シーギリヤに登り、古都ポロンナルワの遺跡を巡ります。中央高地キャンディでは仏歯寺の伝統儀式に参拝し、世界で最も美しいと称される絶景の青い高原列車に乗って紅茶の郷エラへ。ナインアーチブリッジやリトルアダムスピークでの絶景トレッキングを満喫します。\n\n旅のハイライトとして、世界有数のヒョウ生息地ヤーラ国立公園でスリリングな4WDサファリを敢行。さらに南海岸の歴史的なゴールのオランダ城塞の石畳を散策し、コロンボでのショッピングと市内観光を経て快適に帰国の途に就きます。"
+  },
+  "highlights": {
+    "en": [
+      "Conquer the majestic 5th-century Sigiriya Lion Rock Fortress.",
+      "Explore the royal palaces and stone Buddha statues of ancient Polonnaruwa.",
+      "Witness wild elephant herds gathered at Minneriya National Park.",
+      "Marvel at the vibrant 2,000-year-old painted cave temples of Dambulla.",
+      "Experience sacred rituals at the Temple of the Tooth Relic in Kandy.",
+      "Ride the world-famous scenic blue hill-country train to Ella.",
+      "Photograph the architectural marvel of the colonial Nine Arch Bridge.",
+      "Hike Little Adam's Peak for panoramic views across the Ella Gap.",
+      "Embark on an exciting 4WD leopard-tracking safari in Yala National Park.",
+      "Stroll the cobbled seaside ramparts of the UNESCO Dutch Fort in Galle."
+    ],
+    "ja": [
+      "5世紀の天空要塞シーギリヤ・ライオンロックへの登頂。",
+      "世界遺産ポロンナルワの王宮遺跡と巨大なガル・ヴィハーラ仏像の見学。",
+      "野生のアジアゾウが集まる大迫力のサファリ体験。",
+      "2,000年以上の歴史を持つダンブッラ黄金石窟寺院の壁画鑑賞。",
+      "聖地キャンディ仏歯寺でのプージャ（祈りの儀式）見学。",
+      "世界中で絶賛されるエメラルド色の茶畑を走る青い高原列車の旅。",
+      "緑深いジャングルに架かる石造りのナインアーチブリッジ訪問。",
+      "エラ・ギャップを一望するリトルアダムスピーク・ハイキング。",
+      "野生のヒョウやゾウを追跡するヤーラ国立公園の本格4WDジープサファリ。",
+      "夕暮れの美しい世界遺産ゴール・オランダ要塞の散策。"
+    ]
+  },
+  "includes": {
+    "en": [
+      "7 nights accommodation in hand-picked 4-star and luxury boutique hotels.",
+      "Daily breakfast buffet and gourmet dinner at all hotels (Half-Board meal plan).",
+      "Private luxury air-conditioned vehicle with unlimited mileage for 8 full days.",
+      "Professional English or Japanese speaking chauffeur guide.",
+      "Airport Meet & Greet service upon arrival with private departure drop-off.",
+      "Private 4x4 Safari Jeep excursion in Yala National Park with national tracker.",
+      "Reserved 1st/2nd class tickets for the iconic scenic train journey to Ella.",
+      "Complimentary chilled bottled water in the vehicle throughout the tour.",
+      "All expressway tolls, fuel surcharges, parking fees, and driver lodging."
+    ],
+    "ja": [
+      "厳選された4つ星リゾートおよびブティックホテルでの7泊宿泊代金。",
+      "ホテルでの毎日の朝食ビュッフェおよびディナー（1泊2食付きハーフボード）。",
+      "全行程エアコン完備の専用車両と専属ドライバーガイド（燃料代・高速代込み）。",
+      "プロの英語または日本語を話す専属ショーファーガイド。",
+      "空港到着時のネームボードによるお出迎えと出発時のお見送り送迎。",
+      "ヤーラ国立公園での専用4WDサファリジープと専任サファリトラッカー。",
+      "キャンディ〜エラ間の絶景高原列車（指定席チケット）。",
+      "ツアー期間中の専用車内での冷たいミネラルウォーター無料提供。",
+      "ドライバーの宿泊費、食事代、チップ以外のすべての車両関連費用込み。"
+    ]
+  },
+  "excludes": {
+    "en": [
+      "International flight tickets to and from Sri Lanka.",
+      "Sri Lanka ETA tourist visa fees.",
+      "Monuments and site entrance tickets (Sigiriya, Dambulla, Tooth Temple, Yala).",
+      "Daily lunches and personal alcoholic/non-alcoholic drinks.",
+      "Tips for chauffeur guide, safari jeep tracker, and hotel porters.",
+      "Personal travel and medical insurance."
+    ],
+    "ja": [
+      "スリランカ発着の国際線航空券。",
+      "スリランカETA観光ビザ取得費用。",
+      "各史跡・寺院・国立公園の入場チケット（シーギリヤ、仏歯寺、ヤーラ等）。",
+      "毎日の昼食代および個人的なお飲み物代。",
+      "ドライバーガイド、サファリドライバー、ホテルポーターへのチップ。",
+      "海外旅行保険代金。"
+    ]
+  },
+  "pricingConfig": {
+    "tiers": [
+      {
+        "minPax": 1,
+        "maxPax": 1,
+        "pricePerPerson": 850,
+        "label": "Solo (1 Person)"
+      },
+      {
+        "minPax": 2,
+        "maxPax": 2,
+        "pricePerPerson": 580,
+        "label": "Couple (2 Persons)"
+      },
+      {
+        "minPax": 3,
+        "maxPax": 4,
+        "pricePerPerson": 460,
+        "label": "Small Group (3-4 Persons)"
+      },
+      {
+        "minPax": 5,
+        "maxPax": 7,
+        "pricePerPerson": 390,
+        "label": "Medium Group (5-7 Persons)"
+      },
+      {
+        "minPax": 8,
+        "maxPax": 15,
+        "pricePerPerson": 320,
+        "label": "Large Group (8+ Persons)"
+      }
+    ],
+    "passengerPricing": {
+      "couplePricingType": "auto_tier",
+      "coupleFixedPrice": 1160,
+      "childRateType": "percentage",
+      "childRateValue": 50,
+      "infantPrice": 0
+    },
+    "options": [
+      {
+        "id": "opt-single-supplement",
+        "name": {
+          "en": "Single Room Accommodation Supplement",
+          "ja": "シングルルーム（一人部屋）確約追加代金"
+        },
+        "price": 180,
+        "calculationType": "per_room",
+        "description": {
+          "en": "Guarantees private single-occupancy luxury room across all 7 hotel nights.",
+          "ja": "全行程7泊のホテルにおいて完全個室（プライベートルーム）を確約する追加料金。"
+        }
+      },
+      {
+        "id": "opt-first-class-train",
+        "name": {
+          "en": "Scenic Blue Train 1st Class Luxury Air-Conditioned Ticket Upgrade",
+          "ja": "絶景高原列車 1等エアコン付きラグジュアリー指定席アップグレード"
+        },
+        "price": 25,
+        "calculationType": "per_person",
+        "description": {
+          "en": "Upgrades standard scenic train reservation to the air-conditioned 1st Class observation carriage.",
+          "ja": "高原列車の座席を、大型窓と空調が完備された1等展望エアコン車両へアップグレード。"
+        }
+      },
+      {
+        "id": "opt-vip-yala-jeep",
+        "name": {
+          "en": "Custom Modified Luxury 4x4 Leopard Safari Jeep Upgrade",
+          "ja": "ヤーラ国立公園 特製ラグジュアリー4WDジープアップグレード"
+        },
+        "price": 40,
+        "calculationType": "per_person",
+        "description": {
+          "en": "Includes high-seated custom safari jeep with camera gimbal mounts, binoculars, and master naturalist tracker.",
+          "ja": "カメラ撮影に適した高床式特製ジープ、双眼鏡、専任の熟練ナチュラリストガイドが同行。"
+        }
+      },
+      {
+        "id": "opt-ayurveda-package",
+        "name": {
+          "en": "Authentic 90-Minute Ceylon Herbal Ayurveda Spa Treatment",
+          "ja": "本場スリランカ伝統 90分本格アーユルヴェーダ・スパ体験"
+        },
+        "price": 50,
+        "calculationType": "per_person",
+        "description": {
+          "en": "Full body herbal oil massage (Abhyanga), herbal steam bath, and Shirodhara forehead oil therapy.",
+          "ja": "天然薬草オイルを使用した全身マッサージ（アビヤンガ）、薬草スチームサウナ、シロダーラ。"
+        }
+      }
+    ]
+  },
+  "destinations": [
+    {
+      "id": "cdf5e458-a1d8-4944-b53a-6c1d6d664dc0",
+      "slug": "bandaranaike-international-airport",
+      "title": {
+        "en": "Bandaranaike International Airport",
+        "ja": "バンダラナイケ国際空港"
+      },
+      "summary": {
+        "en": "The primary international aviation hub and main gateway to Sri Lanka.",
+        "ja": "スリランカの主要な国際空港。"
+      }
+    },
+    {
+      "id": "036a9dc1-d2d3-4b3f-bf02-023705a03be3",
+      "slug": "sigiriya",
+      "title": {
+        "en": "Sigiriya",
+        "ja": "シーギリヤ"
+      },
+      "summary": {
+        "en": "An ancient rock fortress famous for its royal palace ruins and frescoes.",
+        "ja": "古代の宮殿遺跡とフレスコ画で名高い世界遺産の巨岩要塞。"
+      }
+    },
+    {
+      "id": "bc77c862-a4c9-4d46-84bd-4dfbca552611",
+      "slug": "polonnaruwa",
+      "title": {
+        "en": "Polonnaruwa",
+        "ja": "ポロンナルワ"
+      },
+      "summary": {
+        "en": "The ancient medieval capital of Sri Lanka renowned for its stone sculptures.",
+        "ja": "壮大な石仏と王宮跡が残るスリランカ中世の古都。"
+      }
+    },
+    {
+      "id": "46571f30-ebae-4086-b17a-0308833652dd",
+      "slug": "kandy",
+      "title": {
+        "en": "Kandy",
+        "ja": "キャンディ"
+      },
+      "summary": {
+        "en": "The sacred hill capital housing the venerated Temple of the Tooth Relic.",
+        "ja": "聖なる仏歯寺を擁するスリランカ最後の王都。"
+      }
+    },
+    {
+      "id": "73a4c0b8-fd07-4b69-bdb5-e41ef0647f17",
+      "slug": "ella",
+      "title": {
+        "en": "Ella",
+        "ja": "エラ"
+      },
+      "summary": {
+        "en": "A picturesque mountain village surrounded by lush tea valleys and waterfalls.",
+        "ja": "茶畑と滝に囲まれた風光明媚な高原リゾート。"
+      }
+    },
+    {
+      "id": "4f7a1bcb-6bdc-4630-ac13-86e4eabe8e4e",
+      "slug": "yala-national-park",
+      "title": {
+        "en": "Yala National Park",
+        "ja": "ヤーラ国立公園"
+      },
+      "summary": {
+        "en": "World's prime wildlife sanctuary for wild leopards, elephants, and bears.",
+        "ja": "ヒョウの生息密度世界一を誇るスリランカ屈指の国立公園。"
+      }
+    },
+    {
+      "id": "41639fec-58a1-4921-a07b-7634ea7df7c1",
+      "slug": "galle",
+      "title": {
+        "en": "Galle",
+        "ja": "ゴール"
+      },
+      "summary": {
+        "en": "A charming coastal fortified city with rich colonial Dutch heritage.",
+        "ja": "オランダ植民地時代の美しい城塞と街並みが残る港町。"
+      }
+    },
+    {
+      "id": "a738543e-39dd-4d54-a44b-a5cb45601282",
+      "slug": "colombo",
+      "title": {
+        "en": "Colombo",
+        "ja": "コロンボ"
+      },
+      "summary": {
+        "en": "The vibrant commercial capital blending modern high-rises with colonial architecture.",
+        "ja": "伝統と近代が調和するスリランカ最大の商業都市。"
+      }
+    }
+  ],
+  "activityDetails": [
+    {
+      "title": {
+        "en": "Sigiriya Rock Fortress Climb",
+        "ja": "シーギリヤ・ロック要塞登山"
+      },
+      "description": {
+        "en": "Ascend the ancient 5th-century Lion Rock, explore terraced water gardens, and view the world-famous frescoes.",
+        "ja": "5世紀の古代ライオン・ロックに登り、水の庭園を探索し、世界的に有名なフレスコ画を鑑賞します。"
+      }
+    },
+    {
+      "title": {
+        "en": "Polonnaruwa Ancient City Exploration",
+        "ja": "ポロンナルワ古代都市探索"
+      },
+      "description": {
+        "en": "Cycle or drive through the UNESCO ruins, admiring the Gal Vihara rock-cut Buddha statues and massive royal palaces.",
+        "ja": "ユネスコ世界遺産の遺跡を巡り、ガル・ヴィハーラの巨大な一枚岩の仏像や王宮跡を見学します。"
+      }
+    },
+    {
+      "title": {
+        "en": "Minneriya Wild Elephant Gathering Safari",
+        "ja": "ミンネリヤ国立公園の象の集まりサファリ"
+      },
+      "description": {
+        "en": "Experience a thrilling 4x4 safari to witness hundreds of wild Asian elephants gathered around ancient water reservoirs.",
+        "ja": "湖畔に集まる何百頭もの野生のアジアゾウの群れを4WDジープで観察する大自然のエクスカーション。"
+      }
+    },
+    {
+      "title": {
+        "en": "Temple of the Sacred Tooth Relic Visit",
+        "ja": "仏歯寺（ダラダー・マーリガーワ寺院）参拝"
+      },
+      "description": {
+        "en": "Experience the spiritual heart of Sri Lanka by visiting the golden-roofed temple housing the relic of the Buddha.",
+        "ja": "仏陀の聖なる歯を祀る黄金の屋根の寺院を訪れ、伝統的なプージャ（祈りの儀式）の荘厳な雰囲気を体感します。"
+      }
+    },
+    {
+      "title": {
+        "en": "Traditional Kandyan Cultural Dance Show",
+        "ja": "伝統的なキャンディアン・カルチャー・ダンス"
+      },
+      "description": {
+        "en": "Witness an electrifying cultural performance featuring acrobatic dancers, traditional drums, and barefoot fire-walking.",
+        "ja": "力強い太鼓の響き、伝統的なきらびやかな衣装、そして息を呑む火渡りのパフォーマンスを楽しむ夕べ。"
+      }
+    },
+    {
+      "title": {
+        "en": "Scenic Hill Country Blue Train Ride",
+        "ja": "絶景の青い高地高原列車の旅"
+      },
+      "description": {
+        "en": "Board the iconic train weaving through emerald carpets of tea estates, misty valleys, and cascading mountain falls.",
+        "ja": "エメラルド色の茶畑や深い霧に包まれた谷間を駆け抜ける、世界一の車窓風景を満喫する高原列車の旅。"
+      }
+    },
+    {
+      "title": {
+        "en": "Nine Arch Bridge & Little Adam's Peak Trek",
+        "ja": "ナインアーチブリッジ＆リトルアダムスピーク・トレック"
+      },
+      "description": {
+        "en": "Hike to the monumental colonial railway viaduct and climb Little Adam's Peak for panoramic views of the Ella Gap.",
+        "ja": "深い森に佇む石造りのナインアーチブリッジと、エラ渓谷の絶景を見下ろすリトルアダムスピークをトレッキング。"
+      }
+    },
+    {
+      "title": {
+        "en": "Yala National Park Leopard Tracking Safari",
+        "ja": "ヤーラ国立公園ヒョウ追跡4WDサファリ"
+      },
+      "description": {
+        "en": "Journey deep into the wild scrublands with a master tracker to spot elusive leopards, sloth bears, and crocodiles.",
+        "ja": "熟練のトラッカーと共に大自然へ繰り出し、野生のヒョウ、ナマケグマ、ワニなどを探索する本格サファリ。"
+      }
+    },
+    {
+      "title": {
+        "en": "Galle Dutch Fort UNESCO Heritage Walk",
+        "ja": "世界遺産ゴール・オランダ要塞ヘリテージウォーク"
+      },
+      "description": {
+        "en": "Stroll the cobblestone ramparts, boutique colonial lanes, and seaside lighthouses of the historic 17th-century fortress.",
+        "ja": "17世紀のオランダ植民地時代の面影が残る石畳の城壁通り、おしゃれなカフェ、灯台を優雅に散策。"
+      }
+    }
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": {
+        "en": "Arrival & Journey to the Cultural Triangle",
+        "ja": "到着と文化三角地帯への旅"
+      },
+      "locations": {
+        "en": ["Bandaranaike International Airport", "Habarana / Sigiriya"],
+        "ja": ["バンダラナイケ国際空港", "ハバラナ / シーギリヤ"]
+      },
+      "route": {
+        "en": ["Airport Pickup", "Scenic Countryside Highway", "Hotel Check-in", "Welcome Dinner"],
+        "ja": ["空港お迎え", "田園ハイウェイ", "ホテルチェックイン", "ウェルカムディナー"]
+      },
+      "details": {
+        "en": [
+          "Personalized Meet & Greet by your dedicated Chauffeur Guide at BIA arrival lobby.",
+          "Scenic air-conditioned drive across coconut estates into the heart of the Cultural Triangle.",
+          "Check in to your luxury eco-resort in Sigiriya/Habarana.",
+          "Enjoy a sumptuous traditional Sri Lankan dinner and rest after your flight."
+        ],
+        "ja": [
+          "空港到着ロビーにて専属ドライバーガイドがネームボードを持ってお出迎え。",
+          "快適なエアコン専用車で緑豊かな田園風景を抜け文化三角地帯へ移動。",
+          "シーギリヤ近郊の4つ星ラグジュアリーリゾートにチェックイン。",
+          "ホテルでの贅沢なウェルカムディナーを楽しみ、長旅の疲れを癒します。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 3.5 - 4 Hours",
+        "ja": "約3.5〜4時間"
+      },
+      "scenicStops": {
+        "en": ["Coconut Triangle roadside plantation", "Kurunegala Lake"],
+        "ja": ["ココナッツ農園街道", "クルネーガラ湖"]
+      },
+      "activities": {
+        "en": ["Airport Welcome", "Scenic Transfer", "Relaxation"],
+        "ja": ["空港歓迎", "風光明媚なドライブ", "ホテルでの休養"]
+      },
+      "meals": {
+        "en": [
+          "Welcome Traditional Dinner at Resort (Included)",
+          "Breakfast & Lunch (Not included on flight day)"
+        ],
+        "ja": [
+          "リゾートでの伝統的ウェルカムディナー（込み）",
+          "フライト日の朝食および昼食は各自負担"
+        ]
+      },
+      "accommodation": {
+        "en": [
+          "4-Star Luxury Eco-Resort in Sigiriya / Habarana"
+        ],
+        "ja": [
+          "シーギリヤ / ハバラナの4つ星ラグジュアリーリゾート"
+        ]
+      }
+    },
+    {
+      "day": 2,
+      "title": {
+        "en": "Conquering Sigiriya Rock & Medieval Polonnaruwa",
+        "ja": "シーギリヤ要塞登頂と古都ポロンナルワの探索"
+      },
+      "locations": {
+        "en": ["Sigiriya", "Polonnaruwa", "Habarana"],
+        "ja": ["シーギリヤ", "ポロンナルワ", "ハバラナ"]
+      },
+      "route": {
+        "en": ["Hotel", "Sigiriya Lion Rock Climb", "Local Village Lunch", "Polonnaruwa UNESCO Ruins", "Hotel"],
+        "ja": ["ホテル", "シーギリヤ登頂", "村のランチ", "ポロンナルワ遺跡", "ホテル"]
+      },
+      "details": {
+        "en": [
+          "Early morning climb of the colossal Sigiriya Rock Fortress before the midday heat.",
+          "Explore the Water Gardens, Mirror Wall frescoes, and summit palace foundations.",
+          "Authentic Sri Lankan clay-pot lunch in a peaceful lakeside village.",
+          "Afternoon bicycle or private car tour of the monumental medieval kingdom of Polonnaruwa, visiting the Quadrangle and Gal Vihara rock statues."
+        ],
+        "ja": [
+          "涼しい早朝のうちに高さ200mのシーギリヤ・ロック要塞へ登山開始。",
+          "王宮の庭園、雲の乙女フレスコ画、ライオンテラスを経て頂上遺跡を探索。",
+          "湖畔ののどかな村で土鍋を使った本場のスリランカカレーランチ。",
+          "午後、古都ポロンナルワ遺跡へ。王宮跡や一枚岩に彫られたガル・ヴィハーラ仏像群を見学。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 2 Hours total transfers",
+        "ja": "移動合計約2時間"
+      },
+      "scenicStops": {
+        "en": ["Parakrama Samudra giant ancient reservoir", "Minneriya Lotus Tank"],
+        "ja": ["パラクラマ・サムドラ巨大古代貯水池", "ハスの池"]
+      },
+      "activities": {
+        "en": ["Rock Fortress Climb", "Archaeological Exploration", "Photography"],
+        "ja": ["要塞登山", "遺跡探索", "写真撮影"]
+      },
+      "meals": {
+        "en": "Breakfast & Dinner at Hotel",
+        "ja": "ホテルでの朝食＆ディナー"
+      },
+      "accommodation": {
+        "en": "4-Star Luxury Resort in Sigiriya / Habarana",
+        "ja": "シーギリヤ / ハバラナの4つ星リゾートホテル"
+      }
+    },
+    {
+      "day": 3,
+      "title": {
+        "en": "Golden Dambulla Caves & The Sacred City of Kandy",
+        "ja": "ダンブッラ黄金石窟寺院と聖なる王都キャンディ"
+      },
+      "locations": {
+        "en": ["Sigiriya", "Dambulla", "Matale", "Kandy"],
+        "ja": ["シーギリヤ", "ダンブッラ", "マータレー", "キャンディ"]
+      },
+      "route": {
+        "en": ["Hotel", "Dambulla Cave Temple", "Matale Spice Garden", "Kandy Tooth Temple", "Cultural Dance"],
+        "ja": ["ホテル", "ダンブッラ寺院", "スパイスガーデン", "仏歯寺参拝", "伝統舞踊ショー"]
+      },
+      "details": {
+        "en": [
+          "Morning visit to the magnificent Dambulla Golden Cave Temple complex.",
+          "Guided aromatic walking tour through a famous Matale Ayurvedic herbal garden.",
+          "Ascend into the misty hills of Kandy and check in to your hillside hotel.",
+          "Evening visit to the sacred Temple of the Tooth Relic during the ceremonial drum offering, followed by an electrifying Kandyan cultural fire-dance performance."
+        ],
+        "ja": [
+          "午前中、150体以上の仏像と天井画が残るダンブッラ黄金石窟寺院を参拝。",
+          "マータレーのスパイス農園に立ち寄り、伝統医学アーユルヴェーダのハーブを体験。",
+          "緑豊かな高地キャンディへ移動し、丘の上のホテルにチェックイン。",
+          "夕刻、仏歯寺にて太鼓の鳴り響く伝統的なプージャ（祈祷儀式）に参列し、続いてキャンディアンダンスショーを鑑賞。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 2.5 - 3 Hours",
+        "ja": "約2.5〜3時間"
+      },
+      "scenicStops": {
+        "en": ["Dambulla Golden Buddha statue", "Kandy Lake Viewpoint"],
+        "ja": ["ダンブッラ大仏", "キャンディ湖展望スポット"]
+      },
+      "activities": {
+        "en": ["Cave Monastery Tour", "Spice Tasting", "Temple Ceremony", "Cultural Show"],
+        "ja": ["寺院見学", "スパイス体験", "仏歯寺参拝", "ダンスショー"]
+      },
+      "meals": {
+        "en": "Breakfast & Dinner at Hotel",
+        "ja": "ホテルでの朝食＆ディナー"
+      },
+      "accommodation": {
+        "en": "4-Star Scenic Hotel in Kandy (e.g. Grand Kandyan / Earl's Regency)",
+        "ja": "キャンディの4つ星ホテル（グランド・キャンディアン等）"
+      }
+    },
+    {
+      "day": 4,
+      "title": {
+        "en": "Tea Plantations & World-Famous Hill Country Blue Train to Ella",
+        "ja": "紅茶農園見学と世界屈指の絶景青い高原列車でエラへ"
+      },
+      "locations": {
+        "en": ["Kandy", "Nuwara Eliya", "Nanu Oya Station", "Ella"],
+        "ja": ["キャンディ", "ヌワラエリヤ", "ナヌオヤ駅", "エラ"]
+      },
+      "route": {
+        "en": ["Kandy", "Tea Factory & Estate", "Ramboda Falls", "Scenic Train Ride to Ella", "Ella Hotel"],
+        "ja": ["キャンディ", "紅茶工場＆茶畑", "ランボダ滝", "絶景列車", "エラのホテル"]
+      },
+      "details": {
+        "en": [
+          "Drive past tumbling waterfalls through lush mountain passes to Nuwara Eliya ('Little England').",
+          "Private tour of an active Ceylon Tea factory: pluck tender leaves and sample pure Ceylon black tea.",
+          "Board the world-renowned blue train at Nanu Oya for an exhilarating railway journey winding through mist and pine forests to Ella.",
+          "Chauffeur meets you at Ella station and transfers you to your mountain-view boutique resort."
+        ],
+        "ja": [
+          "滝が流れ落ちる美しい峠道を通り、英国情緒漂う「リトル・イングランド」ヌワラエリヤへ。",
+          "歴史ある紅茶工場を訪問。茶摘み体験や製造工程を見学し、本場セイロンティーを試飲。",
+          "ナヌオヤ駅から世界的に有名な青い高原列車に乗車。雲上の茶畑を縫うように走りエラへ。",
+          "エラ駅でお待ちの専属ドライバーと合流し、山々を一望するブティックリゾートへチェックイン。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 3.5 Hours (Drive + Train)",
+        "ja": "約3.5時間（車＋列車）"
+      },
+      "scenicStops": {
+        "en": ["Ramboda Twin Waterfalls", "St. Clair's Tea Viewpoint", "Highland Railway Bridges"],
+        "ja": ["ランボダ滝", "紅茶渓谷ビューポイント", "高原鉄道の橋梁"]
+      },
+      "activities": {
+        "en": ["Tea Plucking & Tasting", "Iconic Train Journey", "Mountain Photography"],
+        "ja": ["茶摘み・試飲体験", "絶景列車乗車", "山岳パノラマ撮影"]
+      },
+      "meals": {
+        "en": "Breakfast & Dinner at Hotel",
+        "ja": "ホテルでの朝食＆ディナー"
+      },
+      "accommodation": {
+        "en": "Boutique Mountain Resort in Ella (e.g. 98 Acres or Mountain Heavens)",
+        "ja": "エラの山岳ブティックリゾート（98エイカーズ等）"
+      }
+    },
+    {
+      "day": 5,
+      "title": {
+        "en": "The Wonders of Ella: Nine Arch Bridge & Little Adam's Peak",
+        "ja": "エラの絶景：ナインアーチブリッジとリトルアダムスピーク"
+      },
+      "locations": {
+        "en": ["Ella Town", "Demodara", "Ravana Falls"],
+        "ja": ["エラ", "デモダラ", "ラヴァナ滝"]
+      },
+      "route": {
+        "en": ["Nine Arch Bridge Hike", "Little Adam's Peak Trek", "Ravana Falls", "Café Hopping in Ella"],
+        "ja": ["ナインアーチ橋ハイキング", "リトルアダムスピーク", "ラヴァナ滝", "エラ散策"]
+      },
+      "details": {
+        "en": [
+          "Morning jungle walk to the stunning colonial Nine Arch Bridge; watch the morning train pass across the stone viaduct.",
+          "Hike the gentle trail up Little Adam's Peak, rewarded by endless panoramas of the Ella Gap.",
+          "Visit the thunderous Ravana Falls, tied to the ancient Indian epic Ramayana.",
+          "Spend a leisurely afternoon exploring Ella's vibrant cafes, chill bars, and artisan shops."
+        ],
+        "ja": [
+          "朝の爽やかな空気の中、ジャングルを歩いて石造りのナインアーチブリッジへ。列車が渡る名シーンを撮影。",
+          "リトルアダムスピークを軽快にハイキング。エラ・ギャップの壮大な断崖絶壁の大パノラマを堪能。",
+          "古代叙事詩ラーマーヤナの伝説が残る豪快なラヴァナ滝を見学。",
+          "午後は活気あるエラの町でおしゃれなカフェ巡りやショッピングを満喫。"
+        ]
+      },
+      "travelTime": {
+        "en": "Local transfers around Ella",
+        "ja": "エラ周辺での短時間移動"
+      },
+      "scenicStops": {
+        "en": ["Nine Arch Bridge tea view", "Ella Rock view from Peak", "Ravana Waterfall cascades"],
+        "ja": ["ナインアーチ橋", "エラ・ロック展望", "ラヴァナ滝"]
+      },
+      "activities": {
+        "en": ["Trekking & Hiking", "Bridge Photography", "Leisure & Wellness"],
+        "ja": ["ハイキング・トレッキング", "写真撮影", "町歩き・リフレッシュ"]
+      },
+      "meals": {
+        "en": "Breakfast & Dinner at Hotel",
+        "ja": "ホテルでの朝食＆ディナー"
+      },
+      "accommodation": {
+        "en": "Boutique Mountain Resort in Ella",
+        "ja": "エラの山岳ブティックリゾート"
+      }
+    },
+    {
+      "day": 6,
+      "title": {
+        "en": "Into the Wild: 4x4 Leopard Tracking Safari in Yala National Park",
+        "ja": "野生の深奥へ：ヤーラ国立公園でのヒョウ追跡4WDサファリ"
+      },
+      "locations": {
+        "en": ["Ella", "Wellawaya", "Yala National Park"],
+        "ja": ["エラ", "ウェッラワヤ", "ヤーラ国立公園"]
+      },
+      "route": {
+        "en": ["Scenic Mountain Descent", "Safari Lodge Check-in", "Afternoon 4x4 Yala Safari", "Wilderness Dinner"],
+        "ja": ["山岳地帯から平原へ移動", "サファリロッジ到着", "ヤーラ4WDサファリ", "ディナー"]
+      },
+      "details": {
+        "en": [
+          "Descend the dramatic southern slopes from Ella into the sunny arid savannahs of the deep south.",
+          "Check in to your safari resort situated on the edge of the wilderness.",
+          "Board an open-top 4WD safari jeep with an expert wildlife tracker for an exhilarating game drive in Yala Block 1.",
+          "Track Sri Lankan leopards, sloth bears, wild Asian elephants, mugger crocodiles, and colorful tropical birds before sunset."
+        ],
+        "ja": [
+          "エラの山々を下り、南部の広大なサバンナと手付かずの大自然が広がるヤーラへ移動。",
+          "大自然に囲まれたサファリロッジにチェックインして小休止。",
+          "専門のサファリトラッカーと共に、特製オープン4WDジープでヤーラ国立公園へ出発。",
+          "世界一の生息密度を誇る野生のヒョウ、ナマケグマ、ゾウ、ワニ、極彩色の野鳥たちを日没まで追跡。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 2.5 Hours",
+        "ja": "約2.5時間"
+      },
+      "scenicStops": {
+        "en": ["Wellawaya waterfall viewpoints", "Yala coastal sand dunes"],
+        "ja": ["ウェッラワヤ滝ビューポイント", "ヤーラの砂丘とインド洋"]
+      },
+      "activities": {
+        "en": ["Big Game Wildlife Safari", "4x4 Off-Road Adventure", "Wildlife Photography"],
+        "ja": ["野生動物サファリ", "4WDオフロード走行", "大自然撮影"]
+      },
+      "meals": {
+        "en": "Breakfast & Dinner at Safari Resort",
+        "ja": "サファリリゾートでの朝食＆ディナー"
+      },
+      "accommodation": {
+        "en": "Luxury Safari Lodge / Resort near Yala (e.g. Jetwing Yala / Cinnamon Wild)",
+        "ja": "ヤーラ近郊のラグジュアリーサファリリゾート（ジェットウィング・ヤーラ等）"
+      }
+    },
+    {
+      "day": 7,
+      "title": {
+        "en": "Southern Ocean Coastline, Stilt Fishermen & Historic Galle Dutch Fort",
+        "ja": "南海岸の絶景、伝統の竹馬漁師と世界遺産ゴール・オランダ要塞"
+      },
+      "locations": {
+        "en": ["Yala", "Mirissa / Weligama", "Galle", "Colombo"],
+        "ja": ["ヤーラ", "ミリッサ / ウェリガマ", "ゴール", "コロンボ"]
+      },
+      "route": {
+        "en": ["Yala", "Coastal Drive", "Stilt Fishermen Stop", "Galle Fort Walking Tour", "Southern Expressway", "Colombo"],
+        "ja": ["ヤーラ", "海沿いドライブ", "竹馬漁師見学", "ゴール要塞散策", "高速道路", "コロンボ"]
+      },
+      "details": {
+        "en": [
+          "Drive along the sparkling turquoise coastline of the Indian Ocean.",
+          "Pause at Weligama to observe Sri Lanka's iconic stilt fishermen perched over crashing waves.",
+          "Immerse yourself in the colonial beauty of the UNESCO-listed Galle Dutch Fort: explore ramparts, the 1939 lighthouse, cobblestone alleyways, and gem boutiques.",
+          "Cruise up the Southern Expressway to Colombo for your final overnight stay in the metropolis."
+        ],
+        "ja": [
+          "エメラルドグリーンのインド洋が広がる美しい南海岸線を爽快にドライブ。",
+          "ウェリガマにて、伝統的な「竹馬漁（ストゥルフィッシング）」を行う漁師たちの光景を見学。",
+          "ユネスコ世界遺産のゴール・オランダ要塞へ。石畳の小道、歴史ある白亜の灯台、お洒落なブティックを散策。",
+          "南部高速道路を利用して首都コロンボへ移動し、最後の夜をラグジュアリーホテルでお過ごしいただきます。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 4 Hours",
+        "ja": "約4時間"
+      },
+      "scenicStops": {
+        "en": ["Weligama Bay", "Galle Fort Lighthouse", "Flag Rock Bastion"],
+        "ja": ["ウェリガマ湾", "ゴール要塞灯台", "フラッグロック要塞"]
+      },
+      "activities": {
+        "en": ["Coastal Sightseeing", "UNESCO Heritage Walking Tour", "Shopping & Souvenirs"],
+        "ja": ["海岸ドライブ", "世界遺産ウォーキング", "雑貨・宝石ショッピング"]
+      },
+      "meals": {
+        "en": "Breakfast & Dinner at Hotel",
+        "ja": "ホテルでの朝食＆ディナー"
+      },
+      "accommodation": {
+        "en": "5-Star Oceanfront Hotel in Colombo (e.g. Cinnamon Grand / Kingsbury)",
+        "ja": "コロンボの5つ星オーシャンフロントホテル（シナモン・グランド等）"
+      }
+    },
+    {
+      "day": 8,
+      "title": {
+        "en": "Colombo City Highlights & Airport Departure",
+        "ja": "コロンボ市内観光とお土産ショッピング、空港お見送り"
+      },
+      "locations": {
+        "en": ["Colombo", "Bandaranaike International Airport (BIA)"],
+        "ja": ["コロンボ", "バンダラナイケ国際空港 (BIA)"]
+      },
+      "route": {
+        "en": ["Gangaramaya Temple", "Independence Square", "Old Parliament", "Souvenir Shopping", "Airport Drop-off"],
+        "ja": ["ガンガラーマ寺院", "独立記念広場", "旧国会議事堂", "お土産店", "空港へ送迎"]
+      },
+      "details": {
+        "en": [
+          "Morning city tour of Colombo highlighting Gangaramaya Buddhist Temple, Independence Memorial Hall, and Galle Face Green.",
+          "Opportunity for last-minute souvenir shopping at premium tea houses and handicraft stores.",
+          "Comfortable transfer to Bandaranaike International Airport with ample time for your departure flight.",
+          "Bid farewell to Sri Lanka with treasured memories of a magnificent grand journey."
+        ],
+        "ja": [
+          "午前中、コロンボ市内観光。水上寺院で有名なガンガラーマ寺院、独立記念広場、ゴール・フェイス・グリーンを巡ります。",
+          "最高級セイロンティー専門店やスリランカ伝統工芸店で最後のお土産ショッピング。",
+          "フライトスケジュールに合わせて余裕を持ってバンダラナイケ国際空港へ専用車でお送り。",
+          "忘れられない数々の思い出と共に、温かい笑顔でお見送りいたします。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 45 Minutes to Airport",
+        "ja": "空港まで約45分"
+      },
+      "scenicStops": {
+        "en": ["Galle Face Green seaside promenade", "Lotus Tower skyline"],
+        "ja": ["ゴール・フェイス・グリーン海浜公園", "ロータスタワー"]
+      },
+      "activities": {
+        "en": ["City Tour", "Souvenir Shopping", "Airport Farewell"],
+        "ja": ["市内観光", "お土産ショッピング", "空港お見送り"]
+      },
+      "meals": {
+        "en": "Breakfast at Hotel",
+        "ja": "ホテルでの朝食"
+      },
+      "accommodation": {
+        "en": "N/A (Departure Day)",
+        "ja": "該当なし（最終日）"
+      }
+    }
+  ],
+  "gallery": []
+}

@@ -1,0 +1,296 @@
+{
+  "slug": "sigiriya-dambulla-express-heritage-day-tour",
+  "type": "oneday",
+  "badge": "instant_confirmation",
+  "provider": "Ikisaki Tours",
+  "price": "110",
+  "discount": "10",
+  "category": {
+    "en": "Heritage & Cultural Sightseeing",
+    "ja": "文化・世界遺産観光"
+  },
+  "origin": {
+    "en": "Bandaranaike International Airport (BIA) / Colombo",
+    "ja": "バンダラナイケ国際空港 (BIA) / コロンボ"
+  },
+  "duration": {
+    "en": "1 Day (12-14 Hours)",
+    "ja": "1日 (約12〜14時間)"
+  },
+  "title": {
+    "en": "Sigiriya Rock Fortress & Dambulla Cave Temple",
+    "ja": "シーギリヤ・ロック要塞＆ダンブッラ石窟寺院"
+  },
+  "titleEmphasis": {
+    "en": "Ancient Wonders Express Day Tour",
+    "ja": "古代の奇跡エクスプレス日帰りツアー"
+  },
+  "leadTitle": {
+    "en": "Discover Sri Lanka's 8th Wonder in a Single Unforgettable Day",
+    "ja": "たった1日でスリランカ第8の不思議を発見する感動の旅"
+  },
+  "leadDescription": {
+    "en": "Short on time or on an extended transit? This express private day tour takes you directly from the airport or Colombo to the majestic Sigiriya Rock Fortress and Golden Dambulla Cave Temple with a private chauffeur guide.",
+    "ja": "お時間が限られている方やトランジットのお客様に最適。空港またはコロンボから専用ドライバーガイドと共に、壮大なシーギリヤ・ロック要塞と黄金のダンブッラ石窟寺院へ直行する日帰りプライベートツアーです。"
+  },
+  "description": {
+    "en": "Maximize your short stay or transit in Sri Lanka with our exclusive Sigiriya Rock Fortress Express Day Tour. Specially designed for travelers seeking a deep dive into the island's richest historical highlights without committing to an overnight stay. Your journey begins with a prompt pickup directly from Bandaranaike International Airport (or your hotel in Colombo/Negombo) by your friendly, English/Japanese-speaking Chauffeur Guide.\n\nEmbark on a comfortable, air-conditioned drive through picturesque countryside, passing coconut estates, emerald paddy fields, and roadside fruit stalls. Upon reaching the UNESCO World Heritage Sigiriya Rock Fortress—the ancient 5th-century palace built atop a 200-meter monolith by King Kasyapa—you will explore the landscaped water gardens, marvel at the ancient Cloud Maidens frescoes, and climb through the giant Lion Gate to the summit for breathtaking 360-degree views.\n\nAfter descending, enjoy an authentic Sri Lankan rice & curry lunch overlooking the countryside, followed by a visit to the sacred Dambulla Golden Cave Temple complex, home to over 150 serene Buddha statues and ancient Buddhist murals painted across five cavernous sanctuaries. As the day draws to a close, relax in your private vehicle as you are transferred smoothly back to the airport or your hotel.",
+    "ja": "スリランカでの限られた時間やトランジットを最大限に活用できる、専用の「シーギリヤ・ロック要塞＆ダンブッラ日帰りツアー」。宿泊なしでスリランカ屈指の歴史的遺産を体験したい旅行者のために特別に設計されています。プロのドライバーガイドがバンダラナイケ国際空港またはコロンボ周辺のホテルまでお迎えに上がります。\n\n風光明媚な田園風景やヤシの木立を抜けて快適にドライブし、ユネスコ世界遺産のシーギリヤ・ロック要塞へ向かいます。5世紀にカシャパ王によって築かれた高さ200メートルの巨岩に登り、世界的に有名な「雲の乙女」のフレスコ画やライオンテラス、山頂の王宮跡からの大パノラマをお楽しみいただけます。\n\n下山後はのどかな水田を望むレストランで本場のスリランカカレーランチを堪能。続いて150体以上の仏像と極彩色の天井画が残る聖地ダンブッラ石窟寺院を探索します。夕方には専用車でリラックスしながら、次のフライトまたはホテルまで安全にお送りいたします。"
+  },
+  "highlights": {
+    "en": [
+      "Direct hassle-free private transfer from BIA Airport or Colombo/Negombo hotels.",
+      "Conquer the 5th-century UNESCO World Heritage Sigiriya Lion Rock Fortress.",
+      "Admire the ancient Mirror Wall and world-famous 'Cloud Maidens' frescoes.",
+      "Explore the 5 sacred cave sanctuaries of the Dambulla Golden Temple.",
+      "Authentic village culinary experience with traditional Ceylon spice tasting.",
+      "Guaranteed timely return for departing flights or evening hotel drop-off."
+    ],
+    "ja": [
+      "空港またはコロンボ/ネゴンボのホテルからの直行プライベート送迎。",
+      "5世紀に造られたユネスコ世界遺産シーギリヤ・ロックへの登頂。",
+      "古代のミラーウォールと世界的に有名な「雲の乙女」フレスコ画を鑑賞。",
+      "150体以上の仏像が安置された聖地ダンブッラ石窟寺院の探索。",
+      "本場スリランカの家庭料理とスパイス体験ランチ（オプション）。",
+      "帰国フライトやホテルへの安全かつ時間厳守の送迎保証。"
+    ]
+  },
+  "includes": {
+    "en": [
+      "Comfortable air-conditioned private vehicle throughout the day.",
+      "Professional English or Japanese speaking chauffeur guide.",
+      "Airport Meet & Greet with personalized name paging upon flight arrival.",
+      "Complimentary chilled bottled water during the entire journey.",
+      "All expressway tolls, parking charges, and vehicle fuel fees."
+    ],
+    "ja": [
+      "全行程エアコン完備の快適な専用車（プライベート車両）。",
+      "プロの英語または日本語ドライバーガイドによるご案内。",
+      "空港到着時のお出迎えサービス（ネームボード対応）。",
+      "移動中の冷たいミネラルウォーター（無料提供）。",
+      "すべての高速道路通行料、駐車場料金、燃料費込み。"
+    ]
+  },
+  "excludes": {
+    "en": [
+      "Sigiriya Rock Fortress and Dambulla Temple entrance fees.",
+      "Lunch, snacks, and personal beverages.",
+      "Tips and gratuities for chauffeur guide (discretionary).",
+      "Personal travel insurance."
+    ],
+    "ja": [
+      "シーギリヤ・ロックおよびダンブッラ石窟寺院の入場料。",
+      "昼食代および個人的なお飲み物代。",
+      "ドライバーガイドへのチップ（任意）。",
+      "海外旅行傷害保険。"
+    ]
+  },
+  "pricingConfig": {
+    "tiers": [
+      {
+        "minPax": 1,
+        "maxPax": 1,
+        "pricePerPerson": 110,
+        "label": "Solo (1 Person)"
+      },
+      {
+        "minPax": 2,
+        "maxPax": 2,
+        "pricePerPerson": 75,
+        "label": "Couple (2 Persons)"
+      },
+      {
+        "minPax": 3,
+        "maxPax": 4,
+        "pricePerPerson": 55,
+        "label": "Small Group (3-4 Persons)"
+      },
+      {
+        "minPax": 5,
+        "maxPax": 7,
+        "pricePerPerson": 42,
+        "label": "Medium Group (5-7 Persons)"
+      },
+      {
+        "minPax": 8,
+        "maxPax": 15,
+        "pricePerPerson": 32,
+        "label": "Large Group (8+ Persons)"
+      }
+    ],
+    "passengerPricing": {
+      "couplePricingType": "auto_tier",
+      "coupleFixedPrice": 150,
+      "childRateType": "percentage",
+      "childRateValue": 50,
+      "infantPrice": 0
+    },
+    "options": [
+      {
+        "id": "opt-village-lunch",
+        "name": {
+          "en": "Traditional Village Lunch & Bullock Cart Ride",
+          "ja": "伝統的な村のランチ＆牛車体験"
+        },
+        "price": 18,
+        "calculationType": "per_person",
+        "description": {
+          "en": "Authentic multi-dish rice and curry feast cooked in clay pots, preceded by a scenic lake catamaran & bullock cart ride.",
+          "ja": "土鍋で調理された本場スリランカのカレービュッフェと、のどかな湖のカヌーボート＆牛車体験。"
+        }
+      },
+      {
+        "id": "opt-elephant-safari",
+        "name": {
+          "en": "Minneriya Wild Elephant 4x4 Jeep Safari",
+          "ja": "ミネリヤ国立公園 4WD野生象サファリ"
+        },
+        "price": 38,
+        "calculationType": "per_person",
+        "description": {
+          "en": "3-hour private afternoon safari to witness massive gatherings of wild Asian elephants in their natural sanctuary.",
+          "ja": "野生のアジアゾウの群れを間近で観察できる3時間のプライベート4WDサファリエクスカーション。"
+        }
+      },
+      {
+        "id": "opt-luxury-van",
+        "name": {
+          "en": "VIP High-Roof Luxury Van Upgrade",
+          "ja": "VIP専用ハイルーフバン車両アップグレード"
+        },
+        "price": 45,
+        "calculationType": "per_booking",
+        "description": {
+          "en": "Upgrade from standard sedan/minivan to an ultra-spacious Toyota Commuter High-Roof with plush reclining seats.",
+          "ja": "標準車両から広々としたトヨタハイエース・ハイルーフVIP仕様への車両アップグレード。"
+        }
+      }
+    ]
+  },
+  "destinations": [
+    {
+      "id": "cdf5e458-a1d8-4944-b53a-6c1d6d664dc0",
+      "slug": "bandaranaike-international-airport",
+      "title": {
+        "en": "Bandaranaike International Airport",
+        "ja": "バンダラナイケ国際空港"
+      },
+      "summary": {
+        "en": "The primary international aviation hub and main gateway to Sri Lanka.",
+        "ja": "スリランカの主要な国際玄関口。"
+      }
+    },
+    {
+      "id": "036a9dc1-d2d3-4b3f-bf02-023705a03be3",
+      "slug": "sigiriya",
+      "title": {
+        "en": "Sigiriya Rock Fortress",
+        "ja": "シーギリヤ・ロック要塞"
+      },
+      "summary": {
+        "en": "An iconic 5th-century UNESCO rock citadel famous for its frescoes and lion paws.",
+        "ja": "フレスコ画と巨岩の要塞で名高い5世紀のユネスコ世界遺産。"
+      }
+    },
+    {
+      "id": "dambulla-cave-temple-id",
+      "slug": "dambulla",
+      "title": {
+        "en": "Dambulla Golden Cave Temple",
+        "ja": "ダンブッラ黄金石窟寺院"
+      },
+      "summary": {
+        "en": "Sri Lanka's largest and best-preserved ancient cave temple monastery.",
+        "ja": "スリランカ最大かつ最古の保存状態を誇る仏教石窟寺院。"
+      }
+    }
+  ],
+  "activityDetails": [
+    {
+      "title": {
+        "en": "Sigiriya Rock Fortress Climb",
+        "ja": "シーギリヤ・ロック登頂"
+      },
+      "description": {
+        "en": "Ascend the 1,200 ancient steps past royal water gardens, mirror walls, and maiden frescoes to the summit palace ruins.",
+        "ja": "古代の階段を登り、水上庭園、壁画、ライオンテラスを経て頂上の王宮跡を探索します。"
+      }
+    },
+    {
+      "title": {
+        "en": "Dambulla Golden Cave Exploration",
+        "ja": "ダンブッラ石窟寺院の探索"
+      },
+      "description": {
+        "en": "Wander through five sacred rock caverns featuring over 150 golden Buddha statues and vibrant 2,000-year-old ceiling frescoes.",
+        "ja": "5つの聖なる洞窟を巡り、150体以上の黄金仏像と古代の天井画を鑑賞します。"
+      }
+    }
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": {
+        "en": "Sigiriya & Dambulla Full-Day Heritage Trail",
+        "ja": "シーギリヤ＆ダンブッラ終日遺産トレイル"
+      },
+      "locations": {
+        "en": ["Airport / Colombo", "Sigiriya", "Dambulla", "Drop-off"],
+        "ja": ["空港 / コロンボ", "シーギリヤ", "ダンブッラ", "お見送り"]
+      },
+      "route": {
+        "en": ["Hotel / Airport Pickup", "Scenic Countryside Drive", "Sigiriya Climb", "Village Lunch", "Dambulla Caves", "Return Transfer"],
+        "ja": ["ホテル/空港お迎え", "田園ドライブ", "シーギリヤ登頂", "村の昼食", "ダンブッラ寺院", "帰着送迎"]
+      },
+      "details": {
+        "en": [
+          "06:30 AM: Personalized pickup from airport arrival terminal or hotel lobby.",
+          "10:30 AM: Arrive at Sigiriya and begin guided climb of the ancient Lion Rock.",
+          "01:30 PM: Authentic Sri Lankan rice & curry lunch overlooking peaceful lotus lakes.",
+          "02:45 PM: Guided exploration of the five sacred rock sanctuaries at Dambulla Cave Temple.",
+          "04:30 PM: Relax in your private vehicle during the scenic return drive.",
+          "08:30 PM: Safe drop-off at BIA Airport for onward flight or at your hotel."
+        ],
+        "ja": [
+          "06:30: 空港到着ロビーまたはホテルでの専用車お迎え。",
+          "10:30: シーギリヤに到着し、専属ガイドと共にライオンロック登頂を開始。",
+          "13:30: ハスの池を望むレストランで本場のスリランカカレーランチ。",
+          "14:45: 聖地ダンブッラ石窟寺院の5つの洞窟寺院をじっくり拝観。",
+          "16:30: エアコン完備の専用車でリラックスしながら快適な帰路へ。",
+          "20:30: 空港出発ロビーまたはご滞在ホテルへ時間厳守でお見送り。"
+        ]
+      },
+      "travelTime": {
+        "en": "Approx. 4 hours each way",
+        "ja": "片道約4時間"
+      },
+      "scenicStops": {
+        "en": ["Coconut Triangle roadside plantation", "Kurunegala Elephant Rock Viewpoint"],
+        "ja": ["ココナッツ街道の農園", "クルネーガラ象の岩ビューポイント"]
+      },
+      "activities": {
+        "en": ["Hiking & Fortress Climb", "Cave Temple Sightseeing", "Photography", "Cultural Culinary"],
+        "ja": ["ハイキング・登頂", "石窟寺院拝観", "写真撮影", "本場グルメ体験"]
+      },
+      "meals": {
+        "en": [
+          "Lunch can be selected as an optional add-on",
+          "Free bottled water during travel"
+        ],
+        "ja": [
+          "昼食はオプションで追加可能",
+          "移動中のミネラルウォーター無料"
+        ]
+      },
+      "accommodation": {
+        "en": [
+          "N/A (Day Tour - Return Transfer Included)"
+        ],
+        "ja": [
+          "該当なし（日帰りツアー・送迎付き）"
+        ]
+      }
+    }
+  ],
+  "gallery": []
+}
