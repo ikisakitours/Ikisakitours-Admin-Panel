@@ -23,6 +23,18 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+
+    icons: {
+      icon: [
+        { url: "/Layout-Icons/favicon.ico?v=2", sizes: "any" },
+        { url: "/Layout-Icons/favicon.png?v=2", type: "image/png", sizes: "180x180" },
+      ],
+          shortcut: ["/Layout-Icons/favicon.ico"],
+
+      apple: [{ url: "/Layout-Icons/favicon.png?v=2", sizes: "180x180", type: "image/png" }],
+    },
+
+   
   title: {
     default: "Ikisaki Tours | Admin Panel",
     template: "%s | Ikisaki Tours Admin",
@@ -50,18 +62,7 @@ export const metadata: Metadata = {
       noimageindex: true,
     },
   },
-  icons: {
-    icon: [
-      { url: "/Layout-Icons/favicon.ico", sizes: "any" },
-      { url: "/Layout-Icons/image-200x200.webp", sizes: "200x200", type: "image/webp" },
-      { url: "/Layout-Icons/image-400x400.webp", sizes: "400x400", type: "image/webp" },
-    ],
-    shortcut: ["/Layout-Icons/favicon.ico"],
-    apple: [
-      { url: "/Layout-Icons/image-200x200.webp", sizes: "200x200", type: "image/webp" },
-      { url: "/Layout-Icons/image-600x600.webp", sizes: "600x600", type: "image/webp" },
-    ],
-  },
+
   openGraph: {
     type: "website",
     locale: "en_US",
