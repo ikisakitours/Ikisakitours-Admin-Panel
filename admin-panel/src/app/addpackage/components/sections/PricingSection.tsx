@@ -141,10 +141,10 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
   const addOption = () => {
     const newOption: PackageOptionItem = {
       id: `opt_${Date.now()}`,
-      name: { [locale]: "" },
+      name: { en: "", ja: "", [locale]: "" },
       price: 0,
       calculationType: "per_person",
-      description: { [locale]: "" },
+      description: { en: "", ja: "", [locale]: "" },
     };
     updatePricingConfig({ options: [...options, newOption] });
   };
@@ -157,7 +157,8 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
   const updateOptionName = (id: string, text: string) => {
     const updated = options.map((opt) => {
       if (opt.id !== id) return opt;
-      const currentName = typeof opt.name === "object" ? opt.name : { en: String(opt.name) };
+      const currentName =
+        typeof opt.name === "object" && opt.name !== null ? opt.name : { en: String(opt.name || "") };
       return {
         ...opt,
         name: {
@@ -172,7 +173,10 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
   const updateOptionDescription = (id: string, text: string) => {
     const updated = options.map((opt) => {
       if (opt.id !== id) return opt;
-      const currentDesc = typeof opt.description === "object" ? opt.description : { en: String(opt.description || "") };
+      const currentDesc =
+        typeof opt.description === "object" && opt.description !== null
+          ? opt.description
+          : { en: String(opt.description || "") };
       return {
         ...opt,
         description: {
@@ -363,7 +367,7 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
 
         {/* Tiers List / Table */}
         <div className="space-y-2 overflow-x-auto">
-          <div className="min-w-[500px]">
+          <div className="min-w-125">
             {/* Table Header */}
             <div className="grid grid-cols-12 gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5 bg-slate-50 rounded-lg">
               <div className="col-span-5">Tier Label</div>
@@ -409,7 +413,7 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
                     />
                   </div>
                   <div className="col-span-2 flex justify-center">
-                    <div className="relative w-full max-w-[120px]">
+                    <div className="relative w-full max-w-30">
                       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
                         $
                       </span>
@@ -700,8 +704,18 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
         ) : (
           <div className="space-y-3">
             {options.map((opt) => {
-              const optName = typeof opt.name === "object" ? opt.name[locale] || opt.name["en"] || "" : String(opt.name || "");
-              const optDesc = typeof opt.description === "object" ? opt.description[locale] || opt.description["en"] || "" : String(opt.description || "");
+              const optName =
+                typeof opt.name === "object" && opt.name !== null
+                  ? opt.name[locale] || ""
+                  : locale === "en"
+                  ? String(opt.name || "")
+                  : "";
+              const optDesc =
+                typeof opt.description === "object" && opt.description !== null
+                  ? opt.description[locale] || ""
+                  : locale === "en"
+                  ? String(opt.description || "")
+                  : "";
 
               return (
                 <div

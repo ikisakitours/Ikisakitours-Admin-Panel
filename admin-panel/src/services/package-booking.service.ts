@@ -1,80 +1,111 @@
-export interface Travelers {
-  adults: number;
-  couples: number;
-  children: number;
-  infants: number;
-}
+import type {
+  BookingStatus,
+  PackageBooking,
+  PaymentStatus,
+  UpdateBookingStatusPayload,
+} from "@/app/tours/types/package-booking.types";
 
-export interface PackageBooking {
-  id: string;
-  packageId: string;
-  packageName: string;
-  journeyDate: string;
-  travelers: Travelers;
-  firstname: string;
-  lastname: string;
-  email: string;
-  country: string;
-  type: 'oneday' | 'multiday';
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  createdAt: string;
-}
-
-export interface UpdateBookingStatusPayload {
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-}
+export type {
+  BookingCategoryBreakdownItem,
+  BookingPricingSummary,
+  BookingSelectedOption,
+  BookingStatus,
+  BookingTravelers,
+  PackageBooking,
+  PaymentStatus,
+  Travelers,
+  UpdateBookingStatusPayload,
+} from "@/app/tours/types/package-booking.types";
 
 class PackageBookingService {
-  private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+  private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
-  // 1. Fetch all package bookings for the admin panel
+  private getHeaders(): HeadersInit {
+    const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
+    return {
+      "Content-Type": "application/json",
+      ...(adminKey ? { "x-admin-key": adminKey } : {}),
+    };
+  }
+
+  private async extractErrorMessage(res: Response, fallback: string): Promise<string> {
+    try {
+      const data = (await res.json()) as { message?: string | string[] };
+      if (Array.isArray(data?.message)) return data.message.join(", ");
+      if (typeof data?.message === "string" && data.message.trim()) return data.message;
+    } catch {
+      // Ignore JSON parse failure
+    }
+    return fallback;
+  }
+
+  // 1. Fetch All Bookings
   async getAllBookings(): Promise<PackageBooking[]> {
     const res = await fetch(`${this.API_URL}/package-bookings`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store", // Ensures fresh data in admin panel
+      headers: this.getHeaders(),
+      cache: "no-store",
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to fetch package bookings");
+      throw new Error(await this.extractErrorMessage(res, "Failed to fetch bookings"));
     }
 
     return res.json();
   }
 
-  // 2. Update booking status (e.g. pending -> confirmed)
-  async updateStatus(id: string, payload: UpdateBookingStatusPayload): Promise<PackageBooking> {
-    const res = await fetch(`${this.API_URL}/package-bookings/${id}/status`, {
+  // 2. Fetch Single Booking Detail
+  async getBookingById(id: string): Promise<PackageBooking> {
+    const res = await fetch(`${this.API_URL}/package-bookings/${encodeURIComponent(id)}`, {
+      method: "GET",
+      headers: this.getHeaders(),
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error(await this.extractErrorMessage(res, "Failed to fetch booking details"));
+    }
+
+    return res.json();
+  }
+
+  // 3. Update Status & Payment Details
+  async updateBookingStatus(id: string, payload: UpdateBookingStatusPayload): Promise<PackageBooking> {
+    const res = await fetch(`${this.API_URL}/package-bookings/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to update booking status");
+      throw new Error(await this.extractErrorMessage(res, "Failed to update booking status"));
     }
 
     return res.json();
   }
 
-  // 3. Delete a booking if required by admin
+  // Backward-compatible alias for updateStatus
+  async updateStatus(
+    id: string,
+    payload: {
+      status?: BookingStatus;
+      paymentStatus?: PaymentStatus;
+      paymentMethod?: string;
+      paymentTransactionId?: string;
+    },
+  ): Promise<PackageBooking> {
+    return this.updateBookingStatus(id, payload);
+  }
+
+  // 4. Delete Booking
   async deleteBooking(id: string): Promise<{ message: string }> {
-    const res = await fetch(`${this.API_URL}/package-bookings/${id}`, {
+    const res = await fetch(`${this.API_URL}/package-bookings/${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(),
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to delete booking");
+      throw new Error(await this.extractErrorMessage(res, "Failed to delete booking"));
     }
 
     return res.json();
