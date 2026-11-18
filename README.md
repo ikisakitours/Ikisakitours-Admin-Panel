@@ -338,9 +338,20 @@ npm run start
 
 ## Credits & License
 
-| Role | Details |
+| Attribute | Details |
 | :--- | :--- |
-| **Client** | [Ikisaki Tours](https://www.ikisakitours.com) |
-| **Powered By** | Aetheria Labs |
-| **Engineered By** | Shehan_W |
-| **License** | See [`LICENSE`](./LICENSE) |
+| **Client & Owner** | **Ikisaki Tours (Pvt) Ltd** — [www.ikisakitours.com](https://www.ikisakitours.com) |
+| **Powered By** | **Aetheria Labs** |
+| **Engineered By** | **Shehan_W** & **Pramod_Siriwardhana** |
+| **License** | All rights reserved © 2026 Ikisaki Tours (Pvt) Ltd |
+
+> [!IMPORTANT]
+> **Proprietary Software Notice:** This application and its source code are private, proprietary assets built exclusively for the internal operations of **Ikisaki Tours (Pvt) Ltd**. Unauthorized copying, modification, redistribution, or commercial use of any part of this repository without prior written consent is strictly prohibited.
+
+---
+
+<div align="center">
+
+**© 2026 Ikisaki Tours (Pvt) Ltd** · Powered by **Aetheria Labs** · Engineered by **Shehan_W** & **Pramod_Siriwardhana**
+
+</div>
