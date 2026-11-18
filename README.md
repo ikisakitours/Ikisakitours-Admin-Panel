@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="admin-panel/public/Layout-Icons/image-200x200.webp" alt="Ikisaki Tours Logo" width="104" height="104" />
+<img src="admin-panel/public/Layout-Icons/readme-logo-rounded.webp" alt="Ikisaki Tours Logo" width="112" height="112" />
 
 # Ikisaki Tours — Admin Panel
 
