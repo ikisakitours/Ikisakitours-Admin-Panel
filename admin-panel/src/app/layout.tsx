@@ -24,17 +24,17 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
-    icons: {
-      icon: [
-        { url: "/Layout-Icons/favicon.ico?v=2", sizes: "any" },
-        { url: "/Layout-Icons/favicon.png?v=2", type: "image/png", sizes: "180x180" },
-      ],
-          shortcut: ["/Layout-Icons/favicon.ico"],
+  icons: {
+    icon: [
+      { url: "/Layout-Icons/favicon.ico?v=2", sizes: "any" },
+      { url: "/Layout-Icons/favicon.png?v=2", type: "image/png", sizes: "180x180" },
+    ],
+    shortcut: ["/Layout-Icons/favicon.ico"],
 
-      apple: [{ url: "/Layout-Icons/favicon.png?v=2", sizes: "180x180", type: "image/png" }],
-    },
+    apple: [{ url: "/Layout-Icons/favicon.png?v=2", sizes: "180x180", type: "image/png" }],
+  },
 
-   
+
   title: {
     default: "Ikisaki Tours | Admin Panel",
     template: "%s | Ikisaki Tours Admin",
@@ -48,10 +48,6 @@ export const metadata: Metadata = {
     "Sri Lanka Tours",
     "Tour Management System",
     "Booking Operations",
-  ],
-  authors: [
-    { name: "Shehan_W — Aetheria Labs" },
-    { name: "Pramod_Siriwardhana — Aetheria Labs" },
   ],
   creator: "Aetheria Labs",
   publisher: "Ikisaki Tours",
