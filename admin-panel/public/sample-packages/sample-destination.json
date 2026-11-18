@@ -1,0 +1,55 @@
+{
+  "slug": "sigiriya-lion-rock-fortress",
+  "title": {
+    "en": "Sigiriya Lion Rock Fortress",
+    "ja": "シーギリヤ・ライオンロック要塞"
+  },
+  "summary": {
+    "en": "A dramatic 5th-century UNESCO World Heritage sky palace perched atop a 200-meter granite monolith surrounded by ancient water gardens in Sri Lanka's Cultural Triangle.",
+    "ja": "スリランカの文化三角地帯にそびえる高さ200mの巨大な岩山の上に築かれた、5世紀の世界遺産『天空の宮殿』と古代の水の庭園。"
+  },
+  "description": {
+    "en": "Rising vertically from the emerald jungles of Matale District, Sigiriya is Sri Lanka's most iconic archaeological masterpiece. Built by King Kashyapa in 477 AD, the citadel showcases symmetrical royal water gardens, the world-famous Sigiriya Frescoes, the polished Mirror Wall, and the colossal Lion's Paw gateway leading to panoramic summit ruins.",
+    "ja": "マータレー県の深い緑のジャングルから垂直にそびえ立つシーギリヤは、スリランカを代表する考古学の傑作です。紀元477年にカシャパ王によって築かれた要塞には、左右対称の王宮庭園、世界的に有名なシーギリヤ・レディの壁画、鏡の壁、そして巨大なライオンの爪の門があり、頂上からは360度の絶景が広がります。"
+  },
+  "province": {
+    "en": "Central Province (Matale District)",
+    "ja": "中部州（マータレー県）"
+  },
+  "bestTimeToVisit": {
+    "en": "January to April & July to September (Early morning climbs recommended)",
+    "ja": "1月〜4月・7月〜9月（涼しい早朝の登頂がおすすめ）"
+  },
+  "climate": {
+    "en": "Warm Tropical Dry Zone (26°C – 33°C)",
+    "ja": "温暖な熱帯乾燥地帯（気温 26℃〜33℃）"
+  },
+  "primaryLanguage": {
+    "en": "Sinhala & English",
+    "ja": "シンハラ語・英語"
+  },
+  "localCurrency": {
+    "en": "Sri Lankan Rupee (LKR)",
+    "ja": "スリランカ・ルピー (LKR)"
+  },
+  "coordinates": {
+    "lat": 7.957,
+    "lng": 80.7603
+  },
+  "highlights": {
+    "en": [
+      "Climb 1,200 historic steps to the 5th-century summit palace ruins.",
+      "Admire the vividly preserved celestial maiden frescoes in a sheltered rock pocket.",
+      "Walk beside the ancient Mirror Wall inscribed with 8th-century Sinhala poetry.",
+      "Explore symmetrical royal water gardens, boulder gardens, and ancient moats.",
+      "Optional sunrise hike at nearby Pidurangala Rock for iconic views of Sigiriya."
+    ],
+    "ja": [
+      "約1,200段の階段を登り、5世紀の頂上宮殿遺跡から360度の絶景を堪能。",
+      "岩壁のくぼみに色鮮やかに残る『シーギリヤ・レディ』のフレスコ壁画鑑賞。",
+      "8世紀の古代詩が刻まれた歴史的な『鏡の壁』を散策。",
+      "古代の高度な灌漑技術を伝える王宮の水の庭園と巨大な岩の庭園を見学。",
+      "シーギリヤ全景を望む隣山のピドゥランガラ・ロックでの朝日ハイキング（オプション）。"
+    ]
+  }
+}
