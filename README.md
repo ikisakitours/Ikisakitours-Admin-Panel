@@ -2,17 +2,27 @@
 
 <img src="admin-panel/public/Layout-Icons/readme-logo-rounded.webp" alt="Ikisaki Tours Logo" width="112" height="112" />
 
-# Ikisaki Tours — Admin Panel
+<h1>Ikisaki Tours — Admin Panel</h1>
 
-**Centralized Operations, Multilingual CMS & Dynamic Pricing Dashboard for [www.ikisakitours.com](https://www.ikisakitours.com)**
+<p>
+  <strong>Centralized Operations, Multilingual CMS &amp; Dynamic Pricing Dashboard for <a href="https://www.ikisakitours.com">www.ikisakitours.com</a></strong>
+</p>
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2.10-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.2-149ECA?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+<p>
+  <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16.2.10-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19.2-149ECA?style=for-the-badge&logo=react&logoColor=white" alt="React" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <br />
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /></a>
+  <a href="https://vercel.com/"><img src="https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" /></a>
+</p>
 
-[Live Admin Panel](https://ikisakitours-admin-panel.vercel.app) · [In-App Manual (`/manual`)](https://ikisakitours-admin-panel.vercel.app/manual) · [Admin Operations Manual](./admin-panel/ADMIN_MANUAL.md) · [Sample JSON Templates](./admin-panel/public/sample-packages)
+<p>
+  <a href="https://ikisakitours-admin-panel.vercel.app">Live Admin Panel</a> ·
+  <a href="https://ikisakitours-admin-panel.vercel.app/manual">In-App Manual (<code>/manual</code>)</a> ·
+  <a href="./admin-panel/ADMIN_MANUAL.md">Admin Operations Manual</a> ·
+  <a href="./admin-panel/public/sample-packages">Sample JSON Templates</a>
+</p>
 
 </div>
 
@@ -348,6 +358,9 @@ npm run start
 > [!IMPORTANT]
 > **Proprietary Software Notice:** This application and its source code are private, proprietary assets built exclusively for the internal operations of **Ikisaki Tours (Pvt) Ltd**. Unauthorized copying, modification, redistribution, or commercial use of any part of this repository without prior written consent is strictly prohibited.
 
+> [!NOTE]
+> **Copyright © 2026 Ikisaki Tours (Pvt) Ltd. All rights reserved.**  
+> This repository and its source code, design assets, and localization dictionaries are proprietary and confidential. Unauthorized copying, redistribution, modification, or commercial use is strictly prohibited without prior written consent from Ikisaki Tours (Pvt) Ltd. See [`LICENSE`](./LICENSE) for full terms.
 ---
 
 <div align="center">
