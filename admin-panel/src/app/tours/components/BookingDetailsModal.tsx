@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle,
@@ -70,26 +70,59 @@ export function BookingDetailsModal({
   );
   const [saving, setSaving] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
+  const modalScrollRef = useRef<HTMLDivElement | null>(null);
 
-  // Lock background page scroll completely while modal is open
+  // Lock background page scroll without touching html overflow (prevents sticky Sidebar from shifting up)
   useEffect(() => {
     if (!booking) return;
 
-    const prevBodyOverflow = document.body.style.overflow;
-    const prevHtmlOverflow = document.documentElement.style.overflow;
-    const prevBodyPaddingRight = document.body.style.paddingRight;
+    const lockedScrollY = window.scrollY;
+    const lockedScrollX = window.scrollX;
 
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-    }
+    const lockWindowScroll = () => {
+      if (window.scrollY !== lockedScrollY || window.scrollX !== lockedScrollX) {
+        window.scrollTo(lockedScrollX, lockedScrollY);
+      }
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      const container = modalScrollRef.current;
+      const target = e.target as Node | null;
+      if (!container || !target || !container.contains(target)) {
+        e.preventDefault();
+        return;
+      }
+
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const canScroll = scrollHeight > clientHeight + 1;
+      if (!canScroll) {
+        e.preventDefault();
+        return;
+      }
+
+      const scrollingUp = e.deltaY < 0;
+      const scrollingDown = e.deltaY > 0;
+      if ((scrollingUp && scrollTop <= 0) || (scrollingDown && scrollTop + clientHeight >= scrollHeight - 1)) {
+        e.preventDefault();
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const container = modalScrollRef.current;
+      const target = e.target as Node | null;
+      if (!container || !target || !container.contains(target)) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("scroll", lockWindowScroll, { passive: true });
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     return () => {
-      document.documentElement.style.overflow = prevHtmlOverflow;
-      document.body.style.overflow = prevBodyOverflow;
-      document.body.style.paddingRight = prevBodyPaddingRight;
+      window.removeEventListener("scroll", lockWindowScroll);
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchmove", handleTouchMove);
     };
   }, [booking]);
 
@@ -152,16 +185,68 @@ export function BookingDetailsModal({
 
   const breakdown = detail.pricingSummary?.breakdown;
   const appliedTier = detail.pricingSummary?.appliedTier;
-  const selectedOptions = detail.selectedOptions || [];
+
+  const adultCount = breakdown?.adults?.count ?? detail.travelers?.adults ?? 0;
+  const coupleCount = breakdown?.couples?.count ?? detail.travelers?.couples ?? 0;
+  const childCount = breakdown?.children?.count ?? detail.travelers?.children ?? 0;
+  const infantCount = breakdown?.infants?.count ?? detail.travelers?.infants ?? 0;
+
+  // Read directly from package_bookings.selected_options (exact historical values saved at booking time)
+  const resolvedSelectedOptions = (detail.selectedOptions || [])
+    .filter((opt) => {
+      if (
+        opt.selected === false ||
+        opt.enabled === false ||
+        opt.count === 0 ||
+        opt.quantity === 0
+      ) {
+        return false;
+      }
+      return true;
+    })
+    .map((opt) => {
+      const displayName = resolveOptionName(
+        opt.name || opt.nameLocalized || "Unnamed Option",
+        detail.locale || "en"
+      );
+      const calcType = opt.calculationType || "per_person";
+      const qty =
+        typeof opt.quantity === "number" && opt.quantity > 0
+          ? opt.quantity
+          : typeof opt.count === "number" && opt.count > 0
+            ? opt.count
+            : 1;
+
+      const rawUnit = toNumber(opt.unitPrice ?? opt.price, 0);
+      const rawSubtotal = toNumber(opt.subtotal ?? opt.total, 0);
+      const unitPrice = rawUnit > 0 ? rawUnit : qty > 0 && rawSubtotal > 0 ? rawSubtotal / qty : 0;
+      const lineTotal =
+        rawSubtotal > 0 ? rawSubtotal : Math.round(unitPrice * qty * 100) / 100;
+
+      return {
+        id: opt.id,
+        name: displayName,
+        calculationType: calcType,
+        qty,
+        unitPrice,
+        lineTotal,
+      };
+    });
+
+  const calculatedOptionsSum = resolvedSelectedOptions.reduce(
+    (acc, item) => acc + item.lineTotal,
+    0
+  );
 
   const baseTotal =
     detail.basePrice !== undefined && detail.basePrice !== null
       ? toNumber(detail.basePrice)
       : toNumber(detail.pricingSummary?.baseTotal, 0);
-  const optionsTotal =
+  const rawOptionsTotal =
     detail.optionsTotal !== undefined && detail.optionsTotal !== null
       ? toNumber(detail.optionsTotal)
       : toNumber(detail.pricingSummary?.optionsTotal, 0);
+  const optionsTotal = rawOptionsTotal > 0 ? rawOptionsTotal : calculatedOptionsSum;
   const clientGrandTotal =
     detail.totalAmount !== undefined && detail.totalAmount !== null
       ? toNumber(detail.totalAmount)
@@ -206,78 +291,60 @@ export function BookingDetailsModal({
     }
   };
 
-  const adultCount = breakdown?.adults?.count ?? detail.travelers?.adults ?? 0;
-  const coupleCount = breakdown?.couples?.count ?? detail.travelers?.couples ?? 0;
-  const childCount = breakdown?.children?.count ?? detail.travelers?.children ?? 0;
-  const infantCount = breakdown?.infants?.count ?? detail.travelers?.infants ?? 0;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-4">
+      {/* Backdrop (Full viewport coverage above Sidebar) */}
       <div
         onClick={onClose}
         className="fixed inset-0 bg-slate-950/65 backdrop-blur-xs animate-in fade-in duration-150"
       />
 
-      {/* Wide Dynamic Enterprise Modal (Fits cleanly on desktop; smooth internal scroll on smaller laptops) */}
+      {/* Wide & Tall Dynamic Enterprise Modal */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label={`Booking details for ${refCode}`}
-        className="relative z-10 flex max-h-[92vh] w-[96vw] max-w-6xl flex-col bg-slate-50 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative z-10 flex max-h-[95vh] w-[96vw] max-w-6xl flex-col bg-slate-50 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
       >
-        {/* 1. COMPACT BRAND HEADER */}
-        <div className="bg-slate-950 text-white px-6 py-4 border-b border-slate-800 shrink-0">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="space-y-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-lg bg-emerald-500/15 border border-emerald-400/30 px-2.5 py-0.5 font-mono text-xs font-extrabold tracking-wider text-emerald-300">
-                  {refCode}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopyRef}
-                  className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-200 hover:bg-white/15 transition-colors cursor-pointer"
-                >
-                  {copiedRef ? (
-                    <>
-                      <Check className="w-3 h-3 text-emerald-400" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3 h-3" />
-                      Copy
-                    </>
-                  )}
-                </button>
-                <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                    isOneDay
-                      ? "bg-amber-500/15 text-amber-300 border-amber-400/30"
-                      : "bg-purple-500/15 text-purple-200 border-purple-400/30"
-                  }`}
-                >
-                  {isOneDay ? "One-Day Tour" : "Multi-Day Tour"}
-                </span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-slate-300 ml-1">
-                  <Calendar className="w-3.5 h-3.5 text-emerald-400" />
-                  <strong className="text-white">{detail.journeyDate}</strong>
-                </span>
-                <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-slate-400">
-                  <Clock className="w-3 h-3" />
-                  Booked {formatFullDateTime(detail.createdAt)}
-                </span>
-                {loadingDetail && (
-                  <span className="inline-flex items-center gap-1 text-[10px] text-emerald-300">
-                    <Loader2 className="w-3 h-3 animate-spin" /> Syncing
-                  </span>
+        {/* 1. CLEAN SPACIOUS BRAND HEADER */}
+        <div className="bg-slate-950 text-white px-6 sm:px-7 py-5 border-b border-slate-800 shrink-0">
+          {/* Top Row: Reference, Copy, Type + Status Pills & Close */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-lg bg-emerald-500/15 border border-emerald-400/35 px-2.5 py-1 font-mono text-xs font-extrabold tracking-wider text-emerald-300">
+                {refCode}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyRef}
+                className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-200 hover:bg-white/15 transition-colors cursor-pointer"
+              >
+                {copiedRef ? (
+                  <>
+                    <Check className="w-3 h-3 text-emerald-400" />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3" />
+                    Copy
+                  </>
                 )}
-              </div>
-
-              <h2 className="text-base sm:text-lg font-extrabold text-white leading-tight truncate">
-                {detail.packageName}
-              </h2>
+              </button>
+              <span
+                className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold border ${
+                  isOneDay
+                    ? "bg-amber-500/15 text-amber-300 border-amber-400/30"
+                    : "bg-purple-500/15 text-purple-200 border-purple-400/30"
+                }`}
+              >
+                {isOneDay ? "One-Day Tour" : "Multi-Day Tour"}
+              </span>
+              {loadingDetail && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-300 ml-1">
+                  <Loader2 className="w-3 h-3 animate-spin" /> Syncing
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2.5 shrink-0">
@@ -302,10 +369,38 @@ export function BookingDetailsModal({
               </button>
             </div>
           </div>
+
+          {/* Middle Row: Clear Full-Width Tour Title */}
+          <h2 className="mt-3 text-lg sm:text-xl font-extrabold text-white tracking-tight leading-snug">
+            {detail.packageName}
+          </h2>
+
+          {/* Bottom Meta Row: Journey Date, Booked Timestamp, Total Pax */}
+          <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-slate-300">
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="text-slate-400">Journey Date:</span>
+              <strong className="text-white">{detail.journeyDate}</strong>
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-slate-400">
+              <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <span>Booked:</span>
+              <span className="text-slate-200 font-medium">
+                {formatFullDateTime(detail.createdAt)}
+              </span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-slate-400">
+              <Users className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <strong className="text-white">{totalPax} Pax</strong>
+            </span>
+          </div>
         </div>
 
         {/* DYNAMIC INTERNAL SCROLL AREA (Zero scroll on large monitors; smooth scroll on smaller laptops) */}
-        <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-4">
+        <div
+          ref={modalScrollRef}
+          className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-4"
+        >
           {/* ANTI-TAMPERING SECURITY WARNING BANNER (Full Width) */}
           {isTampered && (
             <div className="rounded-2xl border-2 border-rose-300 bg-rose-50 px-4 py-3 flex items-center gap-3 shadow-xs">
@@ -541,14 +636,14 @@ export function BookingDetailsModal({
                 <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
                   <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                     <PackagePlus className="w-3.5 h-3.5 text-purple-600" />
-                    Selected Add-Ons ({selectedOptions.length})
+                    Selected Add-Ons ({resolvedSelectedOptions.length})
                   </h3>
                   <span className="text-xs font-black text-purple-700">
                     +{formatMoney(optionsTotal, currency)}
                   </span>
                 </div>
 
-                {selectedOptions.length === 0 ? (
+                {resolvedSelectedOptions.length === 0 ? (
                   <div className="px-4 py-3 text-xs text-slate-400">
                     No optional add-ons or supplements were selected.
                   </div>
@@ -558,36 +653,34 @@ export function BookingDetailsModal({
                       <thead>
                         <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                           <th className="py-2 px-4">Option</th>
-                          <th className="py-2 px-3">Type</th>
-                          <th className="py-2 px-3 text-center">Qty</th>
+                          <th className="py-2 px-2.5">Type</th>
+                          <th className="py-2 px-2.5 text-right whitespace-nowrap">Unit Price</th>
+                          <th className="py-2 px-2.5 text-center">Qty</th>
                           <th className="py-2 px-4 text-right">Total</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {selectedOptions.map((opt) => {
-                          const qty = opt.count ?? 1;
-                          const unit = toNumber(opt.price, 0);
-                          const lineTotal =
-                            opt.total !== undefined ? toNumber(opt.total, 0) : unit * qty;
-                          return (
-                            <tr key={opt.id}>
-                              <td className="py-2 px-4 font-semibold text-slate-800">
-                                {resolveOptionName(opt.name, detail.locale || "en")}
-                              </td>
-                              <td className="py-2 px-3">
-                                <span className="inline-block rounded bg-purple-50 border border-purple-200 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 whitespace-nowrap">
-                                  {formatOptionCalcType(opt.calculationType)}
-                                </span>
-                              </td>
-                              <td className="py-2 px-3 text-center font-bold text-slate-700">
-                                ×{qty}
-                              </td>
-                              <td className="py-2 px-4 text-right font-bold text-slate-900">
-                                {formatMoney(lineTotal, currency)}
-                              </td>
-                            </tr>
-                          );
-                        })}
+                        {resolvedSelectedOptions.map((opt) => (
+                          <tr key={opt.id}>
+                            <td className="py-2.5 px-4 font-semibold text-slate-800">
+                              {opt.name}
+                            </td>
+                            <td className="py-2.5 px-2.5">
+                              <span className="inline-block rounded bg-purple-50 border border-purple-200 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 whitespace-nowrap">
+                                {formatOptionCalcType(opt.calculationType)}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-2.5 text-right font-semibold text-slate-600 whitespace-nowrap">
+                              {formatMoney(opt.unitPrice, currency)}
+                            </td>
+                            <td className="py-2.5 px-2.5 text-center font-bold text-slate-700 whitespace-nowrap">
+                              ×{opt.qty}
+                            </td>
+                            <td className="py-2.5 px-4 text-right font-extrabold text-slate-900 whitespace-nowrap">
+                              {formatMoney(opt.lineTotal, currency)}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>

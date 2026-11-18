@@ -8,10 +8,16 @@ export interface BookingTravelers {
 export interface BookingSelectedOption {
   id: string;
   name: string | Record<string, string>;
-  price: number;
-  calculationType: "per_person" | "per_room" | "per_booking" | string;
+  nameLocalized?: Record<string, string>;
+  unitPrice?: number | string;
+  price?: number | string;
+  calculationType?: "per_person" | "per_room" | "per_booking" | string;
+  quantity?: number;
   count?: number;
-  total?: number;
+  subtotal?: number | string;
+  total?: number | string;
+  selected?: boolean;
+  enabled?: boolean;
 }
 
 export interface BookingCategoryBreakdownItem {
