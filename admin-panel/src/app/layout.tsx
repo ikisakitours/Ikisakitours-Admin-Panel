@@ -49,7 +49,10 @@ export const metadata: Metadata = {
     "Tour Management System",
     "Booking Operations",
   ],
-  authors: [{ name: "Aetheria Labs — Shehan_W" }],
+  authors: [
+    { name: "Shehan_W — Aetheria Labs" },
+    { name: "Pramod_Siriwardhana — Aetheria Labs" },
+  ],
   creator: "Aetheria Labs",
   publisher: "Ikisaki Tours",
   robots: {
