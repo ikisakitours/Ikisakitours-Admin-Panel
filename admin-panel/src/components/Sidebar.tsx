@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -31,8 +31,10 @@ import {
   LogOut,
   ShieldCheck,
   Loader2,
+  UserCheck,
 } from "lucide-react";
 import { AdminSecurityModal } from "@/components/AdminSecurityModal";
+import { getRoleMeta } from "@/app/staff/data/staffRoles";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
 type NavGroup = { title: string; items: NavItem[] };
@@ -53,6 +55,7 @@ const navGroups: NavGroup[] = [
     title: "User Management",
     items: [
       { href: "/users", label: "Registered Users", icon: Users },
+      { href: "/staff", label: "Staff & Team (RBAC)", icon: UserCheck },
     ],
   },
   {
@@ -157,6 +160,54 @@ export default function Sidebar() {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  // Role-based navigation filtering
+  const visibleNavGroups = useMemo(() => {
+    const role = adminUser?.role || "SUPER_ADMIN";
+    if (role === "SUPER_ADMIN") return navGroups;
+
+    if (role === "PACKAGE_MANAGER") {
+      return navGroups
+        .map((group) => {
+          if (group.title === "Overview") return group;
+          if (
+            group.title === "Tour Packages" ||
+            group.title === "Destinations" ||
+            group.title === "Blog Articles" ||
+            group.title === "Media & Engagement"
+          ) {
+            return group;
+          }
+          return null;
+        })
+        .filter(Boolean) as NavGroup[];
+    }
+
+    if (role === "OPERATIONS_MANAGER") {
+      return navGroups
+        .map((group) => {
+          if (
+            group.title === "Overview" ||
+            group.title === "Bookings & Operations" ||
+            group.title === "User Management" ||
+            group.title === "Media & Engagement" ||
+            group.title === "Help & Guide"
+          ) {
+            if (group.title === "User Management") {
+              return {
+                ...group,
+                items: group.items.filter((item) => item.href !== "/staff"),
+              };
+            }
+            return group;
+          }
+          return null;
+        })
+        .filter(Boolean) as NavGroup[];
+    }
+
+    return navGroups;
+  }, [adminUser?.role]);
+
   const handleOpenSecurityModal = () => {
     setIsExpanded(false);
     setIsSecurityModalOpen(true);
@@ -225,7 +276,7 @@ export default function Sidebar() {
           aria-label="Main navigation"
           className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          {navGroups.map((group, groupIndex) => (
+          {visibleNavGroups.map((group, groupIndex) => (
             <div key={group.title} className={groupIndex > 0 ? "mt-3" : ""}>
               {/* Group heading (expanded) / divider line (collapsed) */}
               <div className="relative mb-1.5 h-4 flex items-center">
@@ -331,7 +382,13 @@ export default function Sidebar() {
                     {adminUser?.fullName || "Ikisaki Admin"}
                   </p>
                   <p className="text-[10px] font-mono text-slate-400 truncate leading-tight">
-                    {adminUser?.role === "SUPER_ADMIN" ? "Super Admin" : adminUser?.role === "OPERATIONS_MANAGER" ? "Ops Manager" : "Admin"}
+                    {adminUser?.role === "SUPER_ADMIN"
+                      ? "Super Admin"
+                      : adminUser?.role === "PACKAGE_MANAGER"
+                      ? "Package Manager"
+                      : adminUser?.role === "OPERATIONS_MANAGER"
+                      ? "Ops Manager"
+                      : "Staff"}
                   </p>
                 </div>
               </button>

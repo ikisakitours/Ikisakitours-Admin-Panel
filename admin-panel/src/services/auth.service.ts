@@ -1,10 +1,23 @@
 // src/services/auth.service.ts
 
+export type AdminRoleType =
+  | "SUPER_ADMIN"
+  | "ADMIN"
+  | "OPERATIONS_MANAGER"
+  | "PACKAGE_MANAGER"
+  | "DESTINATION_EXPERT"
+  | "CONTENT_EDITOR"
+  | "BOOKING_AGENT"
+  | "TRANSPORT_COORDINATOR"
+  | "CUSTOMER_SUPPORT"
+  | "REVIEW_MODERATOR"
+  | "LEGAL_COMPLIANCE";
+
 export interface AdminUser {
   id: string;
   email: string;
   fullName: string;
-  role: 'SUPER_ADMIN' | 'ADMIN' | 'OPERATIONS_MANAGER';
+  role: AdminRoleType;
   avatarUrl?: string;
   isTwoFactorEnabled?: boolean;
 }
