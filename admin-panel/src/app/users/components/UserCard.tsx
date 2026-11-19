@@ -194,9 +194,14 @@ export default function UserCard({
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-slate-400">
               <Hash className="w-3.5 h-3.5" />
-              <span>User ID</span>
+              <span>Customer ID</span>
             </div>
             <div className="flex items-center gap-1.5 font-mono">
+              {(user.referenceId || user.customerReferenceId) && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80 font-mono text-[10px] font-extrabold tracking-tight" title="Ikisaki Customer Reference ID">
+                  {user.referenceId || user.customerReferenceId}
+                </span>
+              )}
               <span className="text-slate-800 font-semibold text-[11px]">
                 {showId ? user.id : `${user.id.substring(0, 8)}...`}
               </span>
@@ -210,7 +215,11 @@ export default function UserCard({
               </button>
               <button
                 type="button"
-                onClick={handleCopyId}
+                onClick={() => {
+                  navigator.clipboard.writeText(user.referenceId || user.customerReferenceId || user.id);
+                  setCopiedId(true);
+                  setTimeout(() => setCopiedId(false), 2000);
+                }}
                 className="text-slate-400 hover:text-emerald-700 transition-colors cursor-pointer"
                 title="Copy ID"
               >

@@ -212,8 +212,16 @@ export function UsersTable({
                     <p className="font-semibold text-slate-800 text-xs truncate" title={user.email}>
                       {user.email || "—"}
                     </p>
-                    <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-400 font-mono">
-                      <span>{isRevealed ? user.id : `${user.id.substring(0, 8)}...`}</span>
+                    {/* 2. Email & ID */}
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      {(user.referenceId || user.customerReferenceId) && (
+                        <span className="inline-flex items-center px-1.5 py-0.2 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80 font-mono text-[9px] font-extrabold tracking-tight" title="Ikisaki Customer Reference ID">
+                          {user.referenceId || user.customerReferenceId}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {isRevealed ? user.id : `${user.id.substring(0, 8)}...`}
+                      </span>
                       <button
                         type="button"
                         onClick={() => toggleReveal(user.id)}
@@ -224,8 +232,8 @@ export function UsersTable({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleCopy(user.id)}
-                        title="Copy User ID"
+                        onClick={() => handleCopy(user.referenceId || user.customerReferenceId || user.id)}
+                        title="Copy Customer ID"
                         className="text-slate-400 hover:text-emerald-700 cursor-pointer"
                       >
                         {copiedId === user.id ? (
