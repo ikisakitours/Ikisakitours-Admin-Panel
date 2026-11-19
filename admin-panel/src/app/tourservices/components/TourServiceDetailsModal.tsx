@@ -108,8 +108,10 @@ export function TourServiceDetailsModal({
 
   useEffect(() => {
     if (service) {
-      setDetail(service);
-      setStatus(service.status);
+      queueMicrotask(() => {
+        setDetail(service);
+        setStatus(service.status);
+      });
     }
   }, [service]);
 

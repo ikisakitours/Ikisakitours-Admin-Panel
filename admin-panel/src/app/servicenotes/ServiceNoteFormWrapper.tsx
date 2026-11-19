@@ -44,7 +44,9 @@ export default function ServiceNoteFormWrapper({
     // Sync state if editingId or initialData changes
     React.useEffect(() => {
         if (initialData) {
-            setFormData(initialData);
+            queueMicrotask(() => {
+                setFormData(initialData);
+            });
         }
     }, [initialData]);
 

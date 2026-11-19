@@ -22,9 +22,11 @@ class ContactService {
 
   private getHeaders(): HeadersInit {
     const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
+    const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
     return {
       "Content-Type": "application/json",
       ...(adminKey ? { "x-admin-key": adminKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
@@ -32,6 +34,7 @@ class ContactService {
   async getContacts(): Promise<ContactItem[]> {
     const res = await fetch(`${this.getBaseUrl()}/contacts`, {
       headers: this.getHeaders(),
+      credentials: "include",
       cache: "no-store",
     });
 

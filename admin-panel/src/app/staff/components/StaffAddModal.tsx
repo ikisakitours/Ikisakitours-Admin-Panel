@@ -114,6 +114,7 @@ export function StaffAddModal({
                 <input
                   type="text"
                   required
+                  autoComplete="name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Kamal Perera"
@@ -131,6 +132,7 @@ export function StaffAddModal({
                   <input
                     type="email"
                     required
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="kamal@ikisakitours.com"
@@ -160,6 +162,7 @@ export function StaffAddModal({
                   <input
                     type={showPassword ? "text" : "password"}
                     required
+                    autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter temporary password..."

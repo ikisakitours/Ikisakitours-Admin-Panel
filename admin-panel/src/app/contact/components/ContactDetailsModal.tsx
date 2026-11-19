@@ -103,8 +103,10 @@ export function ContactDetailsModal({
 
   useEffect(() => {
     if (inquiry) {
-      setDetail(inquiry);
-      setStatus(inquiry.status);
+      queueMicrotask(() => {
+        setDetail(inquiry);
+        setStatus(inquiry.status);
+      });
     }
   }, [inquiry]);
 

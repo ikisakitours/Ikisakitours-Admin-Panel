@@ -33,13 +33,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 class ServicePricingService {
   private getHeaders(): HeadersInit {
     const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
-    const headers: Record<string, string> = {
+    const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
+    return {
       "Content-Type": "application/json",
+      ...(adminKey ? { "x-admin-key": adminKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
-    if (adminKey) {
-      headers["x-admin-key"] = adminKey;
-    }
-    return headers;
   }
 
   // ── 1. Fetch All Pricing Configurations ───────────────────────────────────────

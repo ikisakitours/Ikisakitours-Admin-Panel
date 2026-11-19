@@ -22,9 +22,11 @@ class PackageBookingService {
 
   private getHeaders(): HeadersInit {
     const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
+    const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
     return {
       "Content-Type": "application/json",
       ...(adminKey ? { "x-admin-key": adminKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
@@ -44,6 +46,7 @@ class PackageBookingService {
     const res = await fetch(`${this.API_URL}/package-bookings`, {
       method: "GET",
       headers: this.getHeaders(),
+      credentials: "include",
       cache: "no-store",
     });
 
@@ -59,6 +62,7 @@ class PackageBookingService {
     const res = await fetch(`${this.API_URL}/package-bookings/${encodeURIComponent(id)}`, {
       method: "GET",
       headers: this.getHeaders(),
+      credentials: "include",
       cache: "no-store",
     });
 
@@ -74,6 +78,7 @@ class PackageBookingService {
     const res = await fetch(`${this.API_URL}/package-bookings/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: this.getHeaders(),
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 
@@ -102,6 +107,7 @@ class PackageBookingService {
     const res = await fetch(`${this.API_URL}/package-bookings/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: this.getHeaders(),
+      credentials: "include",
     });
 
     if (!res.ok) {

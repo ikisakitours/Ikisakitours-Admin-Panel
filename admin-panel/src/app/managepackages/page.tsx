@@ -75,7 +75,9 @@ export default function ManagePackagesPage() {
   }, [notify]);
 
   useEffect(() => {
-    fetchPackages();
+    queueMicrotask(() => {
+      fetchPackages();
+    });
   }, [fetchPackages]);
 
   // Triggered when user clicks "Edit" in the table

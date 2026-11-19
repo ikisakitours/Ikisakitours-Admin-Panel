@@ -3,15 +3,12 @@
 import React, { useState } from "react";
 import {
   Check,
-  CheckCircle2,
-  Clock,
   Compass,
   Copy,
   Eye,
   Loader2,
   Mail,
   MessageSquare,
-  Phone,
   Trash2,
 } from "lucide-react";
 import type { ContactInquiry } from "../types/contact.types";
@@ -124,11 +121,11 @@ export function ContactTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3 w-[200px]">Ref &amp; Date</th>
-              <th className="py-3 px-3 w-[250px]">Inquiry Type</th>
+              <th className="py-3 pl-4 pr-3 w-50">Ref &amp; Date</th>
+              <th className="py-3 px-3 w-62.5">Inquiry Type</th>
               <th className="py-3 px-3">Customer</th>
-              <th className="py-3 px-3 w-[170px]">Status</th>
-              <th className="py-3 pl-3 pr-4 text-right w-[140px]">Actions</th>
+              <th className="py-3 px-3 w-42.5">Status</th>
+              <th className="py-3 pl-3 pr-4 text-right w-35">Actions</th>
             </tr>
           </thead>
 
@@ -146,7 +143,7 @@ export function ContactTable({
                   className={`border-l-[3px] ${statusCfg.borderClass} transition-colors odd:bg-white even:bg-slate-50/65 hover:bg-emerald-50/45`}
                 >
                   {/* 1. Row # + Reference + Date */}
-                  <td className="py-3.5 pl-3.5 pr-3 align-middle whitespace-nowrap w-[200px]">
+                  <td className="py-3.5 pl-3.5 pr-3 align-middle whitespace-nowrap w-50">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] font-bold text-slate-400 w-5">
                         {String(rowIndex + 1).padStart(2, "0")}
@@ -184,7 +181,7 @@ export function ContactTable({
                   </td>
 
                   {/* 2. Inquiry Classification (Snapped tight to the left) */}
-                  <td className="py-3.5 px-3 align-middle w-[250px]">
+                  <td className="py-3.5 px-3 align-middle w-62.5">
                     <span className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold border bg-indigo-50/70 text-indigo-700 border-indigo-200">
                       <MessageSquare className="w-3 h-3 text-indigo-500" />
                       <span className="truncate">{inquiry.inquiryType || "General Inquiry"}</span>
@@ -210,7 +207,7 @@ export function ContactTable({
                   </td>
 
                   {/* 4. Status Selector */}
-                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[170px]">
+                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-42.5">
                     <div className="flex items-center gap-1">
                       <select
                         aria-label={`Status for ${refCode}`}
@@ -230,7 +227,7 @@ export function ContactTable({
                   </td>
 
                   {/* 5. Actions */}
-                  <td className="py-3.5 pl-3 pr-4 align-middle text-right whitespace-nowrap w-[140px]">
+                  <td className="py-3.5 pl-3 pr-4 align-middle text-right whitespace-nowrap w-35">
                     <div className="inline-flex items-center justify-end gap-1.5">
                       <button
                         type="button"

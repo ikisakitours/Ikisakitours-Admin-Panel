@@ -16,11 +16,13 @@ export async function fetcher<T>(endpoint: string, options: RequestInit = {}): P
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
+    credentials: 'include',
     cache: 'no-store', // Always fetch fresh data for admin view
   });
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
   }
 
   return response.json();

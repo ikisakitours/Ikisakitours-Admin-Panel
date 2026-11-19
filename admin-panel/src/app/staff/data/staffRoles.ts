@@ -154,3 +154,36 @@ export function getRoleMeta(roleKey?: string): RoleDefinition {
     }
   );
 }
+
+/**
+ * Checks whether a given pathname is permitted for a given user role.
+ */
+export function isRoutePermitted(pathname: string, userRole?: string): boolean {
+  // 1. Root, dashboard, and manual guides are accessible by all staff members
+  if (
+    pathname === "/" ||
+    pathname === "" ||
+    pathname === "/dashboard" ||
+    pathname === "/manual"
+  ) {
+    return true;
+  }
+
+  // 2. Super Administrator has unrestricted root privileges across all routes
+  if (userRole === "SUPER_ADMIN") {
+    return true;
+  }
+
+  // 3. Look up role definition
+  const roleMeta = getRoleMeta(userRole);
+  if (!roleMeta || roleMeta.allowedRoutes.includes("*")) {
+    return true;
+  }
+
+  // 4. Check if current pathname matches or is a subroute of any allowedRoute
+  return roleMeta.allowedRoutes.some((allowed) => {
+    if (allowed === pathname) return true;
+    if (allowed !== "/" && pathname.startsWith(`${allowed}/`)) return true;
+    return false;
+  });
+}

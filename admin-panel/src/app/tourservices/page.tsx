@@ -74,7 +74,9 @@ export default function TourServicesPage() {
   }, []);
 
   useEffect(() => {
-    void fetchServices();
+    queueMicrotask(() => {
+      void fetchServices();
+    });
   }, [fetchServices]);
 
   const new24hCount = useMemo(

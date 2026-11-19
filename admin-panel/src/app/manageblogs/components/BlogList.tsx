@@ -28,7 +28,9 @@ export function BlogList() {
   };
 
   useEffect(() => {
-    fetchBlogs();
+    queueMicrotask(() => {
+      fetchBlogs();
+    });
   }, []);
 
   const resolveTitle = (titleField: any): string => {

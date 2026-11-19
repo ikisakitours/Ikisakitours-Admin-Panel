@@ -44,7 +44,7 @@ export function AdminDeleteModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget && !loading) onClose();
       }}
@@ -82,12 +82,12 @@ export function AdminDeleteModal({
         {(itemTitle || itemSubtitle) && (
           <div className="rounded-2xl bg-slate-50/90 border border-slate-200/80 p-5 text-xs text-left space-y-2">
             {itemTitle && (
-              <p className="text-sm font-extrabold text-slate-900 leading-snug break-words">
+              <p className="text-sm font-extrabold text-slate-900 leading-snug wrap-break-word">
                 {itemTitle}
               </p>
             )}
             {itemSubtitle && (
-              <p className="text-xs font-medium text-slate-600 leading-relaxed break-words whitespace-pre-wrap">
+              <p className="text-xs font-medium text-slate-600 leading-relaxed wrap-break-word whitespace-pre-wrap">
                 {itemSubtitle}
               </p>
             )}

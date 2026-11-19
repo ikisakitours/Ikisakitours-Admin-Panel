@@ -9,15 +9,18 @@ class TourServiceAdminService {
 
   private getHeaders(): HeadersInit {
     const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
+    const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
     return {
       "Content-Type": "application/json",
       ...(adminKey ? { "x-admin-key": adminKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
   async getCustomRequests(): Promise<TourServiceRequest[]> {
     const res = await fetch(`${this.getBaseUrl()}/services/custom`, {
       headers: this.getHeaders(),
+      credentials: "include",
       cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch custom service requests");
@@ -31,6 +34,7 @@ class TourServiceAdminService {
   async getChauffeurRequests(): Promise<TourServiceRequest[]> {
     const res = await fetch(`${this.getBaseUrl()}/services/chauffeur`, {
       headers: this.getHeaders(),
+      credentials: "include",
       cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch chauffeur service requests");
@@ -44,6 +48,7 @@ class TourServiceAdminService {
   async getTransferRequests(): Promise<TourServiceRequest[]> {
     const res = await fetch(`${this.getBaseUrl()}/services/transfer`, {
       headers: this.getHeaders(),
+      credentials: "include",
       cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch transfer service requests");
@@ -74,6 +79,7 @@ class TourServiceAdminService {
     const res = await fetch(`${this.getBaseUrl()}/services/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: this.getHeaders(),
+      credentials: "include",
       body: JSON.stringify({ status }),
     });
 
@@ -89,6 +95,7 @@ class TourServiceAdminService {
     const res = await fetch(`${this.getBaseUrl()}/services/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: this.getHeaders(),
+      credentials: "include",
     });
 
     if (!res.ok) {

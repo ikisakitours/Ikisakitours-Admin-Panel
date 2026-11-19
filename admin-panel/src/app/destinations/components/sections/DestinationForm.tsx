@@ -80,30 +80,32 @@ export default function DestinationForm({
         ])
       );
 
-      setAvailableLanguages(detectedLangs);
-      setSlug(initialData.slug || "");
-      setIsCustomSlug(true);
+      queueMicrotask(() => {
+        setAvailableLanguages(detectedLangs);
+        setSlug(initialData.slug || "");
+        setIsCustomSlug(true);
 
-      setFormData({
-        title: { en: "", ja: "", ...(initialData.title || {}) },
-        summary: { en: "", ja: "", ...(initialData.summary || {}) },
-        description: { en: "", ja: "", ...(initialData.description || {}) },
-        province: { en: "", ja: "", ...(initialData.province || {}) },
-        bestTimeToVisit: { en: "", ja: "", ...(initialData.bestTimeToVisit || {}) },
-        climate: { en: "", ja: "", ...(initialData.climate || {}) },
-        primaryLanguage: { en: "", ja: "", ...(initialData.primaryLanguage || {}) },
-        localCurrency: { en: "", ja: "", ...(initialData.localCurrency || {}) },
-        lat: initialData.coordinates?.lat ?? 35.6762,
-        lng: initialData.coordinates?.lng ?? 139.6503,
-      });
-
-      if (initialData.highlights) {
-        setHighlights({
-          en: [""],
-          ja: [""],
-          ...initialData.highlights,
+        setFormData({
+          title: { en: "", ja: "", ...(initialData.title || {}) },
+          summary: { en: "", ja: "", ...(initialData.summary || {}) },
+          description: { en: "", ja: "", ...(initialData.description || {}) },
+          province: { en: "", ja: "", ...(initialData.province || {}) },
+          bestTimeToVisit: { en: "", ja: "", ...(initialData.bestTimeToVisit || {}) },
+          climate: { en: "", ja: "", ...(initialData.climate || {}) },
+          primaryLanguage: { en: "", ja: "", ...(initialData.primaryLanguage || {}) },
+          localCurrency: { en: "", ja: "", ...(initialData.localCurrency || {}) },
+          lat: initialData.coordinates?.lat ?? 35.6762,
+          lng: initialData.coordinates?.lng ?? 139.6503,
         });
-      }
+
+        if (initialData.highlights) {
+          setHighlights({
+            en: [""],
+            ja: [""],
+            ...initialData.highlights,
+          });
+        }
+      });
     }
   }, [initialData]);
 

@@ -82,7 +82,9 @@ export default function ToursPage() {
   }, []);
 
   useEffect(() => {
-    void fetchBookings();
+    queueMicrotask(() => {
+      void fetchBookings();
+    });
   }, [fetchBookings]);
 
   const new24hCount = useMemo(

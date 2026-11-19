@@ -43,11 +43,13 @@ export default function FaqForm({
         ])
       );
 
-      setAvailableLanguages(detectedLangs);
-      setFormData({
-        category: { en: '', ja: '', ...(initialData.category || {}) },
-        question: { en: '', ja: '', ...(initialData.question || {}) },
-        answer: { en: '', ja: '', ...(initialData.answer || {}) },
+      queueMicrotask(() => {
+        setAvailableLanguages(detectedLangs);
+        setFormData({
+          category: { en: '', ja: '', ...(initialData.category || {}) },
+          question: { en: '', ja: '', ...(initialData.question || {}) },
+          answer: { en: '', ja: '', ...(initialData.answer || {}) },
+        });
       });
     }
   }, [initialData]);

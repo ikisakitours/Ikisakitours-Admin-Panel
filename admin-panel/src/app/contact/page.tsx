@@ -86,7 +86,9 @@ export default function ContactPage() {
   }, []);
 
   useEffect(() => {
-    void fetchInquiries();
+    queueMicrotask(() => {
+      void fetchInquiries();
+    });
   }, [fetchInquiries]);
 
   // Extract all distinct inquiry types from live data

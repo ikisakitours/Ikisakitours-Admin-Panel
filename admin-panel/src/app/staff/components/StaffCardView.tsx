@@ -8,6 +8,8 @@ import { StaffCard } from "./StaffCard";
 interface StaffCardViewProps {
   staffList: AdminStaffUser[];
   loading: boolean;
+  currentAdminId?: string;
+  currentAdminEmail?: string;
   onRoleChange: (staff: AdminStaffUser, newRole: AdminRole) => void;
   onRequestToggleStatus: (staff: AdminStaffUser) => void;
   onRequestResetPassword: (staff: AdminStaffUser) => void;
@@ -17,6 +19,8 @@ interface StaffCardViewProps {
 export function StaffCardView({
   staffList,
   loading,
+  currentAdminId,
+  currentAdminEmail,
   onRoleChange,
   onRequestToggleStatus,
   onRequestResetPassword,
@@ -46,6 +50,8 @@ export function StaffCardView({
         <StaffCard
           key={staff.id}
           staff={staff}
+          currentAdminId={currentAdminId}
+          currentAdminEmail={currentAdminEmail}
           onRoleChange={onRoleChange}
           onRequestToggleStatus={onRequestToggleStatus}
           onRequestResetPassword={onRequestResetPassword}

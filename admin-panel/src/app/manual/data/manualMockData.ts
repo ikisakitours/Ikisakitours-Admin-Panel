@@ -146,15 +146,19 @@ export interface AiPromptTemplate {
 
 /* ── 1. HERO STATS & QUICK SEARCH CHIPS ── */
 export const MANUAL_HERO_STATS: HeroStatData[] = [
-  { label: "Admin Modules", value: "11 Groups · 21 Pages", accentClass: "text-emerald-300" },
+  { label: "Admin Modules", value: "12 Groups · 22 Pages", accentClass: "text-emerald-300" },
   { label: "Multilingual CMS", value: "EN · JA + Custom", accentClass: "text-white" },
-  { label: "JSON & AI Studio", value: "4 Templates + Prompts", accentClass: "text-amber-300" },
+  { label: "Staff & RBAC", value: "10 Roles · 2FA TOTP", accentClass: "text-amber-300" },
   { label: "Media & Guard", value: "WebP · PC ≥1024px", accentClass: "text-teal-300" },
 ];
 
 export const MANUAL_SEARCH_CHIPS: string[] = [
   "packages",
   "pricing",
+  "staff",
+  "2fa",
+  "rbac",
+  "security",
   "json",
   "ai",
   "japanese",
@@ -391,10 +395,37 @@ export const MANUAL_TOC_ITEMS: TocItemData[] = [
   {
     id: "compliance",
     number: "11",
-    title: "Legal Docs & Operations Log",
-    shortDesc: "Multilingual policies & daily team/driver notes",
-    icon: "scale",
-    keywords: ["legal", "legaldocs", "privacy", "terms", "sections", "adminlogs", "logs", "driver", "notes", "operations"],
+    title: "Staff & RBAC, Legal Docs & Logs",
+    shortDesc: "10-Role RBAC, 2FA, legal policies & daily operations log",
+    icon: "shieldCheck",
+    keywords: [
+      "staff",
+      "rbac",
+      "roles",
+      "role",
+      "2fa",
+      "totp",
+      "security",
+      "authenticator",
+      "google authenticator",
+      "fouc",
+      "restricted",
+      "access",
+      "suspended",
+      "avatar",
+      "r2",
+      "cleanup",
+      "legal",
+      "legaldocs",
+      "privacy",
+      "terms",
+      "sections",
+      "adminlogs",
+      "logs",
+      "driver",
+      "notes",
+      "operations",
+    ],
   },
   {
     id: "json-ai",
@@ -425,6 +456,7 @@ export const MANUAL_TOC_ITEMS: TocItemData[] = [
 /* ── 4. QUICK-LAUNCH MODULE DIRECTORY (ALL ROUTES) ── */
 export const QUICK_DIRECTORY_MODULES: QuickModuleCardData[] = [
   { label: "Dashboard", href: "/dashboard", desc: "Visitors, clicks & SEO charts", icon: "dashboard", colorClass: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+  { label: "Staff & RBAC", href: "/staff", desc: "10 Roles, 2FA & team permissions", icon: "shieldCheck", colorClass: "text-emerald-700 bg-emerald-50 border-emerald-200" },
   { label: "Tour Bookings", href: "/tours", desc: "One-Day & Multi-Day bookings", icon: "calendar", colorClass: "text-blue-600 bg-blue-50 border-blue-200" },
   { label: "Tour Services", href: "/tourservices", desc: "Custom, Chauffeur & Transfers", icon: "compass", colorClass: "text-indigo-600 bg-indigo-50 border-indigo-200" },
   { label: "Registered Users", href: "/users", desc: "Customer accounts & emails", icon: "users", colorClass: "text-sky-600 bg-sky-50 border-sky-200" },
@@ -807,12 +839,85 @@ export const GENERIC_GUIDE_SECTIONS: Record<
   compliance: {
     id: "compliance",
     number: "11",
-    title: "Legal Policies & Admin Operations Log",
-    subtitle: "Step-by-step instructions to create/edit multilingual legal policies and record daily team handovers.",
-    icon: "scale",
-    actionHref: "/legaldocs",
-    actionLabel: "Open Legal Docs",
+    title: "Staff & RBAC, Security, Legal Policies & Operations Log",
+    subtitle: "Step-by-step instructions to manage the 10-role staff directory, enforce 2FA TOTP security, maintain multilingual legal policies, and record team logs.",
+    icon: "shieldCheck",
+    actionHref: "/staff",
+    actionLabel: "Manage Staff & Roles",
     blocks: [
+      {
+        title: "Staff Directory & 10-Role Access Control (/staff)",
+        route: "/staff",
+        icon: "shieldCheck",
+        iconColorClass: "text-emerald-600",
+        summary: "Super Admin portal to provision internal team accounts across 10 specialized operational roles with live status toggles and security policies.",
+        badges: ["Super Admin Only", "10 Specialized Roles", "Active / Suspended", "2FA Compliance"],
+        steps: [
+          "Open /staff — view Total Staff, Super Admins, Operations & Fleet, Content & Catalog, and 2FA Compliance KPI counters.",
+          "Click '+ Add Staff Member' to open the StaffAddModal. Enter Full Name, Email, and temporary password (or click Generate Strong Password).",
+          "Review the First Sign-In Security Policy banner and select one of the 10 specialized roles filtered by category pills (Executive, Operations, Content, Support & Compliance).",
+          "To change a role anytime, click the StaffRoleDropdown on the staff row/card and pick the new role — saves live immediately.",
+          "To suspend a compromised account, toggle the status switch to Suspended — all active sessions in admin_sessions are instantly invalidated.",
+          "To reset a forgotten password, click the Key icon to open StaffResetPasswordModal and assign a new temporary key (prior sessions revoked).",
+        ],
+        bullets: [
+          "The 10 Roles: SUPER_ADMIN (Root), OPERATIONS_MANAGER (Logistics/Dispatch), PACKAGE_MANAGER (Tour Builder), DESTINATION_EXPERT (Destinations), CONTENT_EDITOR (Blogs/FAQs), BOOKING_AGENT (Reservations), TRANSPORT_COORDINATOR (Chauffeurs/Rates), CUSTOMER_SUPPORT (Inquiries), REVIEW_MODERATOR (Reviews/Feedback), LEGAL_COMPLIANCE (Policies/Logs).",
+          "Self-protection safeguards strictly prevent Super Admins from suspending or deleting their own account.",
+        ],
+      },
+      {
+        title: "Two-Factor Authentication (2FA / TOTP) Setup",
+        route: "/dashboard",
+        icon: "shieldCheck",
+        iconColorClass: "text-teal-600",
+        summary: "Enforce RFC 6238 TOTP two-factor security using Google Authenticator, Authy, or 1Password.",
+        badges: ["Google Authenticator", "RFC 6238 Standard", "6-Digit Challenge"],
+        steps: [
+          "Click your avatar/profile pill at the bottom-left of the sidebar to open Admin Profile & Security modal.",
+          "Navigate to the Two-Factor Authentication (2FA) section and click 'Activate 2FA Security'.",
+          "Scan the displayed QR code with Google Authenticator or copy the Base32 setup key into your authenticator app.",
+          "Enter the live 6-digit verification code from your phone and click 'Verify & Activate'.",
+          "On your next login, the portal prompts for your 6-digit TOTP code after password verification before issuing access tokens.",
+        ],
+        bullets: [
+          "Disabling 2FA requires confirming your current account password to prevent unauthorized tampering.",
+          "Built on Node.js native crypto for 100% serverless Vercel compatibility without ESM bundling conflicts.",
+        ],
+      },
+      {
+        title: "Zero-Trust Route Guard & Access Restrictions (AdminShell)",
+        route: "/dashboard",
+        icon: "alertTriangle",
+        iconColorClass: "text-amber-600",
+        summary: "Pre-render route authorization prevents unauthorized access and eliminates Flash of Unauthorized Content (FOUC).",
+        badges: ["Zero FOUC", "Pre-Render Guard", "Restricted Screen"],
+        steps: [
+          "When an admin logs in, their assigned role is evaluated against all target routes via isRoutePermitted.",
+          "If a staff member types an unauthorized URL (e.g. /staff or /managedestinations), AdminShell intercepts the request before rendering.",
+          "The system displays the unified AdminAccessRestricted screen showing their active role, the target module, authorized roles, and a 'Return to Permitted Dashboard' button.",
+        ],
+        bullets: [
+          "Unauthorized components are never mounted into the DOM, completely preventing data-fetching leaks and broken console errors.",
+          "Backend NestJS RolesGuard independently validates permissions on all REST endpoints with HTTP 403 Forbidden.",
+        ],
+      },
+      {
+        title: "Cloudflare R2 WebP Profile Photo Engine & Automatic Asset Cleanup",
+        route: "/dashboard",
+        icon: "images",
+        iconColorClass: "text-indigo-600",
+        summary: "Client-side WebP compression with automatic server-side deletion of old orphaned avatar images.",
+        badges: [".webp Auto-Compression", "Cache-Busted", "Auto Storage Cleanup"],
+        steps: [
+          "In Admin Profile & Security modal, select any image (JPG/PNG/WebP) for your avatar.",
+          "The client-side engine automatically compresses and converts the photo to high-efficiency .webp before upload.",
+          "A unique timestamp query parameter is attached to the avatar URL to ensure immediate browser cache busting.",
+          "When you save a new avatar, the backend automatically issues a DeleteObjectCommand to Cloudflare R2, removing the previous image so cloud storage never clutters.",
+        ],
+        bullets: [
+          "When a staff member is deleted, their avatar file is also automatically purged from Cloudflare R2.",
+        ],
+      },
       {
         title: "How to Add & Edit Legal Policy Documents (/legaldocs)",
         route: "/legaldocs",
@@ -1034,5 +1139,33 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "Before accessing /login, the primary admin user must be seeded in the backend database, and Supabase database tables must have Row Level Security enabled.",
     solution:
       "In the backend repository, run 'npm run seed:admin' (reads INITIAL_ADMIN_EMAIL & INITIAL_ADMIN_PASSWORD from .env; default admin@ikisakitours.com). In the Supabase SQL editor warning modal, always click 'Run and enable RLS' to block anon key attacks while allowing direct NestJS database connections.",
+  },
+  {
+    question: "Access Restricted screen appears when navigating to a module (/managedestinations, /staff, etc.)",
+    module: "Security & RBAC",
+    cause: "Your assigned operational role does not have administrative authorization to view or edit that module (e.g. Destination Specialist cannot access Staff or Fleet).",
+    solution:
+      "Click 'Return to Permitted Dashboard' to return to your authorized workspace. If your daily duties require access to this section, request your Super Administrator to upgrade your role via the Staff Directory (/staff).",
+  },
+  {
+    question: "Google Authenticator 2FA code is rejected or login is blocked",
+    module: "Security & 2FA",
+    cause: "Device clock drift (TOTP codes rely on strict 30-second synchronization) or entering an expired code.",
+    solution:
+      "In Google Authenticator settings, tap 'Time correction for codes' → 'Sync now' to align your mobile device clock with standard internet time. Enter the fresh 6-digit code before the circular countdown expires.",
+  },
+  {
+    question: "Staff member account suspended or 'Your staff account has been suspended' error on login",
+    module: "Security & RBAC",
+    cause: "A Super Admin toggled the account status to Suspended, which immediately invalidates all active sessions in the database.",
+    solution:
+      "A Super Administrator must navigate to /staff and toggle the status switch back to Active. If credentials were lost, the Super Admin can also click the Key icon to assign a secure temporary password.",
+  },
+  {
+    question: "How are old avatar photos cleaned up when updating profile pictures?",
+    module: "Media & Storage",
+    cause: "Frequent profile photo replacements could leave orphaned files in Cloudflare R2 bucket storage if not automatically pruned.",
+    solution:
+      "The Ikisaki profile engine handles this automatically: images are compressed client-side into .webp, and when saving a new avatar, the backend automatically issues a DeleteObjectCommand to Cloudflare R2, removing the previous image so storage never accumulates clutter.",
   },
 ];

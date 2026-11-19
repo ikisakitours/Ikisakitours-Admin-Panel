@@ -73,7 +73,9 @@ export default function ServiceNotesPage() {
   }, [notify]);
 
   useEffect(() => {
-    fetchNotes();
+    queueMicrotask(() => {
+      fetchNotes();
+    });
   }, [fetchNotes]);
 
   const handleFormSubmit = async (formData: ServiceNotePayload) => {

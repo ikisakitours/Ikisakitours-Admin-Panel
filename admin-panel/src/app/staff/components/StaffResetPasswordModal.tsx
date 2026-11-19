@@ -97,6 +97,7 @@ export function StaffResetPasswordModal({
             <input
               type="text"
               required
+              autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="e.g. Ikisaki!9xK@82Lm"

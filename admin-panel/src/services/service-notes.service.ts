@@ -17,13 +17,13 @@ class ServiceNotesService {
   }
 
   private getHeaders(): Record<string, string> {
+    const adminKey = process.env.ADMIN_KEY || process.env.NEXT_PUBLIC_ADMIN_KEY || process.env.NEXT_PUBLIC_ADMIN_API_KEY;
+    const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
+      ...(adminKey ? { "x-admin-key": adminKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
-    const adminKey = process.env.ADMIN_KEY || process.env.NEXT_PUBLIC_ADMIN_KEY;
-    if (adminKey) {
-      headers["x-admin-key"] = adminKey;
-    }
     return headers;
   }
 

@@ -60,7 +60,9 @@ export default function ManageBlogsPage() {
   }, [notify]);
 
   useEffect(() => {
-    fetchBlogs();
+    queueMicrotask(() => {
+      fetchBlogs();
+    });
   }, [fetchBlogs]);
 
   const handleBlogCreated = () => {

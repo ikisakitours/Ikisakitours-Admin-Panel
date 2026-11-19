@@ -118,7 +118,9 @@ export default function CommentsPage() {
   }, []);
 
   useEffect(() => {
-    void fetchItems();
+    queueMicrotask(() => {
+      void fetchItems();
+    });
   }, [fetchItems]);
 
   const new24hCount = useMemo(

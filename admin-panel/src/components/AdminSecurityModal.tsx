@@ -119,15 +119,12 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
   // Clear password inputs and defeat browser autofill when opening password tab
   useEffect(() => {
     if (activeTab === "password") {
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setPasswordMsg(null);
       const timer = setTimeout(() => {
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-      }, 50);
+        setPasswordMsg(null);
+      }, 0);
       return () => clearTimeout(timer);
     }
   }, [activeTab]);
@@ -148,13 +145,17 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => {
+      setMounted(true);
+    });
   }, []);
 
   // Load current admin details
   useEffect(() => {
     if (!isOpen) return;
-    setUserLoading(true);
+    queueMicrotask(() => {
+      setUserLoading(true);
+    });
     authService.getMe().then((user) => {
       if (user) {
         if (user.fullName) setFullName(user.fullName);
@@ -228,10 +229,12 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
         }
       }
 
+      const previousAvatarUrl = pendingAvatarFile ? (avatarUrl || undefined) : undefined;
       setUploadStatus("Saving administrator profile...");
       const res = await authService.updateProfile({
         fullName: fullName.trim(),
         avatarUrl: finalAvatarUrl,
+        oldAvatarUrl: previousAvatarUrl,
       });
 
       if (res.success) {
@@ -377,7 +380,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-120 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

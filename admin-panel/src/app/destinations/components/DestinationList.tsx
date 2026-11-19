@@ -27,7 +27,9 @@ export default function DestinationList({ refreshKey }: DestinationListProps) {
   };
 
   useEffect(() => {
-    fetchDestinations();
+    queueMicrotask(() => {
+      fetchDestinations();
+    });
   }, [refreshKey, selectedLang]);
 
   const handleDelete = async (id: string, title: string) => {
