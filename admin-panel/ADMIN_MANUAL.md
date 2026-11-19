@@ -297,9 +297,17 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 - **Dynamic Width Toast:** Auto-adjusts width to notification content (`min-w-[240px]` up to `max-w-md` with `break-words`).
 
 ### 13.5 Zero Trust Enterprise Admin Authentication & Edge Route Guard
-- **Edge Middleware Protection (`middleware.ts`):** Automatically blocks any unauthenticated direct URL visits and redirects to `/login?redirect=...`.
+- **Edge Route Guard Protection (`src/proxy.ts` / `middleware.ts`):** Automatically blocks any unauthenticated direct URL visits and redirects to `/login?redirect=...`.
 - **Light Luxury Login Portal (`/login`):** Fully integrated into the light luxury theme of the admin panel (`bg-slate-50`, crisp white cards, 256-bit encryption badge).
 - **Dedicated Sign Out:** Accessible anytime from the bottom of the hover sidebar.
+- **Initial Super Admin Seeding (`npm run seed:admin`):**
+  - Run in the backend repository: `npm run seed:admin` to provision the primary Super Admin.
+  - Reads `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD` from `.env`.
+  - Default development credentials: `admin@ikisakitours.com` / `IkisakiAdmin2026!`.
+- **Supabase Database Row Level Security (RLS):**
+  - In the Supabase SQL Editor migration warning, always select **`Run and enable RLS`**.
+  - Prevents public client keys (`anon`) from accessing `admin_users` or `admin_sessions`, while the NestJS server connects directly via PostgreSQL pool credentials with full privileges.
+- **Brute Force Lockout:** 5 consecutive incorrect attempts automatically locks the account for 30 minutes (HTTP 429).
 
 ---
 

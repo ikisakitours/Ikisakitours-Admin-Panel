@@ -24,6 +24,7 @@ import {
   type AdminToastState,
   type ToastVariant,
 } from "@/components/AdminToast";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import {
   getDisplayServiceReference,
   isNewServiceRequest,
@@ -173,23 +174,28 @@ export default function TourServicesPage() {
     }
   };
 
-  const handleDelete = async (service: TourServiceRequest) => {
-    const ref = getDisplayServiceReference(service);
-    if (!confirm(`Are you sure you want to delete or cancel service request ${ref} for ${service.fullName}?`)) {
-      return;
-    }
+  const [serviceToDelete, setServiceToDelete] = useState<TourServiceRequest | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const promptDeleteService = async (service: TourServiceRequest) => {
+    setServiceToDelete(service);
+  };
+
+  const confirmDeleteService = async () => {
+    if (!serviceToDelete) return;
+    const ref = getDisplayServiceReference(serviceToDelete);
     try {
-      setDeletingId(service.id);
-      await tourServiceAdmin.deleteServiceRequest(service.id);
-      setServices((prev) => prev.filter((s) => s.id !== service.id));
-      if (selectedService?.id === service.id) setSelectedService(null);
+      setDeleteLoading(true);
+      await tourServiceAdmin.deleteServiceRequest(serviceToDelete.id);
+      setServices((prev) => prev.filter((s) => s.id !== serviceToDelete.id));
+      if (selectedService?.id === serviceToDelete.id) setSelectedService(null);
       notify(`Removed service request ${ref}`, "info");
+      setServiceToDelete(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to delete service request";
       notify(msg, "error");
     } finally {
-      setDeletingId(null);
+      setDeleteLoading(false);
     }
   };
 
@@ -475,7 +481,7 @@ export default function TourServicesPage() {
             deletingId={deletingId}
             onViewDetails={(s) => setSelectedService(s)}
             onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
+            onDelete={promptDeleteService}
             onCopyReference={(ref) => notify(`Copied reference ${ref}`, "info")}
           />
         )}
@@ -499,7 +505,7 @@ export default function TourServicesPage() {
                     item={service}
                     onViewDetails={(s) => setSelectedService(s)}
                     onStatusChange={handleStatusChange}
-                    onDelete={handleDelete}
+                    onDelete={promptDeleteService}
                   />
                 ))}
               </div>
@@ -525,6 +531,18 @@ export default function TourServicesPage() {
           onNotify={notify}
         />
       )}
+
+      {/* Unified Luxury Delete Modal */}
+      <AdminDeleteModal
+        isOpen={!!serviceToDelete}
+        title="Delete Tour Service Request?"
+        description="This will permanently delete this service request from the database. This action cannot be undone."
+        itemTitle={serviceToDelete ? `${getDisplayServiceReference(serviceToDelete)} — ${serviceToDelete.fullName}` : undefined}
+        itemSubtitle={serviceToDelete ? `${serviceToDelete.category.toUpperCase()} • ${serviceToDelete.email} • ${serviceToDelete.phoneNumber || "No Phone"}` : undefined}
+        loading={deleteLoading}
+        onClose={() => setServiceToDelete(null)}
+        onConfirm={confirmDeleteService}
+      />
 
       {/* Toast */}
       <AdminToast toast={toast} onDismiss={() => setToast(null)} />

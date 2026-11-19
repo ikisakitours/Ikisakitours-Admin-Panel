@@ -497,4 +497,23 @@ Task: Implement Enterprise Admin Authentication, Session Security & RBAC Protect
 
 4. Super Admin Seeding Script:
    - Implement `npm run seed:admin` CLI command reading INITIAL_ADMIN_EMAIL and INITIAL_ADMIN_PASSWORD from .env to safely provision the initial Super Admin account.
+
+5. Self-Service Profile, Password Change & Google Authenticator (2FA) Endpoints:
+   - PATCH /api/admin/auth/profile:
+     * Guarded by AdminAuthGuard.
+     * Body: { fullName?: string, avatarUrl?: string }.
+     * Updates admin user profile and returns updated record.
+   - PATCH /api/admin/auth/change-password:
+     * Guarded by AdminAuthGuard.
+     * Body: { currentPassword: string, newPassword: string }.
+     * Verifies current password against bcrypt hash; updates with new hashed password.
+   - POST /api/admin/auth/2fa/generate:
+     * Generates TOTP secret (otplib) and QR code data URL (qrcode).
+     * Returns: { success: true, secret: string, qrCodeDataUrl: string }.
+   - POST /api/admin/auth/2fa/enable:
+     * Body: { totpCode: string }.
+     * Validates 6-digit TOTP token; sets two_factor_secret and is_two_factor_enabled = true.
+   - POST /api/admin/auth/2fa/disable:
+     * Body: { currentPassword: string }.
+     * Verifies current password; clears two_factor_secret and disables 2FA.
 ```

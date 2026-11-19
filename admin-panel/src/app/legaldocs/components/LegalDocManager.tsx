@@ -7,6 +7,8 @@ import { legalDocsService } from "@/services/legaldocs.service";
 import DocumentSidebar from "./DocumentSidebar";
 import LegalDocEditor from "./LegalDocEditor";
 import NewDocumentModal from "./NewDocumentModal";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
+import { AdminToast, type AdminToastState } from "@/components/AdminToast";
 
 export default function LegalDocManager() {
   const [documents, setDocuments] = useState<LegalDocument[]>([]);
@@ -14,6 +16,9 @@ export default function LegalDocManager() {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading]     = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+  const [docToDelete, setDocToDelete] = useState<LegalDocument | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Dynamic language management (matches PackageFormWrapper & FaqForm)
   const [locale, setLocale]                         = useState<string>("en");
@@ -98,15 +103,32 @@ export default function LegalDocManager() {
     }
   };
 
-  const deleteDocument = async (id: string) => {
-    setErrorMessage(null);
+  const promptDeleteDocument = (doc: LegalDocument) => {
+    setDocToDelete(doc);
+  };
+
+  const confirmDeleteDocument = async () => {
+    if (!docToDelete) return;
     try {
-      await legalDocsService.deleteDocument(id);
-      const remaining = documents.filter((d) => d.id !== id);
+      setDeleteLoading(true);
+      await legalDocsService.deleteDocument(docToDelete.id);
+      const remaining = documents.filter((d) => d.id !== docToDelete.id);
       setDocuments(remaining);
       setActiveId(remaining[0]?.id ?? "");
+      setToast({
+        id: Date.now(),
+        message: `Deleted legal document "${docToDelete.title?.[locale] || docToDelete.id}"`,
+        variant: "info",
+      });
+      setDocToDelete(null);
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to delete document.");
+      setToast({
+        id: Date.now(),
+        message: err.message || "Failed to delete document.",
+        variant: "error",
+      });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -206,7 +228,7 @@ export default function LegalDocManager() {
               onLocaleChange={setLocale}
               onAddLanguage={addCustomLanguage}
               onUpdate={updateDocument}
-              onDelete={() => deleteDocument(activeDoc.id)}
+              onDelete={() => promptDeleteDocument(activeDoc)}
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-28 bg-white rounded-2xl border border-slate-200 shadow-xs text-center">
@@ -229,6 +251,21 @@ export default function LegalDocManager() {
           existingIds={documents.map((d) => d.id)}
         />
       )}
+
+      {/* Unified Luxury Delete Modal */}
+      <AdminDeleteModal
+        isOpen={!!docToDelete}
+        title="Delete Legal Document?"
+        description="This will permanently delete this policy document from the CMS and legal compliance registry. This action cannot be undone."
+        itemTitle={docToDelete ? `Document ID: ${docToDelete.id}` : undefined}
+        itemSubtitle={docToDelete ? `Title: ${docToDelete.title?.[locale] || docToDelete.id} • ${docToDelete.sections?.length || 0} Sections` : undefined}
+        loading={deleteLoading}
+        onClose={() => setDocToDelete(null)}
+        onConfirm={confirmDeleteDocument}
+      />
+
+      {/* Toast Notification */}
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

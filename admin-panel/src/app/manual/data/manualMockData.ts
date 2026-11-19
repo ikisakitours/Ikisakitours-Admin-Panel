@@ -1024,8 +1024,15 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
   {
     question: "Why does typing the Admin URL directly redirect me to /login?",
     module: "Security & Access",
-    cause: "The Admin Panel enforces Zero Trust Edge Middleware (src/middleware.ts). Any unauthenticated direct URL visit is blocked immediately.",
+    cause: "The Admin Panel enforces Zero Trust Edge Route Guard (src/proxy.ts). Any unauthenticated direct URL visit is blocked immediately.",
     solution:
       "Enter your authorized staff credentials at /login to establish a secure 256-bit encrypted session. After authenticating, the system automatically redirects you back to your requested page.",
+  },
+  {
+    question: "How do I create the initial Super Admin account or resolve Supabase RLS warnings?",
+    module: "Security & Provisioning",
+    cause: "Before accessing /login, the primary admin user must be seeded in the backend database, and Supabase database tables must have Row Level Security enabled.",
+    solution:
+      "In the backend repository, run 'npm run seed:admin' (reads INITIAL_ADMIN_EMAIL & INITIAL_ADMIN_PASSWORD from .env; default admin@ikisakitours.com). In the Supabase SQL editor warning modal, always click 'Run and enable RLS' to block anon key attacks while allowing direct NestJS database connections.",
   },
 ];

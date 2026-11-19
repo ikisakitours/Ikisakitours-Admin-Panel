@@ -27,6 +27,7 @@ import {
 } from "@/services/service-notes.service";
 import ServiceNoteFormWrapper from "./ServiceNoteFormWrapper";
 import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 
 interface ServiceNoteItem extends ServiceNotePayload {
   id: string | number;
@@ -40,6 +41,8 @@ export default function ServiceNotesPage() {
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [currentFormData, setCurrentFormData] = useState<ServiceNotePayload | null>(null);
+  const [noteToDelete, setNoteToDelete] = useState<ServiceNoteItem | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Filters & Controls
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -105,22 +108,23 @@ export default function ServiceNotesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = async (item: ServiceNoteItem) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete the guideline for "${item.vehicleType}" (${item.serviceType})?`
-    );
-    if (!confirmed) return;
+  const promptDeleteNote = (item: ServiceNoteItem) => {
+    setNoteToDelete(item);
+  };
 
+  const confirmDeleteNote = async () => {
+    if (!noteToDelete) return;
     try {
-      setDeletingId(item.id);
-      await serviceNotesService.deleteServiceNote(item.id);
-      notify(`Deleted guideline for ${item.vehicleType}`, "success");
-      if (editingId === item.id) handleCancelEdit();
+      setDeleteLoading(true);
+      await serviceNotesService.deleteServiceNote(noteToDelete.id);
+      notify(`Deleted guideline for ${noteToDelete.vehicleType}`, "success");
+      if (editingId === noteToDelete.id) handleCancelEdit();
       fetchNotes();
+      setNoteToDelete(null);
     } catch (error: any) {
       notify(error.message || "Failed to delete guideline.", "error");
     } finally {
-      setDeletingId(null);
+      setDeleteLoading(false);
     }
   };
 
@@ -553,16 +557,11 @@ export default function ServiceNotesPage() {
                           </button>
                           <button
                             type="button"
-                            disabled={deletingId === item.id}
-                            onClick={() => handleDelete(item)}
+                            onClick={() => promptDeleteNote(item)}
                             title="Delete guideline"
-                            className="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-1 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                            className="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-1 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer"
                           >
-                            {deletingId === item.id ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-3 h-3" />
-                            )}
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
                       </td>
@@ -612,8 +611,8 @@ export default function ServiceNotesPage() {
                         </button>
                         <button
                           type="button"
-                          disabled={deletingId === item.id}
-                          onClick={() => handleDelete(item)}
+                          onClick={() => promptDeleteNote(item)}
+                          title="Delete guideline"
                           className="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -744,6 +743,18 @@ export default function ServiceNotesPage() {
           </div>
         </div>
       )}
+
+      {/* Unified Luxury Delete Confirmation Modal */}
+      <AdminDeleteModal
+        isOpen={!!noteToDelete}
+        title="Delete Vehicle Service Guideline?"
+        description="This will permanently delete this vehicle specification and service guideline rule. This action cannot be undone."
+        itemTitle={noteToDelete ? `${noteToDelete.vehicleType} • ${noteToDelete.serviceType}` : undefined}
+        itemSubtitle={noteToDelete ? `Capacity: ${noteToDelete.vehicleCapacity} • Luggage: ${noteToDelete.luggages} • Starting Price: $${noteToDelete.startingPrice}` : undefined}
+        loading={deleteLoading}
+        onClose={() => setNoteToDelete(null)}
+        onConfirm={confirmDeleteNote}
+      />
 
       {/* Universal Toast */}
       <AdminToast toast={toast} onDismiss={() => setToast(null)} />
