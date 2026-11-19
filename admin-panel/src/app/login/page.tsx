@@ -287,7 +287,7 @@ function LoginForm() {
                     </p>
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1 flex justify-center">
                     <input
                       type="text"
                       maxLength={6}
@@ -296,7 +296,7 @@ function LoginForm() {
                       value={totpCode}
                       onChange={(e) => setTotpCode(e.target.value.replace(/[^0-9]/g, ""))}
                       placeholder="000000"
-                      className="w-full text-center tracking-[0.4em] font-mono font-bold py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xl outline-none focus:bg-white focus:border-emerald-600 focus:ring-1 focus:ring-emerald-500/20"
+                      className="w-48 sm:w-52 text-center tracking-[0.35em] font-mono font-bold py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-lg outline-none focus:bg-white focus:border-emerald-600 focus:ring-1 focus:ring-emerald-500/20 shadow-xs transition-all"
                     />
                   </div>
 

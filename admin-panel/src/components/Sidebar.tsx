@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -125,7 +125,30 @@ export default function Sidebar() {
   const [mounted, setMounted] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [userLoading, setUserLoading] = useState(true);
+  const navRef = useRef<HTMLElement | null>(null);
   const activeItemRef = useRef<HTMLAnchorElement | null>(null);
+
+  // Smoothly scroll ONLY the sidebar's internal <nav> without affecting the parent page/window
+  const scrollToActiveItem = useCallback(() => {
+    if (!navRef.current || !activeItemRef.current) return;
+    const nav = navRef.current;
+    const item = activeItemRef.current;
+
+    const navRect = nav.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+
+    // Calculate item position relative to the scroll container
+    const currentScrollTop = nav.scrollTop;
+    const itemRelativeTop = itemRect.top - navRect.top + currentScrollTop;
+
+    // Bring it comfortably up higher (place item at ~22% from top of sidebar nav)
+    const targetScrollTop = Math.max(0, itemRelativeTop - nav.clientHeight * 0.22);
+
+    nav.scrollTo({
+      top: targetScrollTop,
+      behavior: "smooth",
+    });
+  }, []);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -158,15 +181,13 @@ export default function Sidebar() {
       });
   }, []);
 
-  // Ensure active navigation item stays centered in comfortable view upon route change or sidebar collapse/expand
+  // Ensure active navigation item stays in comfortable upper view upon route change or sidebar collapse/expand
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (activeItemRef.current) {
-        activeItemRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
-      }
+      scrollToActiveItem();
     }, 140);
     return () => clearTimeout(timer);
-  }, [pathname, isExpanded]);
+  }, [pathname, isExpanded, scrollToActiveItem]);
 
   const handleLogout = async () => {
     await authService.logout();
@@ -222,9 +243,7 @@ export default function Sidebar() {
         if (!isSecurityModalOpen) {
           setIsExpanded(true);
           setTimeout(() => {
-            if (activeItemRef.current) {
-              activeItemRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
-            }
+            scrollToActiveItem();
           }, 160);
         }
       }}
@@ -282,6 +301,7 @@ export default function Sidebar() {
 
         {/* Scrollable Navigation Area with Hidden Scrollbars */}
         <nav
+          ref={navRef}
           aria-label="Main navigation"
           className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
@@ -318,7 +338,7 @@ export default function Sidebar() {
                       onClick={() => {
                         setIsExpanded(false);
                         setTimeout(() => {
-                          activeItemRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+                          scrollToActiveItem();
                         }, 140);
                       }}
                       className={`relative flex items-center rounded-xl border text-sm transition-all duration-200 scroll-my-8 ${isExpanded

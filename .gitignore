@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+admin-panel/node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+
+# Environment variables & secrets (STRICTLY NEVER COMMIT)
+.env
+.env.*
+.env.local
+.env*.local
+admin-panel/.env*
+admin-panel/.env.local
+admin-panel/.env.*.local
+
+# Next.js build output
+.next/
+admin-panel/.next/
+out/
+admin-panel/out/
+build/
+admin-panel/build/
+
+# Testing & coverage
+coverage/
+
+# OS and system files
+.DS_Store
+Thumbs.db
+*.pem
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Vercel & TypeScript
+.vercel/
+*.tsbuildinfo
+admin-panel/next-env.d.ts

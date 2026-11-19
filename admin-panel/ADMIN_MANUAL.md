@@ -188,11 +188,19 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 ## 8. Users, Media Gallery, Reviews & Contact (`/users`, `/imageupload`, `/comments`, `/contact`)
 
 ### How to Manage Registered Users (`/users`)
-1. Open **`/users`** to view the **Total Users** counter and customer cards.
-2. **Toggle Access (`Active` ↔ `Blocked`):** Click the top-right Access badge on a user card to suspend or restore account access.
-3. **Toggle VIP (`👑`):** Click the VIP button to award or remove VIP Member status (adds a gold Crown badge to their avatar).
-4. **Toggle Verified (`✓`):** Click Verified to add or remove the blue verified checkmark.
-5. **View User UUID:** Click the **Eye icon** on any card to reveal or hide the internal User ID for support lookups.
+1. Open **`/users`** to view the **Total Customers KPI Bar** (`Active Accounts`, `VIP Members`, `Verified`, `Suspended`) and customer directory.
+2. **Branded Customer Reference ID (`IKISAKI-XXXXXX`):**
+   - Every registered customer receives a clean, human-readable branded reference code (e.g., `IKISAKI-8F42M9`) upon email or social OAuth sign-up (auto-backfilled for legacy accounts).
+   - Displayed as an amber badge next to the customer's email with a 1-click **Copy ID** action.
+   - Use this ID for phone/email support lookups, dispute resolution, and future referral programs.
+3. **Omni-Search Bar:** Search instantly across **Customer Name**, **Email Address**, **Country**, **Database UUID**, or **Branded IKISAKI Reference ID**.
+4. **Real-time Zero-Trust Access Suspension (`Active` ↔ `Blocked`):**
+   - Click the Access status toggle badge (`Active` ↔ `Blocked`) on any table row or card.
+   - When set to **Blocked** (`hasAccess: false`), the backend's `JwtAuthGuard` immediately rejects all authenticated API requests (HTTP 403 `ACCOUNT_SUSPENDED`), and the customer website locks them out with **Zero-Flash** to the dedicated dark luxury `<AccessRestricted />` screen.
+   - Suspended customers are strictly blocked from submitting bookings, creating reviews, requesting custom chauffeur tours, or navigating any page.
+5. **Toggle VIP Tier (`👑`):** Click the VIP button to award or remove VIP Member status (adds a gold Crown badge to their avatar).
+6. **Toggle Verified (`✓`):** Click Verified to add or remove the blue verified checkmark.
+7. **View Technical UUID:** Click the **Eye icon** on any card or row to reveal or hide the internal database primary key.
 
 ### Media Gallery (`/imageupload`)
 > [!IMPORTANT]
@@ -377,6 +385,60 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 - **Automatic Client-Side WebP Conversion:** Photos uploaded in the Admin Profile modal are compressed and converted to `.webp` before sending to Cloudflare R2.
 - **Cache Busting:** Avatar URLs include unique versioning timestamps so browsers update immediately upon photo changes.
 - **Backend Automatic Cleanup:** When a new avatar photo replaces an existing one, the backend automatically issues a delete command to Cloudflare R2, removing the old orphaned file and keeping cloud storage clean.
+
+### 13.11 Customer Account Suspension & Zero-Trust Defense-in-Depth
+- **Real-Time Database Verification (`JwtAuthGuard`):**
+  - Customer JWT tokens contain only `{ sub: user.id }`.
+  - On every incoming authenticated customer request, the NestJS `JwtAuthGuard` executes a real-time Drizzle ORM query against PostgreSQL (`users` table).
+  - If `hasAccess === false`, the guard immediately throws `403 Forbidden` with a standardized payload:
+    ```json
+    {
+      "statusCode": 403,
+      "error": "ACCOUNT_SUSPENDED",
+      "message": "Your account access has been restricted by administration.",
+      "user": {
+        "id": "uuid",
+        "customerReferenceId": "IKISAKI-8F42M9",
+        "email": "customer@example.com",
+        "firstname": "Pramod",
+        "lastname": "Siriwardhana",
+        "hasAccess": false
+      }
+    }
+    ```
+  - This guarantees that suspended users cannot execute actions even if they hold an unexpired JWT session token.
+- **Complete Mutation Protection:**
+  - `POST /api/comments` & `POST /api/comments/package-review`: Blocked with 403 `ACCOUNT_SUSPENDED`.
+  - `POST /api/package-bookings`: Rejected if caller or payload email belongs to a suspended customer. Public guest bookings remain 100% open.
+  - `POST /api/services/*` (Transfer, Chauffeur, Custom tours): Inquiries from suspended accounts are blocked. Public guest inquiries remain 100% open.
+- **Customer Frontend Zero-Flash Lockout (`AccessGate.tsx`):**
+  - Root layout wraps the application with `<AccessGate>`.
+  - Synchronously inspects cached `userData` in `localStorage` from Frame 0.
+  - Suspended customers cannot view any page content (even for a millisecond); they are locked onto the dark luxury `<AccessRestricted />` screen.
+  - Clicking **"SIGN OUT"** cleanly purges cookies and `localStorage`, restoring public guest browsing.
+- **Unauthenticated Guest Guard for `/profile`:**
+  - If an unauthenticated visitor navigates directly to `/profile`, they are prompted with `<AuthRequiredModal />` or redirected to sign in, while public tour/destination pages remain completely open.
+
+### 13.12 Branded Customer Reference ID System (`IKISAKI-XXXXXX`)
+- **Clean Alphanumeric Generation (`reference-id.util.ts`):**
+  - Produces high-readability 6-character codes excluding ambiguous characters (`0`, `O`, `1`, `I`), prefixed with `IKISAKI-` (e.g., `IKISAKI-8F42M9`).
+- **Generation Touchpoints:**
+  - Automatically issued upon standard email sign-up (`POST /api/auth/signup`).
+  - Automatically issued upon Social OAuth sign-in (Google, Facebook, Instagram).
+  - Automatically backfilled on the fly for legacy customer records upon sign-in or profile fetch.
+- **Support & Referral Integration:**
+  - Replaces raw database UUIDs on customer-facing screens.
+  - Pre-fills email inquiries from the `<AccessRestricted />` screen (`mailto:info@ikisakitours.com?subject=...`).
+  - Served as the foundation for future customer referral tracking and loyalty rewards.
+
+### 13.13 UI/UX Resilience: Content-Adaptive Toast Engine & Sidebar Navigation Auto-Centering
+- **Content-Adaptive Dynamic Toast Notifications (`AdminToast.tsx`):**
+  - Toast width smoothly adjusts according to the content size (`w-fit max-w-md sm:max-w-lg`) instead of imposing an artificial fixed minimum width.
+  - Maintains compact height (`py-2`), standard crisp font sizing (`text-[11px] sm:text-xs`), and responsive `break-words` text wrapping.
+- **Sidebar Isolated Smooth Navigation (`Sidebar.tsx`):**
+  - Scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll movement to the sidebar navigation container, preventing accidental main page/window scrolling.
+  - Bottom navigation items (such as Staff, Settings, and Legal Docs) are elevated into the comfortable upper viewport (positioned at ~22% from top) upon click or route transition.
+  - Hover auto-scroll (`onMouseEnter`) automatically and smoothly glides to the currently active page when expanding the sidebar.
 
 ---
 
