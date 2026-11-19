@@ -18,6 +18,8 @@ import AvailabilityHeader from "./AvailabilityHeader";
 import AvailabilityCalendar from "./AvailabilityCalendar";
 import DateConfigPanel from "./DateConfigPanel";
 import ClosedDatesList from "./ClosedDatesList";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
+import { AdminToast, type AdminToastState } from "@/components/AdminToast";
 
 // Re-export constants & types for backwards compatibility
 export { TOUR_TYPES, MONTHS, YEARS };
@@ -45,6 +47,8 @@ export default function AvailabilityManager() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+  const [dateToDelete, setDateToDelete] = useState<string | null>(null);
 
   // Discover languages present in dateDetails
   const discoverLanguages = (details: Record<string, DateConfig>) => {
@@ -164,7 +168,7 @@ export default function AvailabilityManager() {
     if (!selectedDate) return;
 
     if (selectedTourTypes.length === 0) {
-      handleRemoveRestriction(selectedDate);
+      promptRemoveRestriction(selectedDate);
       return;
     }
 
@@ -202,10 +206,16 @@ export default function AvailabilityManager() {
     setHasUnsavedChanges(true);
   };
 
-  // Remove restriction (make date available again)
-  const handleRemoveRestriction = (dateToRemove?: string) => {
+  // Prompt remove restriction (triggers AdminDeleteModal)
+  const promptRemoveRestriction = (dateToRemove?: string) => {
     const target = dateToRemove || selectedDate;
     if (!target) return;
+    setDateToDelete(target);
+  };
+
+  const confirmRemoveRestriction = () => {
+    if (!dateToDelete) return;
+    const target = dateToDelete;
 
     setClosedDates((prev) => prev.filter((d) => d !== target));
     setDateDetails((prev) => {
@@ -219,6 +229,12 @@ export default function AvailabilityManager() {
       setSelectedNotes({ en: "", ja: "" });
     }
     setHasUnsavedChanges(true);
+    setToast({
+      id: Date.now(),
+      message: `Restriction removed for date ${target}. Remember to click "Save Changes".`,
+      variant: "info",
+    });
+    setDateToDelete(null);
   };
 
   // Month navigation helpers
@@ -364,7 +380,7 @@ export default function AvailabilityManager() {
               onLocaleChange={setNoteLocale}
               onAddLanguage={addCustomLanguage}
               onApply={handleApplyRestriction}
-              onRemove={() => handleRemoveRestriction()}
+              onRemove={() => promptRemoveRestriction()}
               onClose={() => setSelectedDate(null)}
             />
 
@@ -374,11 +390,30 @@ export default function AvailabilityManager() {
               selectedDate={selectedDate}
               noteLocale={noteLocale}
               onSelectDate={setSelectedDate}
-              onRemoveDate={handleRemoveRestriction}
+              onRemoveDate={promptRemoveRestriction}
             />
           </div>
         </div>
       </div>
+
+      {/* Unified Luxury Delete Modal */}
+      <AdminDeleteModal
+        isOpen={!!dateToDelete}
+        title="Remove Date Restriction?"
+        description="This will remove the booking closure for this date and open it for customer reservations. Remember to click 'Save Changes' to push changes live."
+        itemTitle={dateToDelete ? `Closed Date: ${dateToDelete}` : undefined}
+        itemSubtitle={
+          dateToDelete && dateDetails[dateToDelete]
+            ? `Restricted Services: ${dateDetails[dateToDelete].tourTypes?.join(", ") || "All Services"}`
+            : undefined
+        }
+        confirmLabel="Remove Restriction"
+        onClose={() => setDateToDelete(null)}
+        onConfirm={confirmRemoveRestriction}
+      />
+
+      {/* Unified Admin Toast */}
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

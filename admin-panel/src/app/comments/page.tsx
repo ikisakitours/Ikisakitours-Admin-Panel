@@ -25,6 +25,7 @@ import {
   type AdminToastState,
   type ToastVariant,
 } from "@/components/AdminToast";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import {
   getDisplayCommentReference,
   isNewComment,
@@ -233,25 +234,30 @@ export default function CommentsPage() {
     }
   };
 
-  const handleDelete = async (item: FeedbackItem) => {
-    const ref = getDisplayCommentReference(item);
-    if (!confirm(`Are you sure you want to delete review ${ref} from ${item.authorName}?`)) {
-      return;
-    }
+  const [commentToDelete, setCommentToDelete] = useState<FeedbackItem | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const promptDeleteComment = async (item: FeedbackItem) => {
+    setCommentToDelete(item);
+  };
+
+  const confirmDeleteComment = async () => {
+    if (!commentToDelete) return;
+    const ref = getDisplayCommentReference(commentToDelete);
     try {
-      setDeletingId(item.id);
-      if (item.itemType === "package-review") {
-        await PackageReviewsService.remove(item.id);
+      setDeleteLoading(true);
+      if (commentToDelete.itemType === "package-review") {
+        await PackageReviewsService.remove(commentToDelete.id);
       }
-      setItems((prev) => prev.filter((i) => i.id !== item.id));
-      if (selectedItem?.id === item.id) setSelectedItem(null);
+      setItems((prev) => prev.filter((i) => i.id !== commentToDelete.id));
+      if (selectedItem?.id === commentToDelete.id) setSelectedItem(null);
       notify(`Deleted review ${ref}`, "info");
+      setCommentToDelete(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to delete review";
       notify(msg, "error");
     } finally {
-      setDeletingId(null);
+      setDeleteLoading(false);
     }
   };
 
@@ -549,7 +555,7 @@ export default function CommentsPage() {
             deletingId={deletingId}
             onViewDetails={(item) => setSelectedItem(item)}
             onToggleVisibility={handleToggleVisibility}
-            onDelete={handleDelete}
+            onDelete={promptDeleteComment}
             onCopyReference={(ref) => notify(`Copied reference ${ref}`, "info")}
           />
         )}
@@ -656,6 +662,18 @@ export default function CommentsPage() {
           onNotify={notify}
         />
       )}
+
+      {/* Unified Luxury Delete Modal */}
+      <AdminDeleteModal
+        isOpen={!!commentToDelete}
+        title="Delete Guest Review?"
+        description="This will permanently delete this review from the database. This action cannot be undone."
+        itemTitle={commentToDelete ? `${getDisplayCommentReference(commentToDelete)} — ${commentToDelete.authorName}` : undefined}
+        itemSubtitle={commentToDelete ? `${commentToDelete.itemType === "package-review" ? "Tour Package Review" : "Website Feedback"} • ${commentToDelete.rating ? `${commentToDelete.rating} Stars` : "No rating"}` : undefined}
+        loading={deleteLoading}
+        onClose={() => setCommentToDelete(null)}
+        onConfirm={confirmDeleteComment}
+      />
 
       {/* Toast */}
       <AdminToast toast={toast} onDismiss={() => setToast(null)} />

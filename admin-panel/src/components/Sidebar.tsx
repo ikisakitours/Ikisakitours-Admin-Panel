@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { authService } from "@/services/auth.service";
+import { authService, AdminUser } from "@/services/auth.service";
 import {
   LayoutDashboard,
   Users,
@@ -28,7 +29,10 @@ import {
   MessageSquarePlus,
   MapPinPlus,
   LogOut,
+  ShieldCheck,
+  Loader2,
 } from "lucide-react";
+import { AdminSecurityModal } from "@/components/AdminSecurityModal";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
 type NavGroup = { title: string; items: NavItem[] };
@@ -114,6 +118,27 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
+  const activeItemRef = useRef<HTMLAnchorElement | null>(null);
+
+  useEffect(() => {
+    setUserLoading(true);
+    authService.getMe().then((user) => {
+      if (user) setAdminUser(user);
+      setUserLoading(false);
+    }).catch(() => {
+      setUserLoading(false);
+    });
+  }, []);
+
+  // Ensure active navigation item stays in view upon route change or sidebar collapse/expand
+  useEffect(() => {
+    if (activeItemRef.current) {
+      activeItemRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [pathname, isExpanded]);
 
   const handleLogout = async () => {
     await authService.logout();
@@ -132,16 +157,25 @@ export default function Sidebar() {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  const handleOpenSecurityModal = () => {
+    setIsExpanded(false);
+    setIsSecurityModalOpen(true);
+  };
+
   return (
     <aside
       className="sticky top-0 z-50 h-screen w-22 shrink-0 select-none"
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      onMouseEnter={() => {
+        if (!isSecurityModalOpen) setIsExpanded(true);
+      }}
+      onMouseLeave={() => {
+        if (!isSecurityModalOpen) setIsExpanded(false);
+      }}
       onFocus={(e) => {
-        if (e.target.matches(":focus-visible")) setIsExpanded(true);
+        if (!isSecurityModalOpen && e.target.matches(":focus-visible")) setIsExpanded(true);
       }}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setIsExpanded(false);
+        if (!isSecurityModalOpen && !e.currentTarget.contains(e.relatedTarget as Node | null)) setIsExpanded(false);
       }}
     >
       <div
@@ -217,10 +251,16 @@ export default function Sidebar() {
                   return (
                     <Link
                       key={item.href}
+                      ref={isActive ? activeItemRef : undefined}
                       href={item.href}
                       title={!isExpanded ? item.label : undefined}
                       aria-current={isActive ? "page" : undefined}
-                      onClick={() => setIsExpanded(false)}
+                      onClick={() => {
+                        setIsExpanded(false);
+                        setTimeout(() => {
+                          activeItemRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                        }, 120);
+                      }}
                       className={`relative flex items-center rounded-xl border text-sm transition-all duration-200 ${isExpanded
                         ? "w-full px-3.5 py-2.5 justify-start gap-3"
                         : "w-11 h-11 mx-auto justify-center px-0"
@@ -254,29 +294,109 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        {/* Sign Out Action Button */}
-        <div className="relative shrink-0 px-3 py-2 border-t border-white/5">
-          <button
-            type="button"
-            onClick={handleLogout}
-            title={!isExpanded ? "Sign out of Admin Session" : undefined}
-            className={`group relative flex items-center rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 hover:border-rose-500/40 transition-all cursor-pointer text-xs font-bold ${
-              isExpanded
-                ? "w-full px-3.5 py-2.5 justify-start gap-3"
-                : "w-11 h-11 mx-auto justify-center px-0"
-            }`}
-          >
-            <LogOut className="h-4 w-4 shrink-0 text-rose-400 group-hover:scale-105 transition-transform" />
-            {isExpanded && (
-              <span className="truncate whitespace-nowrap animate-in fade-in duration-150">
-                Sign Out
-              </span>
-            )}
-          </button>
+        {/* Executive Admin Session & Security Module */}
+        <div className={`relative shrink-0 border-t border-white/5 transition-all duration-200 ${isExpanded ? "p-3" : "py-2 px-1"}`}>
+          {isExpanded ? (
+            /* Expanded Mode: Integrated Luxury Account Card (Clean, borderless, no flashing box) */
+            <div className="flex items-center justify-between px-2 py-1.5 transition-colors group animate-in fade-in duration-150">
+              {/* Profile details & click-to-open security */}
+              <button
+                type="button"
+                onClick={handleOpenSecurityModal}
+                className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer group/prof"
+                aria-label="Admin Profile & Security Settings"
+              >
+                <div className="relative shrink-0 flex items-center justify-center w-8 h-8 rounded-xl overflow-hidden bg-slate-900 border border-white/10 text-slate-950 font-black text-xs shadow-xs">
+                  {userLoading ? (
+                    <div className="flex items-center justify-center w-full h-full bg-slate-900">
+                      <Loader2 className="w-3.5 h-3.5 text-emerald-400 animate-spin" />
+                    </div>
+                  ) : adminUser?.avatarUrl ? (
+                    <Image
+                      src={adminUser.avatarUrl}
+                      alt={adminUser.fullName || "Admin Avatar"}
+                      width={32}
+                      height={32}
+                      unoptimized
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center font-black text-slate-950">
+                      IT
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-slate-200 truncate leading-tight group-hover/prof:text-emerald-300 transition-colors">
+                    {adminUser?.fullName || "Ikisaki Admin"}
+                  </p>
+                  <p className="text-[10px] font-mono text-slate-400 truncate leading-tight">
+                    {adminUser?.role === "SUPER_ADMIN" ? "Super Admin" : adminUser?.role === "OPERATIONS_MANAGER" ? "Ops Manager" : "Admin"}
+                  </p>
+                </div>
+              </button>
+
+              {/* Action Controls */}
+              <div className="flex items-center gap-1 shrink-0 pl-1.5">
+                <button
+                  type="button"
+                  onClick={handleOpenSecurityModal}
+                  aria-label="Security & 2FA Settings"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors cursor-pointer"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  aria-label="Sign Out"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Collapsed Mode: Minimalist Luxury Icons (Clean, borderless, no flashing box) */
+            <div className="flex flex-col items-center gap-2 py-0.5 animate-in fade-in duration-150">
+              <button
+                type="button"
+                onClick={handleOpenSecurityModal}
+                aria-label="Account Security & 2FA"
+                className="relative flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-emerald-300 transition-colors cursor-pointer group overflow-hidden"
+              >
+                {userLoading ? (
+                  <div className="flex items-center justify-center w-full h-full bg-slate-900/60 rounded-xl">
+                    <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+                  </div>
+                ) : adminUser?.avatarUrl ? (
+                  <Image
+                    src={adminUser.avatarUrl}
+                    alt={adminUser.fullName || "Admin Avatar"}
+                    width={40}
+                    height={40}
+                    unoptimized
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                ) : (
+                  <ShieldCheck className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label="Sign Out"
+                className="flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer group"
+              >
+                <LogOut className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Footer Branding */}
-        <div className="relative shrink-0 py-3.5 border-t border-white/5 transition-all duration-300">
+        <div className={`relative shrink-0 border-t border-white/5 transition-all duration-300 ${isExpanded ? "py-3.5" : "py-2"}`}>
           <div
             className={`group flex cursor-default items-center transition-all duration-300 ${isExpanded ? "justify-start px-5 gap-3" : "justify-center px-0"
               }`}
@@ -314,6 +434,13 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
+
+      {/* Account Security & 2FA Modal */}
+      <AdminSecurityModal
+        isOpen={isSecurityModalOpen}
+        onClose={() => setIsSecurityModalOpen(false)}
+        onProfileUpdated={(user) => setAdminUser(user)}
+      />
     </aside>
   );
 }

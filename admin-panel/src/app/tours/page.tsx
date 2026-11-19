@@ -26,6 +26,7 @@ import {
   type AdminToastState,
   type ToastVariant,
 } from "@/components/AdminToast";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import FixedTourCard from "./components/FixedTourRequestCard";
 import {
   getDisplayReference,
@@ -207,26 +208,27 @@ export default function ToursPage() {
     }
   };
 
-  const handleDeleteBooking = async (booking: PackageBooking) => {
-    const ref = getDisplayReference(booking);
-    if (
-      !confirm(
-        `Are you sure you want to delete booking ${ref} (${booking.firstname} ${booking.lastname})?`
-      )
-    ) {
-      return;
-    }
+  const [bookingToDelete, setBookingToDelete] = useState<PackageBooking | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const promptDeleteBooking = async (booking: PackageBooking) => {
+    setBookingToDelete(booking);
+  };
+
+  const confirmDeleteBooking = async () => {
+    if (!bookingToDelete) return;
+    const ref = getDisplayReference(bookingToDelete);
     try {
-      setDeletingId(booking.id);
-      await packageBookingService.deleteBooking(booking.id);
-      handleDeletedById(booking.id);
+      setDeleteLoading(true);
+      await packageBookingService.deleteBooking(bookingToDelete.id);
+      handleDeletedById(bookingToDelete.id);
       notify(`Deleted booking ${ref}`, "info");
+      setBookingToDelete(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to delete booking";
       notify(msg, "error");
     } finally {
-      setDeletingId(null);
+      setDeleteLoading(false);
     }
   };
 
@@ -538,7 +540,7 @@ export default function ToursPage() {
             deletingId={deletingId}
             onViewDetails={(b) => setSelectedBooking(b)}
             onQuickStatusChange={handleQuickStatusChange}
-            onDelete={handleDeleteBooking}
+            onDelete={promptDeleteBooking}
             onCopyReference={(ref) => notify(`Copied reference ${ref}`, "info")}
           />
         )}
@@ -561,6 +563,7 @@ export default function ToursPage() {
                   booking={booking}
                   onStatusUpdated={handleUpdated}
                   onDeleted={handleDeletedById}
+                  onDelete={promptDeleteBooking}
                   onViewDetails={(b) => setSelectedBooking(b)}
                   onNotify={notify}
                 />
@@ -582,6 +585,18 @@ export default function ToursPage() {
         onClose={() => setSelectedBooking(null)}
         onUpdated={handleUpdated}
         onNotify={notify}
+      />
+
+      {/* Unified Luxury Delete Confirmation Modal */}
+      <AdminDeleteModal
+        isOpen={!!bookingToDelete}
+        title="Delete Tour Booking?"
+        description="This will permanently delete this customer tour booking record from the operations database. This action cannot be undone."
+        itemTitle={bookingToDelete ? `${getDisplayReference(bookingToDelete)} — ${bookingToDelete.firstname} ${bookingToDelete.lastname}` : undefined}
+        itemSubtitle={bookingToDelete ? `${bookingToDelete.packageName || "Tour Package"} • ${bookingToDelete.journeyDate || "Date TBD"} • ${bookingToDelete.email}` : undefined}
+        loading={deleteLoading}
+        onClose={() => setBookingToDelete(null)}
+        onConfirm={confirmDeleteBooking}
       />
 
       {/* Toast Notification */}

@@ -49,45 +49,45 @@ export function AdminDeleteModal({
         if (e.target === e.currentTarget && !loading) onClose();
       }}
     >
-      <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-5 animate-in zoom-in-95 duration-150 relative">
+      <div className="w-full max-w-xl md:max-w-2xl bg-white rounded-3xl p-8 sm:p-9 shadow-2xl border border-slate-100 space-y-6 animate-in zoom-in-95 duration-150 relative">
         {/* Close "X" button on top-right */}
         <button
           type="button"
           disabled={loading}
           onClick={onClose}
           aria-label="Close dialog"
-          className="absolute right-4 top-4 p-1 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
+          className="absolute right-5 top-5 p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* 1. Dedicated Top Centered Warning Icon (Independent from text layout) */}
-        <div className="text-center space-y-2 pt-1">
-          <div className="mx-auto flex h-13 w-13 items-center justify-center rounded-2xl bg-rose-50 border border-rose-200/90 text-rose-600 shadow-xs">
-            <AlertTriangle className="w-6 h-6 stroke-[2.2]" />
+        <div className="text-center space-y-3 pt-1">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 border border-rose-200/90 text-rose-600 shadow-xs">
+            <AlertTriangle className="w-7 h-7 stroke-[2.2]" />
           </div>
 
           {/* 2. Text Content (Unobstructed & Clean) */}
-          <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
+          <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">
             {title}
           </h3>
           {description && (
-            <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
+            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-lg mx-auto">
               {description}
             </p>
           )}
         </div>
 
-        {/* 3. Item Preview Container */}
+        {/* 3. Item Preview Container (Full text, no truncation) */}
         {(itemTitle || itemSubtitle) && (
-          <div className="rounded-2xl bg-slate-50/90 border border-slate-200/80 p-3.5 text-xs text-left space-y-1">
+          <div className="rounded-2xl bg-slate-50/90 border border-slate-200/80 p-5 text-xs text-left space-y-2">
             {itemTitle && (
-              <p className="font-extrabold text-slate-900 line-clamp-2">
+              <p className="text-sm font-extrabold text-slate-900 leading-snug break-words">
                 {itemTitle}
               </p>
             )}
             {itemSubtitle && (
-              <p className="text-[11px] font-semibold text-slate-500">
+              <p className="text-xs font-medium text-slate-600 leading-relaxed break-words whitespace-pre-wrap">
                 {itemSubtitle}
               </p>
             )}
@@ -95,12 +95,12 @@ export function AdminDeleteModal({
         )}
 
         {/* 4. Footer Actions */}
-        <div className="flex items-center justify-end gap-2.5 pt-1">
+        <div className="flex items-center justify-end gap-3 pt-2">
           <button
             type="button"
             disabled={loading}
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+            className="px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
           >
             Cancel
           </button>
@@ -108,11 +108,11 @@ export function AdminDeleteModal({
             type="button"
             disabled={loading}
             onClick={onConfirm}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold rounded-xl transition-colors shadow-xs cursor-pointer disabled:opacity-50"
           >
             {loading ? (
               <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
                 <span>Deleting...</span>
               </>
             ) : (

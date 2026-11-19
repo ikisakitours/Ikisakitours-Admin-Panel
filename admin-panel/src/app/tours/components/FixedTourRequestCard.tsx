@@ -34,6 +34,7 @@ interface FixedTourCardProps {
   booking: PackageBooking;
   onStatusUpdated?: (updated: PackageBooking) => void;
   onDeleted?: (id: string) => void;
+  onDelete?: (booking: PackageBooking) => void;
   onViewDetails?: (booking: PackageBooking) => void;
   onNotify?: (message: string, variant: "success" | "error" | "info") => void;
 }
@@ -42,6 +43,7 @@ export default function FixedTourCard({
   booking,
   onStatusUpdated,
   onDeleted,
+  onDelete,
   onViewDetails,
   onNotify,
 }: FixedTourCardProps) {
@@ -92,6 +94,10 @@ export default function FixedTourCard({
   };
 
   const handleDelete = async () => {
+    if (onDelete) {
+      onDelete(booking);
+      return;
+    }
     if (!confirm(`Delete booking ${refCode} for ${fullName}? This cannot be undone.`)) return;
 
     try {

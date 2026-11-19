@@ -175,10 +175,8 @@ export default function LegalDocEditor({
           {/* Delete document */}
           <button
             type="button"
-            onClick={() => {
-              if (confirm(`Delete "${displayTitle}" permanently?`)) onDelete();
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded-lg text-xs font-semibold transition-all"
+            onClick={onDelete}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded-lg text-xs font-semibold transition-all cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" /> Delete
           </button>

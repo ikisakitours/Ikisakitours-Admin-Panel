@@ -38,10 +38,15 @@
   - [2. Multilingual `JSONB` CMS & Gold Title Highlighting](#2-multilingual-jsonb-cms--gold-title-highlighting)
   - [3. Strict WebP Media Pipeline & Brand Assets](#3-strict-webp-media-pipeline--brand-assets)
   - [4. Interactive In-App Operations Manual (`/manual`)](#4-interactive-in-app-operations-manual-manual)
+  - [5. Enterprise Zero-Trust Admin Authentication, RBAC & Seeding (`npm run seed:admin`)](#5-enterprise-zero-trust-admin-authentication-rbac--seeding-npm-run-seedadmin)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
+  - [1. Clone & Install](#1-clone--install)
+  - [2. Configure Environment Variables](#2-configure-environment-variables)
+  - [3. Run, Type-Check & Build](#3-run-type-check--build)
+  - [4. Backend Super Admin Seeding (`npm run seed:admin`)](#4-backend-super-admin-seeding-npm-run-seedadmin)
 - [Deployment (Vercel)](#deployment-vercel)
 - [Production Readiness Checklist](#production-readiness-checklist)
 - [Credits & License](#credits--license)
@@ -182,6 +187,30 @@ Built as a modular, data-driven documentation hub inside [`admin-panel/src/app/m
 - Direct 1-click downloads for One-Day and Multi-Day sample JSON templates
 - Interactive Pre-Publish Checklist with live progress bar + expandable Troubleshooting Accordion
 
+### 5. Enterprise Zero-Trust Admin Authentication, RBAC & Seeding (`npm run seed:admin`)
+
+The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authentication architecture designed to prevent unauthorized access, credential theft, session hijacking, and brute-force attacks:
+
+- **Next.js 16 Edge Route Guard (`src/proxy.ts` / `middleware.ts`)**: Every single administrative route (`/dashboard`, `/tours`, `/managepackages`, `/destinations`, `/blogs`, etc.) is intercepted at the Vercel edge. Unauthenticated requests are immediately halted and redirected to `/login?redirect=<target>` before any page renders.
+- **Light Luxury Login Portal (`/login`)**: Redesigned with a crisp executive light aesthetic (`bg-slate-50`, polished white cards, `emerald-600` accent buttons, and 256-bit encryption indicators) matching the Ikisaki brand.
+- **Role-Based Access Control (RBAC)**: Supports 3 strict administrative tiers:
+  - `SUPER_ADMIN`: Full root system control, user provisioning, rate/pricing approval, and audit log access.
+  - `ADMIN`: Daily operations, package creation, blog publishing, customer review moderation, and bookings management.
+  - `OPERATIONS_MANAGER`: Read/write access restricted to bookings, availability calendars, and customer service notes.
+- **Brute-Force & Lockout Defense**:
+  - Tracks consecutive failed login attempts in the database (`failed_login_attempts`, `locked_until`).
+  - On **5 consecutive incorrect attempts**, the account and IP are locked for **30 minutes** (returning `HTTP 429 Too Many Requests`).
+- **Session Security & Dual-Token Rotation**:
+  - Issues a 15-minute Access JWT and a 7-day cryptographically secure UUID Refresh Token.
+  - Stored inside an `HttpOnly`, `Secure`, `SameSite=Strict` cookie (`admin_session`) — inaccessible to browser JavaScript, completely eliminating XSS token theft.
+  - Automatic refresh token rotation: if a revoked refresh token is reused, all active sessions for that admin user are instantly invalidated.
+- **Database Audit Logs (`admin_audit_logs`)**:
+  - Automatically records timestamp, user ID, event type (`LOGIN_SUCCESS`, `LOGIN_FAILED`, `LOGOUT`), client IP address, and User-Agent for forensic review.
+- **Supabase Row Level Security (RLS) Isolation**:
+  - The tables `admin_users`, `admin_sessions`, and `admin_audit_logs` are protected with Row Level Security.
+  - Anyone attempting to access these tables via public Supabase `anon` API keys is completely blocked (`403 Forbidden` / 0 rows).
+  - Only the NestJS backend connecting via direct PostgreSQL pool credentials (`DATABASE_URL`) can read or write administrative tables.
+
 ---
 
 ## API Service Layer Reference
@@ -190,6 +219,7 @@ All backend communication lives in strongly typed modules under [`admin-panel/sr
 
 | Service File | Primary Endpoint(s) | Purpose |
 | :--- | :--- | :--- |
+| `auth.service.ts` | `/api/admin/auth/login`, `/api/admin/auth/logout`, `/api/admin/auth/me` | Zero-Trust login, session token persistence, profile check, and logout |
 | `package.service.ts` | `/addpackages` (`GET`, `POST`, `PATCH`, `DELETE`) | Create packages (`FormData` + images), fetch by slug, text-only updates |
 | `package-booking.service.ts` | `/package-bookings`, `/package-bookings/:id/status` | List fixed tour bookings, update status, delete |
 | `tourservice.service.ts` | `/services/custom`, `/services/chauffeur`, `/services/transfer` | Manage tailor-made tour, chauffeur & transfer requests |
@@ -325,6 +355,55 @@ npm run build
 npm run start
 ```
 
+### 4. Backend Super Admin Seeding (`npm run seed:admin`)
+
+To log into the Admin Panel, at least one **SUPER_ADMIN** user must exist in the database. The backend repository includes a dedicated seed CLI command to create the primary Super Admin account securely.
+
+#### A. Configure Backend `.env`
+In the **backend** repository (`ikisakitours-backend`), ensure the following environment variables are defined in your `.env` file:
+
+```env
+# Backend Admin Authentication & Security
+INITIAL_ADMIN_EMAIL=admin@ikisakitours.com
+INITIAL_ADMIN_PASSWORD=IkisakiAdmin2026!
+ADMIN_JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
+ADMIN_SESSION_COOKIE_SECRET=your_super_secret_cookie_encryption_key
+```
+
+#### B. Execute the Seeding Script
+In the backend repository, run the seed command from your terminal:
+
+```bash
+# Inside the ikisakitours-backend directory:
+npm run seed:admin
+```
+
+**What this command does:**
+1. Verifies database connectivity to PostgreSQL via Drizzle ORM.
+2. Reads `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD` from `.env`.
+3. Hashes the password using `bcrypt` (12 rounds of salt).
+4. Inserts (or updates) the record in the `admin_users` table with `role: "SUPER_ADMIN"` and `isActive: true`.
+5. Logs a clean success confirmation with the email and provisioned role.
+
+#### C. Local Development Login Credentials
+Once seeded, navigate to `http://localhost:3000/login` (or your production admin URL) and log in with:
+
+| Field | Development Value |
+| :--- | :--- |
+| **Email Address** | `admin@ikisakitours.com` *(or your custom `INITIAL_ADMIN_EMAIL`)* |
+| **Password** | `IkisakiAdmin2026!` *(or your custom `INITIAL_ADMIN_PASSWORD`)* |
+| **Provisioned Role** | `SUPER_ADMIN` |
+
+> [!TIP]
+> **Production Recommendation:** For production environments, choose a strong, high-entropy password (minimum 16 characters with mixed cases, numbers, and symbols) for `INITIAL_ADMIN_PASSWORD` before running `npm run seed:admin`.
+
+#### D. Supabase Row Level Security (RLS) Configuration
+When executing the SQL table schema migrations in Supabase SQL Editor for Section 7 (`admin_users`, `admin_sessions`, `admin_audit_logs`), Supabase displays a modal:
+> *"Potential issue detected: This query creates tables without enabling Row Level Security. Clients using anon or authenticated keys may be able to access these tables."*
+
+- **Always choose:** **`Run and enable RLS`** (the green button).
+- **Why this is critical:** Enabling RLS blocks public users with the Supabase `anon` API key from querying or modifying administrative tables via client REST endpoints. Since the NestJS backend connects directly to PostgreSQL using the database connection string (`DATABASE_URL`), it completely bypasses RLS with full administrative privileges while keeping the tables 100% shielded from public internet scraping.
+
 ---
 
 ## Deployment (Vercel)
@@ -344,7 +423,7 @@ npm run start
 - [x] Unified `pricingConfig` (Group Discount Tiers + Passenger Rules + Add-Ons) live
 - [x] Dynamic `meals[]` & `accommodation[]` itinerary arrays supported
 - [x] Modular in-app **Admin Manual Guide (`/manual`)** integrated into Sidebar
-- [x] Zero Trust Admin Authentication & Edge Middleware route guard (`middleware.ts`)
+- [x] Zero Trust Admin Authentication & Edge Route Guard (`src/proxy.ts`)
 - [x] Executive Light-Luxury Login Portal (`/login`) with 256-bit encrypted session handling
 - [x] Universal 1-Click Live Visibility Toggle across Packages, Blogs, Destinations & FAQs
 - [x] Edit-Mode Image Upload Isolation (`hideImageUpload={true}`) preventing accidental overwrites

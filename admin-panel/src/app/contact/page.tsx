@@ -24,6 +24,7 @@ import {
   type AdminToastState,
   type ToastVariant,
 } from "@/components/AdminToast";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import {
   getDisplayContactReference,
   isNewContact,
@@ -191,23 +192,28 @@ export default function ContactPage() {
     }
   };
 
-  const handleDelete = async (inquiry: ContactInquiry) => {
-    const ref = getDisplayContactReference(inquiry);
-    if (!confirm(`Are you sure you want to delete inquiry ${ref} from ${inquiry.fullName}?`)) {
-      return;
-    }
+  const [inquiryToDelete, setInquiryToDelete] = useState<ContactInquiry | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const promptDeleteInquiry = async (inquiry: ContactInquiry) => {
+    setInquiryToDelete(inquiry);
+  };
+
+  const confirmDeleteInquiry = async () => {
+    if (!inquiryToDelete) return;
+    const ref = getDisplayContactReference(inquiryToDelete);
     try {
-      setDeletingId(inquiry.id);
-      await contactService.deleteContact(inquiry.id);
-      setInquiries((prev) => prev.filter((i) => i.id !== inquiry.id));
-      if (selectedInquiry?.id === inquiry.id) setSelectedInquiry(null);
+      setDeleteLoading(true);
+      await contactService.deleteContact(inquiryToDelete.id);
+      setInquiries((prev) => prev.filter((i) => i.id !== inquiryToDelete.id));
+      if (selectedInquiry?.id === inquiryToDelete.id) setSelectedInquiry(null);
       notify(`Deleted inquiry ${ref}`, "info");
+      setInquiryToDelete(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to delete inquiry";
       notify(msg, "error");
     } finally {
-      setDeletingId(null);
+      setDeleteLoading(false);
     }
   };
 
@@ -492,7 +498,7 @@ export default function ContactPage() {
             deletingId={deletingId}
             onViewDetails={(inq) => setSelectedInquiry(inq)}
             onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
+            onDelete={promptDeleteInquiry}
             onCopyReference={(ref) => notify(`Copied reference ${ref}`, "info")}
           />
         )}
@@ -516,7 +522,7 @@ export default function ContactPage() {
                     {...inquiry}
                     onViewDetails={(inq) => setSelectedInquiry(inq)}
                     onStatusChange={handleStatusChange}
-                    onDelete={handleDelete}
+                    onDelete={promptDeleteInquiry}
                   />
                 ))}
               </div>
@@ -542,6 +548,18 @@ export default function ContactPage() {
           onNotify={notify}
         />
       )}
+
+      {/* Unified Luxury Delete Modal */}
+      <AdminDeleteModal
+        isOpen={!!inquiryToDelete}
+        title="Delete Contact Inquiry?"
+        description="This will permanently delete this customer contact inquiry from the operations database. This action cannot be undone."
+        itemTitle={inquiryToDelete ? `${getDisplayContactReference(inquiryToDelete)} — ${inquiryToDelete.fullName}` : undefined}
+        itemSubtitle={inquiryToDelete ? `${inquiryToDelete.inquiryType} • ${inquiryToDelete.email} • ${inquiryToDelete.phone || "No Phone"}` : undefined}
+        loading={deleteLoading}
+        onClose={() => setInquiryToDelete(null)}
+        onConfirm={confirmDeleteInquiry}
+      />
 
       {/* Toast */}
       <AdminToast toast={toast} onDismiss={() => setToast(null)} />
