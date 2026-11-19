@@ -80,13 +80,14 @@ flowchart LR
 
 | Group | Route(s) | Operational Capabilities |
 | :--- | :--- | :--- |
+| **Authentication & Access** | `/login` | Zero Trust executive login portal with 256-bit encrypted session handling, Edge Middleware route protection, and instant sidebar Sign Out |
 | **Overview** | `/dashboard` | Monthly KPI cards (Visitors, Feed Impressions, Total Clicks, Avg. SEO Rank) + interactive Recharts `GrowthChart` |
 | **Bookings & Operations** | `/tours`, `/tourservices` | One-Day / Multi-Day package booking statuses (`Pending`, `Confirmed`, `Completed`, `Cancelled`); tabbed service inquiries (`Custom Made Tours`, `Private Chauffeur`, `Transfers`) with status filters (`Pending`, `Approved`, `Active`, `Rejected`) |
 | **User Management** | `/users` | Customer directory with total count badge and live **VIP**, **Active Access**, and **Verified** status toggles |
-| **Tour Packages** | `/addpackage`, `/managepackages` | EN/JA/+ tour builder, 1-click JSON prefill, 18 conversion badges, Title + Gold Highlight rules, dynamic group pricing tiers, passenger rules, add-ons, dynamic meals/accommodation lists, Live Pricing Simulator, and text-only `PATCH` inline editing |
-| **Destinations** | `/destinations`, `/managedestinations`, `/managedestinations/[id]/edit` | Reusable Sri Lanka destination hubs with JSON uploader, quick facts, multilingual content, media, and route sequencing |
-| **Blog Articles** | `/blogs`, `/manageblogs`, `/manageblogs/[id]/edit` | Multilingual travel blog CMS with JSON importer, auto-slugify + custom slug override, and image uploader |
-| **FAQs & Help** | `/faqs`, `/managefaqs`, `/managefaqs/[id]/edit` | Localized English & Japanese customer support Q&A management |
+| **Tour Packages** | `/addpackage`, `/managepackages` | EN/JA/+ tour builder, 1-click JSON prefill, 18 conversion badges, Title + Gold Highlight rules, dynamic group pricing tiers, passenger rules, add-ons, dynamic meals/accommodation lists, Live Pricing Simulator, text-only `PATCH` inline editing, and 1-click Live Visibility toggle |
+| **Destinations** | `/destinations`, `/managedestinations`, `/managedestinations/[id]/edit` | Reusable Sri Lanka destination hubs with JSON uploader, quick facts, multilingual content, 1-click Live Visibility, and isolated edit mode (`hideImageUpload`) |
+| **Blog Articles** | `/blogs`, `/manageblogs`, `/manageblogs/[id]/edit` | Multilingual travel blog CMS with JSON importer, auto-slugify + custom slug override, 1-click Live Visibility toggle, and isolated edit mode (`hideImageUpload`) |
+| **FAQs & Help** | `/faqs`, `/managefaqs`, `/managefaqs/[id]/edit` | Localized English & Japanese customer support Q&A management with 1-click Live Visibility toggle |
 | **Availability & Rates** | `/newupdates`, `/servicepricing`, `/servicenotes` | Closed-date monthly calendar with tour-type closures & multilingual notes; 3-tab service pricing (`Charter`, `Custom`, `Transfer`); vehicle specs & multilingual service guidelines |
 | **Media & Engagement** | `/imageupload`, `/comments`, `/contact` | Strict `.webp` batch uploader (max 4/batch); unified Website Feedback + Package Reviews moderation (visibility toggle + direct **Admin Replies**); Contact Us inquiry inbox |
 | **Compliance & System** | `/legaldocs`, `/adminlogs` | Multilingual structured Legal Document CMS (Privacy Policy, Terms, sections & sub-items) and internal Admin Operations Log |
@@ -343,6 +344,12 @@ npm run start
 - [x] Unified `pricingConfig` (Group Discount Tiers + Passenger Rules + Add-Ons) live
 - [x] Dynamic `meals[]` & `accommodation[]` itinerary arrays supported
 - [x] Modular in-app **Admin Manual Guide (`/manual`)** integrated into Sidebar
+- [x] Zero Trust Admin Authentication & Edge Middleware route guard (`middleware.ts`)
+- [x] Executive Light-Luxury Login Portal (`/login`) with 256-bit encrypted session handling
+- [x] Universal 1-Click Live Visibility Toggle across Packages, Blogs, Destinations & FAQs
+- [x] Edit-Mode Image Upload Isolation (`hideImageUpload={true}`) preventing accidental overwrites
+- [x] Reusable Top-Centered `AdminDeleteModal` and dynamic-width `AdminToast` system
+- [x] Streamlined Overview-First layouts for Tour Services, Reviews, and Contact Inquiries
 
 ---
 

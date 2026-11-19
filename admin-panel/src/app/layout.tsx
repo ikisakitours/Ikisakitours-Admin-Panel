@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Roboto_Mono, Geist } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import { DesktopOnlyGuard } from "@/components/DesktopOnlyGuard";
+import { AdminShell } from "@/components/AdminShell";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -119,17 +120,9 @@ export default function RootLayout({
       {/* Apply the font class directly to the body so it inherits everywhere */}
       <body className={`${robotoMono.className} min-h-full bg-slate-50 text-slate-900`}>
         <DesktopOnlyGuard>
-          <div className="flex min-h-screen">
-
-            {/* Static Sidebar: locked in place, never reloads */}
-            <Sidebar />
-
-            {/* Dynamic Content Area: Only this section reloads when you change pages */}
-            <main className="flex-1 p-8">
-              {children}
-            </main>
-
-          </div>
+          <AdminShell>
+            {children}
+          </AdminShell>
         </DesktopOnlyGuard>
       </body>
     </html>

@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 import {
   LayoutDashboard,
   Users,
@@ -26,6 +27,7 @@ import {
   FilePlus2,
   MessageSquarePlus,
   MapPinPlus,
+  LogOut,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
@@ -110,7 +112,14 @@ const navGroups: NavGroup[] = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleLogout = async () => {
+    await authService.logout();
+    router.push("/login");
+    router.refresh();
+  };
 
   const activeStyles =
     "bg-emerald-500/15 text-emerald-300 font-semibold border-emerald-500/30 shadow-xs shadow-emerald-500/10";
@@ -244,6 +253,27 @@ export default function Sidebar() {
             </div>
           ))}
         </nav>
+
+        {/* Sign Out Action Button */}
+        <div className="relative shrink-0 px-3 py-2 border-t border-white/5">
+          <button
+            type="button"
+            onClick={handleLogout}
+            title={!isExpanded ? "Sign out of Admin Session" : undefined}
+            className={`group relative flex items-center rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 hover:border-rose-500/40 transition-all cursor-pointer text-xs font-bold ${
+              isExpanded
+                ? "w-full px-3.5 py-2.5 justify-start gap-3"
+                : "w-11 h-11 mx-auto justify-center px-0"
+            }`}
+          >
+            <LogOut className="h-4 w-4 shrink-0 text-rose-400 group-hover:scale-105 transition-transform" />
+            {isExpanded && (
+              <span className="truncate whitespace-nowrap animate-in fade-in duration-150">
+                Sign Out
+              </span>
+            )}
+          </button>
+        </div>
 
         {/* Footer Branding */}
         <div className="relative shrink-0 py-3.5 border-t border-white/5 transition-all duration-300">

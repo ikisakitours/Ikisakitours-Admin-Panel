@@ -59,6 +59,7 @@ export default function EditBlogPage() {
             ) : (
                 <BlogForm
                     initialData={blog}
+                    hideImageUpload={true}
                     onSuccess={() => router.push('/manageblogs')}
                 />
             )}

@@ -21,7 +21,11 @@ import {
 import { BookingsSummaryBar } from "./components/BookingsSummaryBar";
 import { BookingsTable } from "./components/BookingsTable";
 import { BookingDetailsModal } from "./components/BookingDetailsModal";
-import { BookingToast, type BookingToastState, type ToastVariant } from "./components/BookingToast";
+import {
+  AdminToast,
+  type AdminToastState,
+  type ToastVariant,
+} from "@/components/AdminToast";
 import FixedTourCard from "./components/FixedTourRequestCard";
 import {
   getDisplayReference,
@@ -56,7 +60,7 @@ export default function ToursPage() {
   const [selectedBooking, setSelectedBooking] = useState<PackageBooking | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [toast, setToast] = useState<BookingToastState | null>(null);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
 
   const notify = useCallback((message: string, variant: ToastVariant = "info") => {
     setToast({ id: Date.now(), message, variant });
@@ -581,7 +585,7 @@ export default function ToursPage() {
       />
 
       {/* Toast Notification */}
-      <BookingToast toast={toast} onDismiss={() => setToast(null)} />
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

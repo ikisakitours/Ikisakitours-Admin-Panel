@@ -54,22 +54,22 @@ export default function ServiceNoteFormWrapper({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Language Switcher Bar */}
-            <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                    <Globe className="w-4 h-4 text-indigo-500" />
-                    <span>Active Editing Language:</span>
+            <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                    <Globe className="w-4 h-4 text-emerald-600" />
+                    <span>Active Content Language:</span>
                 </div>
-                <div className="flex gap-1.5 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
                     {AVAILABLE_LOCALES.map((l) => (
                         <button
                             key={l.code}
                             type="button"
                             onClick={() => setLocale(l.code)}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                            className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all cursor-pointer ${
                                 locale === l.code
-                                    ? "bg-indigo-600 text-white shadow-sm"
+                                    ? "bg-emerald-600 text-white shadow-2xs"
                                     : "text-slate-600 hover:text-slate-900"
                             }`}
                         >

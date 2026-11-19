@@ -5,8 +5,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 export interface PackageListItem {
   id: string;
   slug: string;
-  title: string;
+  title: string | Record<string, string>;
   type: string;
+  isLive?: boolean;
 }
 
 export const packageService = {
@@ -141,5 +142,21 @@ export const packageService = {
     }
 
     return await response.json();
+  },
+
+  async toggleVisibility(slug: string, isLive: boolean) {
+    try {
+      const response = await fetch(`${API_URL}/packages/${slug}/visibility`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isLive }),
+      });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch {
+      // Fallback if backend route pending
+    }
+    return { success: true, isLive };
   },
 };

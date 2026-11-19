@@ -11,7 +11,6 @@ import {
   Compass,
   RotateCcw,
   Info,
-  CheckCircle2,
   Percent,
   Car,
 } from "lucide-react";
@@ -298,7 +297,7 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+            <label className="block text-xs font-bold text-slate-700 mb-1 items-center justify-between">
               <span>Display Discount (%)</span>
               <span className="text-[10px] text-slate-400 font-normal">Optional</span>
             </label>

@@ -11,9 +11,15 @@ interface BlogFormProps {
     initialData?: BlogPayload | null;
     onSuccess?: () => void;
     onBlogCreated?: () => void;
+    hideImageUpload?: boolean;
 }
 
-export default function BlogForm({ initialData, onSuccess, onBlogCreated }: BlogFormProps) {
+export default function BlogForm({
+    initialData,
+    onSuccess,
+    onBlogCreated,
+    hideImageUpload = false,
+}: BlogFormProps) {
     const isEditMode = Boolean(initialData?.id);
 
     const [loading, setLoading] = useState(false);
@@ -264,12 +270,14 @@ export default function BlogForm({ initialData, onSuccess, onBlogCreated }: Blog
                 availableLanguages={availableLanguages}
             />
 
-            {/* Component 3: Image Uploader */}
-            <ImageUploader
-                selectedFiles={selectedFiles}
-                onFilesSelected={handleFileSelect}
-                onRemoveFile={removeFile}
-            />
+            {/* Component 3: Image Uploader (Hidden when hideImageUpload is true) */}
+            {!hideImageUpload && (
+                <ImageUploader
+                    selectedFiles={selectedFiles}
+                    onFilesSelected={handleFileSelect}
+                    onRemoveFile={removeFile}
+                />
+            )}
         </form>
     );
 }
