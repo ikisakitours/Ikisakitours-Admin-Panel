@@ -158,11 +158,14 @@ export default function Sidebar() {
       });
   }, []);
 
-  // Ensure active navigation item stays in view upon route change or sidebar collapse/expand
+  // Ensure active navigation item stays centered in comfortable view upon route change or sidebar collapse/expand
   useEffect(() => {
-    if (activeItemRef.current) {
-      activeItemRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
+    const timer = setTimeout(() => {
+      if (activeItemRef.current) {
+        activeItemRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }, 140);
+    return () => clearTimeout(timer);
   }, [pathname, isExpanded]);
 
   const handleLogout = async () => {
@@ -216,7 +219,14 @@ export default function Sidebar() {
     <aside
       className="sticky top-0 z-50 h-screen w-22 shrink-0 select-none"
       onMouseEnter={() => {
-        if (!isSecurityModalOpen) setIsExpanded(true);
+        if (!isSecurityModalOpen) {
+          setIsExpanded(true);
+          setTimeout(() => {
+            if (activeItemRef.current) {
+              activeItemRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
+            }
+          }, 160);
+        }
       }}
       onMouseLeave={() => {
         if (!isSecurityModalOpen) setIsExpanded(false);
@@ -308,10 +318,10 @@ export default function Sidebar() {
                       onClick={() => {
                         setIsExpanded(false);
                         setTimeout(() => {
-                          activeItemRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-                        }, 120);
+                          activeItemRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+                        }, 140);
                       }}
-                      className={`relative flex items-center rounded-xl border text-sm transition-all duration-200 ${isExpanded
+                      className={`relative flex items-center rounded-xl border text-sm transition-all duration-200 scroll-my-8 ${isExpanded
                         ? "w-full px-3.5 py-2.5 justify-start gap-3"
                         : "w-11 h-11 mx-auto justify-center px-0"
                         } ${isActive ? activeStyles : inactiveStyles}`}

@@ -113,13 +113,20 @@ export default function UsersPage() {
     const q = searchQuery.toLowerCase().trim();
 
     const filtered = users.filter((u) => {
-      // 1. Search query
+      // 1. Search query (supports name, email, country, UUID, or branded IKISAKI Reference ID)
       if (q) {
         const full = `${u.firstname || ""} ${u.lastname || ""}`.toLowerCase();
         const email = (u.email || "").toLowerCase();
         const country = (u.country || "").toLowerCase();
         const id = (u.id || "").toLowerCase();
-        if (!full.includes(q) && !email.includes(q) && !country.includes(q) && !id.includes(q)) {
+        const refId = (u.referenceId || u.customerReferenceId || "").toLowerCase();
+        if (
+          !full.includes(q) &&
+          !email.includes(q) &&
+          !country.includes(q) &&
+          !id.includes(q) &&
+          !refId.includes(q)
+        ) {
           return false;
         }
       }

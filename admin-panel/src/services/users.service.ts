@@ -3,6 +3,8 @@ import { fetcher } from '@/lib/api-client';
 
 export interface User {
   id: string;
+  referenceId?: string; // Branded customer code: e.g. "IKISAKI-782419"
+  customerReferenceId?: string; // Alternative alias
   firstname: string;
   lastname: string;
   email: string;

@@ -35,35 +35,37 @@ export function AdminToast({ toast, onDismiss }: AdminToastProps) {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-120 pointer-events-none animate-in fade-in slide-in-from-bottom-3 duration-200 max-w-[calc(100vw-2.5rem)] flex justify-end">
+    <div className="fixed bottom-6 right-6 z-120 pointer-events-none animate-in fade-in slide-in-from-bottom-4 duration-300 max-w-[min(36rem,calc(100vw-2rem))] flex justify-end">
       <div
         role="status"
-        className={`pointer-events-auto inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2 shadow-xl backdrop-blur-md w-auto max-w-lg min-w-45 transition-all duration-200 ${styles[toast.variant]}`}
+        className={`pointer-events-auto flex items-start gap-3 rounded-2xl border px-4 py-3 shadow-2xl backdrop-blur-xl w-auto max-w-xl min-w-[300px] sm:min-w-[340px] transition-all duration-200 ${styles[toast.variant]}`}
       >
-        <div className="shrink-0">
+        <div className="shrink-0 mt-0.5">
           {toast.variant === "success" && (
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <CheckCircle2 className="h-4.5 w-4.5 text-emerald-400" />
           )}
           {toast.variant === "error" && (
-            <AlertTriangle className="h-4 w-4 text-rose-400" />
+            <AlertTriangle className="h-4.5 w-4.5 text-rose-400" />
           )}
           {toast.variant === "warning" && (
-            <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <AlertTriangle className="h-4.5 w-4.5 text-amber-400" />
           )}
           {toast.variant === "info" && (
-            <Info className="h-4 w-4 text-sky-400" />
+            <Info className="h-4.5 w-4.5 text-sky-400" />
           )}
         </div>
-        <p className="text-[11px] sm:text-xs font-semibold leading-tight whitespace-normal wrap-break-word text-left select-text">
-          {toast.message}
-        </p>
+        <div className="flex-1 min-w-0 py-0.5">
+          <p className="text-xs sm:text-[13px] font-medium leading-relaxed break-words text-left select-text">
+            {toast.message}
+          </p>
+        </div>
         <button
           type="button"
           onClick={onDismiss}
           aria-label="Dismiss notification"
-          className="shrink-0 rounded-md p-0.5 opacity-70 hover:opacity-100 hover:bg-white/10 transition-all cursor-pointer ml-1"
+          className="shrink-0 rounded-lg p-1 opacity-70 hover:opacity-100 hover:bg-white/10 transition-all cursor-pointer -mr-1 -mt-0.5 text-slate-300"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
       </div>
     </div>
