@@ -610,8 +610,10 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         iconColorClass: "text-indigo-600",
         summary: "Browse all published destinations and click Edit to open the dedicated edit page (/managedestinations/[id]/edit).",
         bullets: [
+          "1-Click Live Visibility: Toggle any destination between 'Live on Site' and 'Hidden / Draft' instantly.",
+          "Safe Metadata Editing: During edit mode (/managedestinations/[id]/edit), the file upload input is automatically hidden to protect existing Cloudflare R2 photos from accidental overwrites.",
           "Update localized titles, summaries, quick facts, or descriptions without breaking existing tour links.",
-          "Delete outdated or duplicate destination entries safely.",
+          "Delete outdated or duplicate destination entries safely using the standardized AdminDeleteModal.",
         ],
       },
     ],
@@ -637,10 +639,12 @@ export const GENERIC_GUIDE_SECTIONS: Record<
           "In the EN tab, enter Title (auto-generates URL Slug), Author, Category, Read Time, Summary, and full Blog body.",
           "Switch to the JA tab (or click + to add a new language) and enter the Japanese translations.",
           "Attach cover/article photos using ImageUploader and click Save to publish live.",
-          "To update or delete later, open /manageblogs and click Edit (/manageblogs/[id]/edit).",
+          "To update later, open /manageblogs and click Edit (/manageblogs/[id]/edit). Note that during edit mode, image uploading is automatically hidden because edit endpoints safely update metadata only.",
+          "Use the 1-click Live Visibility toggle in /manageblogs to stage articles in draft mode or publish them live.",
         ],
         bullets: [
           "Supports manual custom slug override if you want a shorter SEO URL.",
+          "Filter catalog by All Visibility ('Live on Site' vs 'Hidden / Drafts').",
         ],
       },
       {
@@ -1002,5 +1006,26 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "Protected admin endpoints require a valid NEXT_PUBLIC_ADMIN_API_KEY & active backend URL; serverless APIs may take 3–5s on cold start; viewports below 768px trigger DesktopOnlyGuard.",
     solution:
       "Wait 5 seconds and refresh if the backend is waking up; verify .env.local keys with your developer if 401/403 persists; always use a desktop/laptop browser (≥ 1024px).",
+  },
+  {
+    question: "Why is image file upload hidden when editing a Destination or Blog article?",
+    module: "Media & Editing",
+    cause: "The backend edit endpoints (PATCH /destinations/:id and PATCH /blogs/:id) accept JSON metadata updates only. Existing Cloudflare R2 photos are preserved safely in the database.",
+    solution:
+      "Image uploading is automatically hidden during edit mode via hideImageUpload={true} to avoid confusion. To add a new photo set, create a new entry on /destinations or /blogs.",
+  },
+  {
+    question: "How does the 1-Click Live Visibility toggle work across Packages, Blogs, Destinations & FAQs?",
+    module: "Catalog Management",
+    cause: "Admins need instant control to hide seasonal packages, draft articles, or unready items without deleting their data.",
+    solution:
+      "Click the 'Live' / 'Hidden' pill button in any catalog table or card. When set to 'Hidden', the public website strictly filters the item out (WHERE isLive = true), while it remains fully editable in the Admin Panel.",
+  },
+  {
+    question: "Why does typing the Admin URL directly redirect me to /login?",
+    module: "Security & Access",
+    cause: "The Admin Panel enforces Zero Trust Edge Middleware (src/middleware.ts). Any unauthenticated direct URL visit is blocked immediately.",
+    solution:
+      "Enter your authorized staff credentials at /login to establish a secure 256-bit encrypted session. After authenticating, the system automatically redirects you back to your requested page.",
   },
 ];

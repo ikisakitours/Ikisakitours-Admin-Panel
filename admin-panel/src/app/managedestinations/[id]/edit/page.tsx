@@ -59,6 +59,7 @@ export default function EditDestinationPage() {
       ) : (
         <DestinationForm
           initialData={destination}
+          hideImageUpload={true}
           onSuccess={() => router.push('/managedestinations')}
         />
       )}

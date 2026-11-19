@@ -272,4 +272,35 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 
 ---
 
+## 13. November 19, 2026 Operational Upgrades (from 07:45 AM onwards)
+
+### 13.1 Universal 1-Click Live Visibility Toggle
+- **Modules Covered:** Tour Packages (`/managepackages`), Blog Articles (`/manageblogs`), Destinations (`/managedestinations`), and FAQs (`/managefaqs`).
+- **Functionality:** 
+  - Allows operations staff to instantly toggle any item between **Live on Site** (Emerald badge) and **Hidden / Draft** (Slate badge) with a single click.
+  - Public website queries automatically filter `WHERE isLive = true`, preventing unfinished drafts or seasonal tours from appearing to guests or search engines.
+  - Each module features an **All Visibility** dropdown filter (`All Visibility`, `Live on Site`, `Hidden / Drafts`) to inspect active vs staged inventory.
+
+### 13.2 Edit-Mode Image Upload Isolation
+- **Modules Covered:** Edit Destination (`/managedestinations/[id]/edit`) and Edit Blog (`/manageblogs/[id]/edit`).
+- **Behavior:** The file upload input is now automatically hidden during edit mode via `hideImageUpload={true}`.
+- **Why:** The backend update endpoints (`PATCH /destinations/:id` and `PATCH /blogs/:id`) process JSON metadata updates only. Hiding the file picker prevents accidental re-upload attempts and guarantees existing Cloudflare R2 photos remain uncorrupted.
+
+### 13.3 Clean Overview-First Data Tables & Compact Search
+- **Standardized Search Bar:** Compact width across all management modules (`w-full sm:w-64 lg:w-72 shrink-0`) aligned with the Reviews page design.
+- **Tour Services (`/tourservices`):** Route & schedule details are concise; Airport/Intercity transfers display *"Awaiting Quote (Distance Based)"* instead of $0; Service Notes vehicle dropdowns right-aligned.
+- **Reviews & Feedback (`/comments`):** Distinct handling for Website Feedback vs Tour Package reviews; official industry-standard staff reply presets.
+- **Contact Inquiries (`/contact`):** Truncated messages prevent horizontal layout blowout; Inquiry Type column pulled cleanly to the left.
+
+### 13.4 Unified Luxury Delete Modal (`AdminDeleteModal`) & Dynamic Toasts (`AdminToast`)
+- **Centered Top Warning Icon:** Reusable delete modal with item preview card and loading spinner, preventing layout distortion.
+- **Dynamic Width Toast:** Auto-adjusts width to notification content (`min-w-[240px]` up to `max-w-md` with `break-words`).
+
+### 13.5 Zero Trust Enterprise Admin Authentication & Edge Route Guard
+- **Edge Middleware Protection (`middleware.ts`):** Automatically blocks any unauthenticated direct URL visits and redirects to `/login?redirect=...`.
+- **Light Luxury Login Portal (`/login`):** Fully integrated into the light luxury theme of the admin panel (`bg-slate-50`, crisp white cards, 256-bit encryption badge).
+- **Dedicated Sign Out:** Accessible anytime from the bottom of the hover sidebar.
+
+---
+
 *Maintained by **Aetheria Labs** for **Ikisaki Tours** (`www.ikisakitours.com`).*

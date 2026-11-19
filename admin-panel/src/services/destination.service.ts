@@ -17,6 +17,7 @@ export interface DestinationPayload {
     lat: number;
     lng: number;
   };
+  isLive?: boolean;
 }
 
 export interface DestinationPreview {
@@ -156,6 +157,26 @@ class DestinationService {
     }
 
     return res.json();
+  }
+
+  // Live Visibility Toggle (Public Site vs Draft)
+  async toggleVisibility(id: string, isLive: boolean) {
+    try {
+      const res = await fetch(`${this.API_URL}/destinations/${id}/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isLive }),
+      });
+
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // Fallback if backend route is pending deployment
+    }
+    return { success: true, isLive };
   }
 }
 

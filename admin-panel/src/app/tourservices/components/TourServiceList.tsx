@@ -21,7 +21,7 @@ export default function TourServiceList({ activeTab, refreshKey, selectedStatus 
     const fetchData = async (tab: string) => {
         setLoading(true);
         try {
-            let data = [];
+            let data: any[] = [];
             if (tab === "custom") data = await tourServiceAdmin.getCustomRequests();
             if (tab === "chauffeur") data = await tourServiceAdmin.getChauffeurRequests();
             if (tab === "transfer") data = await tourServiceAdmin.getTransferRequests();

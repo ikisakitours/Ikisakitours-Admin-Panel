@@ -1,146 +1,146 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Compass,
+  Eye,
+  Mail,
+  MessageSquare,
+  Phone,
+  Trash2,
+} from "lucide-react";
+import type { ContactInquiry } from "../types/contact.types";
+import {
+  CONTACT_STATUS_CONFIG,
+  formatContactRelativeTime,
+  getDisplayContactReference,
+} from "../utils/contactFormatters";
 
-export interface ContactInquiryProps {
-  id: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  inquiryType: string;
-  subject: string;
-  message: string;
-  createdAt: string;
-  status: "pending" | "contacted" | "completed";
-  tourInterest?: string;
-  onDelete?: (id: string) => void;
-}
+export type ContactInquiryProps = ContactInquiry & {
+  onViewDetails?: (inquiry: ContactInquiry) => void;
+  onStatusChange?: (inquiryId: string, newStatus: string) => Promise<void>;
+  onDelete?: (inquiry: ContactInquiry) => Promise<void>;
+};
 
-export default function ContactInquiryCard({
-  id,
-  fullName,
-  email,
-  phone,
-  inquiryType,
-  subject,
-  message,
-  createdAt,
-  status: initialStatus,
-  tourInterest,
-  onDelete,
-}: ContactInquiryProps) {
-  const [status, setStatus] = useState(initialStatus);
+export default function ContactInquiryCard(props: ContactInquiryProps) {
+  const {
+    id,
+    fullName,
+    email,
+    phone,
+    inquiryType,
+    subject,
+    message,
+    tourInterest,
+    createdAt,
+    status: currentStatus,
+    onViewDetails,
+    onStatusChange,
+    onDelete,
+  } = props;
+
+  const [loading, setLoading] = useState(false);
+  const refCode = getDisplayContactReference(props);
+  const statusKey = (currentStatus || "pending").toLowerCase();
+  const statusCfg = CONTACT_STATUS_CONFIG[statusKey] || CONTACT_STATUS_CONFIG.pending;
+
+  const handleStatusUpdate = async (newStatus: string) => {
+    if (!onStatusChange) return;
+    try {
+      setLoading(true);
+      await onStatusChange(id, newStatus);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-3xl shadow-sm hover:shadow-md transition-all p-6 mb-4">
-      {/* Header: Dynamic Inquiry Type Badge, Date, and Admin Status Dropdown */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-4">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Dynamically display whatever string is stored in the database */}
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 flex items-center gap-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-            {inquiryType || "General Inquiry"}
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+      <div className="space-y-3.5">
+        {/* Top Meta Bar */}
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-[11px] font-extrabold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
+              {refCode}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold border bg-indigo-50 text-indigo-700 border-indigo-200">
+              <MessageSquare className="w-3 h-3" />
+              <span>{inquiryType || "General Inquiry"}</span>
+            </span>
+          </div>
+
+          <span className="text-[10px] font-semibold text-slate-400">
+            {formatContactRelativeTime(createdAt)}
           </span>
-          <span className="text-xs text-slate-400 font-mono font-medium">{createdAt}</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as any)}
-            className={`text-xs font-bold px-3 py-1.5 rounded-xl border focus:outline-none transition-colors cursor-pointer font-mono ${
-              status === "completed"
-                ? "bg-emerald-500 text-white border-emerald-500"
-                : status === "contacted"
-                ? "bg-slate-800 text-white border-slate-800"
-                : "bg-slate-100 text-slate-600 border-slate-200"
-            }`}
-          >
-            <option value="pending" className="bg-white text-slate-800">Pending Review</option>
-            <option value="contacted" className="bg-white text-slate-800">Contacted / Responded</option>
-            <option value="completed" className="bg-white text-slate-800">Resolved / Closed</option>
-          </select>
+        {/* Sender Info */}
+        <div>
+          <h3 className="text-sm font-extrabold text-slate-900 truncate">
+            {subject || "Inquiry Message"}
+          </h3>
+          <p className="text-xs font-bold text-slate-700 mt-1">{fullName}</p>
+          <div className="flex flex-col gap-0.5 text-[11px] text-slate-500 mt-1">
+            <span className="flex items-center gap-1.5 truncate">
+              <Mail className="w-3 h-3 text-slate-400 shrink-0" /> {email}
+            </span>
+            {phone && (
+              <span className="flex items-center gap-1.5">
+                <Phone className="w-3 h-3 text-slate-400 shrink-0" /> {phone}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Message Snippet */}
+        <div className="rounded-xl bg-slate-50/80 border border-slate-100 p-3 text-xs text-slate-700 italic line-clamp-3">
+          &quot;{message}&quot;
+        </div>
+
+        {tourInterest && (
+          <div className="flex items-center gap-1 text-[11px] text-purple-700 font-semibold truncate">
+            <Compass className="w-3 h-3 text-purple-500 shrink-0" />
+            <span className="truncate">Interest: {tourInterest}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Footer Controls */}
+      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+        <select
+          value={statusKey}
+          disabled={loading}
+          onChange={(e) => handleStatusUpdate(e.target.value)}
+          className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold outline-none cursor-pointer transition-colors ${statusCfg.pillClass}`}
+        >
+          <option value="pending" className="bg-white text-slate-800">Pending Review</option>
+          <option value="contacted" className="bg-white text-slate-800">Contacted</option>
+          <option value="completed" className="bg-white text-slate-800">Resolved</option>
+        </select>
+
+        <div className="flex items-center gap-1.5">
+          {onViewDetails && (
+            <button
+              type="button"
+              onClick={() => onViewDetails(props)}
+              className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
+            >
+              <Eye className="w-3 h-3" />
+              <span>View</span>
+            </button>
+          )}
 
           {onDelete && (
             <button
-              onClick={() => onDelete(id)}
-              className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-mono font-medium transition duration-200"
-              title="Delete Inquiry"
+              type="button"
+              onClick={() => onDelete(props)}
+              title="Delete inquiry"
+              className="p-1 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer"
             >
-              Delete
+              <Trash2 className="w-3 h-3" />
             </button>
           )}
         </div>
-      </div>
-
-      {/* Body: Contact Details + Message Block */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-        {/* Column 1: Sender Contact Details */}
-        <div className="space-y-3 md:col-span-1 border-r border-slate-100 pr-2">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">Full Name</span>
-            <h3 className="text-base font-bold text-slate-900 font-mono">{fullName}</h3>
-          </div>
-
-          <div className="flex flex-col gap-1.5 text-xs text-slate-600 font-mono">
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <span className="truncate">{email}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <span>{phone}</span>
-            </div>
-          </div>
-
-          {tourInterest && (
-            <div className="pt-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono block mb-1">Tour Interest</span>
-              <span className="inline-block bg-indigo-50 text-indigo-600 text-xs px-2.5 py-1 rounded-lg font-mono font-medium">
-                {tourInterest}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Column 2 & 3: Subject & Message Body */}
-        <div className="md:col-span-2 bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1 font-mono">
-              Subject: <span className="text-slate-900 font-semibold">{subject}</span>
-            </span>
-            <p className="text-xs text-slate-700 leading-relaxed mt-2 bg-white border border-slate-200/70 p-3 rounded-xl whitespace-pre-wrap font-mono">
-              {message}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer: Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-        <a
-          href={`mailto:${email}?subject=RE: ${subject}`}
-          className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-mono font-bold rounded-xl transition-colors shadow-sm"
-        >
-          <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-          Reply Email
-        </a>
-
-        <a
-          href={`tel:${phone}`}
-          className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-mono font-bold rounded-xl shadow-sm transition-colors"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-          Call Sender
-        </a>
       </div>
     </div>
   );

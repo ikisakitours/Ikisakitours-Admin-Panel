@@ -13,9 +13,15 @@ interface DestinationFormProps {
   initialData?: DestinationPayload | null;
   onSuccess?: () => void;
   onDestinationCreated?: () => void;
+  hideImageUpload?: boolean;
 }
 
-export default function DestinationForm({ initialData, onSuccess, onDestinationCreated }: DestinationFormProps) {
+export default function DestinationForm({
+  initialData,
+  onSuccess,
+  onDestinationCreated,
+  hideImageUpload = false,
+}: DestinationFormProps) {
   const isEditMode = Boolean(initialData?.id);
 
   const [loading, setLoading] = useState(false);
@@ -386,16 +392,18 @@ export default function DestinationForm({ initialData, onSuccess, onDestinationC
         onRemoveHighlight={handleRemoveHighlight}
       />
 
-      {/* Media Files */}
-      <DestinationMedia
-        selectedFiles={selectedFiles}
-        onFileSelect={(e) => {
-          if (e.target.files) {
-            setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)].slice(0, 6));
-          }
-        }}
-        onRemoveFile={(idx) => setSelectedFiles((prev) => prev.filter((_, i) => i !== idx))}
-      />
+      {/* Media Files (Hidden when hideImageUpload prop is true) */}
+      {!hideImageUpload && (
+        <DestinationMedia
+          selectedFiles={selectedFiles}
+          onFileSelect={(e) => {
+            if (e.target.files) {
+              setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)].slice(0, 6));
+            }
+          }}
+          onRemoveFile={(idx) => setSelectedFiles((prev) => prev.filter((_, i) => i !== idx))}
+        />
+      )}
 
       {/* Quick Facts */}
       <DestinationQuickFacts

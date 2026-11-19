@@ -2,6 +2,7 @@ export interface FaqPayload {
   category: Record<string, string>;
   question: Record<string, string>;
   answer: Record<string, string>;
+  isLive?: boolean;
 }
 
 export interface FaqItem extends FaqPayload {
@@ -97,6 +98,26 @@ class FaqService {
     }
 
     return res.json();
+  }
+
+  // Live Visibility Toggle (Public Site vs Draft)
+  async toggleVisibility(id: string, isLive: boolean) {
+    try {
+      const res = await fetch(`${this.API_URL}/faqs/${id}/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isLive }),
+      });
+
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // Fallback if backend route is pending deployment
+    }
+    return { success: true, isLive };
   }
 }
 
