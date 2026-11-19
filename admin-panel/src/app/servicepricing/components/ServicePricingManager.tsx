@@ -86,7 +86,9 @@ export default function CharterPricingManager() {
   };
 
   useEffect(() => {
-    loadPricingData();
+    queueMicrotask(() => {
+      loadPricingData();
+    });
   }, []);
 
   const addCustomLanguage = () => {

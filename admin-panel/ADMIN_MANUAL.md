@@ -309,6 +309,75 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Prevents public client keys (`anon`) from accessing `admin_users` or `admin_sessions`, while the NestJS server connects directly via PostgreSQL pool credentials with full privileges.
 - **Brute Force Lockout:** 5 consecutive incorrect attempts automatically locks the account for 30 minutes (HTTP 429).
 
+### 13.6 Enterprise Two-Factor Authentication (2FA / TOTP) Engine
+- **RFC 6238 Standard:** TOTP engine implemented using Node.js built-in `crypto` for 100% serverless Vercel compatibility without ESM bundling conflicts.
+- **Activation Flow (Google Authenticator / Authy):**
+  1. Any staff member opens the **Admin Profile & Security Modal** (click avatar at bottom-left of sidebar).
+  2. In the **Two-Factor Authentication (2FA)** section, click **Activate 2FA Security**.
+  3. The system calls `POST /api/admin/auth/2fa/generate` to generate a Base32 Secret and an `otpauth://` QR Code Data URL.
+  4. Scan the QR code using Google Authenticator on your mobile device.
+  5. Enter the live 6-digit verification code and click **Verify & Activate** (`POST /api/admin/auth/2fa/enable`).
+  6. The database stores the secret, enables `is_two_factor_enabled = true`, and logs `2FA_ENABLED` in `admin_audit_logs`.
+- **Enforced Login Challenge (`POST /api/admin/auth/login`):**
+  - **Step 1:** Staff member enters Email and Password.
+  - **Step 2:** If `is_two_factor_enabled === true`, the server does **not** issue a JWT token. It responds with HTTP 200 `{ requiresTwoFactor: true }`.
+  - **Step 3:** The frontend switches to the 2FA Challenge screen, prompting for the 6-digit Authenticator code.
+  - **Step 4:** Code is verified via `totp.util.ts`. If valid, JWT access & refresh tokens are issued, `last_login_at` and `last_login_ip` are updated, and `LOGIN_SUCCESS` is logged. If invalid, returns HTTP 401.
+- **Deactivation:** Disabling 2FA (`POST /api/admin/auth/2fa/disable`) requires re-entering the staff member's current account password.
+
+### 13.7 10-Role Staff Management & Access Control Engine (RBAC - `/staff`)
+- **Restricted Access:** Only `SUPER_ADMIN` can view and manage the Staff & Access Control module (`/staff`).
+- **The 10 Specialized Roles:**
+  1. `SUPER_ADMIN` (Executive Root / Owner — Unrestricted access across all modules).
+  2. `OPERATIONS_MANAGER` (Tour Operations Director — Oversees bookings, dispatch, chauffeurs, and customer records).
+  3. `PACKAGE_MANAGER` (Tour Package Lead — Authors tour packages, itineraries, pricing tiers, and media).
+  4. `DESTINATION_EXPERT` (Destination Specialist — Curates Sri Lanka destinations and regional guides).
+  5. `CONTENT_EDITOR` (Multilingual Content Editor — Publishes SEO travel blogs, cultural articles, and FAQs).
+  6. `BOOKING_AGENT` (Tour Booking Specialist — Confirms reservations, calendars, and guest counts).
+  7. `TRANSPORT_COORDINATOR` (Transport & Fleet Manager — Manages private chauffeurs, vehicle specs, and transfer rates).
+  8. `CUSTOMER_SUPPORT` (Customer Support Executive — Handles web contact inquiries, FAQs, and guest messages).
+  9. `REVIEW_MODERATOR` (Guest Reviews Moderator — Moderates traveler reviews and drafts official replies).
+  10. `LEGAL_COMPLIANCE` (Legal & Compliance Officer — Maintains terms, privacy policies, and security audit logs).
+- **Onboarding Modal (`StaffAddModal`):**
+  - Balanced 2-column grid: Staff Full Name (Col 1), Email Address (Col 2), Temporary Initial Password (Col 1).
+  - Auto-Generate Strong Password button produces high-entropy credentials (`Ikisaki!...`).
+  - Dedicated full-width **First Sign-In Security Policy** banner informing staff of mandatory password change and 2FA setup upon initial sign-in.
+  - Category filter pills (`ALL`, `Executive`, `Operations`, `Content`, `Support & Compliance`) with live counts.
+  - Sleek 2-column role cards with custom icons, badge colors, and clear operational descriptions.
+- **Unified Staff Role Selector (`StaffRoleDropdown`):**
+  - Custom dropdown button hugging role text and chevron without ugly browser `<select>` width blowouts.
+  - Floating popover with role icons, category tags, and active checkmarks.
+- **Dual Display Modes:** Toggle seamlessly between dense **Table View** and responsive **Cards View**.
+
+### 13.8 Staff Account Lifecycle & Security Guards
+- **Account Suspension & Invalidation:**
+  - Toggling staff status to `Suspended` (`PATCH /api/admin/staff/:id/status`) immediately revokes all active sessions for that user in `admin_sessions`.
+  - Suspended staff accounts are blocked at login with HTTP 403: *"Your staff account has been suspended. Please contact your Super Administrator."*
+- **Self-Suspension & Self-Deletion Safeguards:**
+  - The system strictly prevents Super Admins from suspending or deleting their own account, preventing accidental lockouts.
+- **Temporary Password Reset (`StaffResetPasswordModal`):**
+  - Super Admin can reset any staff member's temporary password in 1 click with auto-generated secure credentials.
+  - Resets automatically invalidate existing sessions, forcing the staff member to sign in fresh.
+- **Unified Confirmation Modals & Dynamic Alerts:**
+  - All status toggles and deletions are protected by `AdminDeleteModal` with loading states.
+  - All feedback notifications are rendered exclusively through `AdminToast`.
+
+### 13.9 Dual-Lock Route Guard & Zero-Flash Protection (`AdminShell` + `AdminAccessRestricted`)
+- **Global Route Interceptor (`AdminShell.tsx`):**
+  - Evaluates `isRoutePermitted(pathname, user.role)` before rendering `{children}`.
+  - Eliminates the Flash of Unauthorized Content (FOUC): Unauthorized page components are never mounted into the DOM, and their data-fetching API requests are never dispatched.
+- **Unified Access Restricted Screen (`AdminAccessRestricted.tsx`):**
+  - Styled to match the Ikisaki Tours executive light luxury design system.
+  - Displays the active staff role, target module name, authorized roles chip matrix, and a 1-click **Return to Dashboard** action.
+- **Backend Route Protection (`RolesGuard`):**
+  - NestJS Controllers enforce `@UseGuards(AdminAuthGuard, RolesGuard)` and `@Roles(...)`.
+  - Even if a client bypasses the frontend, the backend returns HTTP 403 Forbidden, keeping the PostgreSQL database 100% secure.
+
+### 13.10 Cloudflare R2 WebP Profile Photo Engine & Automatic Asset Cleanup
+- **Automatic Client-Side WebP Conversion:** Photos uploaded in the Admin Profile modal are compressed and converted to `.webp` before sending to Cloudflare R2.
+- **Cache Busting:** Avatar URLs include unique versioning timestamps so browsers update immediately upon photo changes.
+- **Backend Automatic Cleanup:** When a new avatar photo replaces an existing one, the backend automatically issues a delete command to Cloudflare R2, removing the old orphaned file and keeping cloud storage clean.
+
 ---
 
 *Maintained by **Aetheria Labs** for **Ikisaki Tours** (`www.ikisakitours.com`).*

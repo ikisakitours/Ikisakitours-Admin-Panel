@@ -31,7 +31,6 @@ export default function BlogList({ refreshKey }: BlogListProps) {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      // Pass the selected language to the service method
       const data = await blogService.getPreviews(selectedLang);
       setBlogs(data);
     } catch (err: any) {
@@ -42,8 +41,10 @@ export default function BlogList({ refreshKey }: BlogListProps) {
   };
 
   useEffect(() => {
-    fetchBlogs();
-  }, [refreshKey, selectedLang]); // Re-fetch whenever refreshKey or selected language changes
+    queueMicrotask(() => {
+      fetchBlogs();
+    });
+  }, [refreshKey, selectedLang]);
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;

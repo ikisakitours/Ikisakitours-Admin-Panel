@@ -3,6 +3,9 @@
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { authService, type AdminUser } from "@/services/auth.service";
+import { getRoleMeta } from "@/app/staff/data/staffRoles";
 import {
   Users as UsersIcon,
   Search,
@@ -12,6 +15,7 @@ import {
   X,
   AlertTriangle,
   ArrowUpDown,
+  ShieldAlert,
 } from "lucide-react";
 import { UsersService, type User } from "@/services/users.service";
 import UserCard from "./components/UserCard";
@@ -23,6 +27,22 @@ type StatusFilter = "all" | "active" | "blocked" | "vip" | "verified";
 type SortOption = "newest" | "oldest" | "name";
 
 export default function UsersPage() {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("admin_user");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  });
+  const [authChecking, setAuthChecking] = useState(true);
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +78,23 @@ export default function UsersPage() {
   }, [notify]);
 
   useEffect(() => {
-    fetchUsers();
+    authService
+      .getMe()
+      .then((user) => {
+        if (user) {
+          setCurrentUser(user);
+        }
+        setAuthChecking(false);
+      })
+      .catch(() => {
+        setAuthChecking(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      fetchUsers();
+    });
   }, [fetchUsers]);
 
   // Extract distinct countries
@@ -188,6 +224,34 @@ export default function UsersPage() {
     setCountryFilter("all");
     setSortBy("newest");
   };
+
+  const isAllowed = currentUser?.role === "SUPER_ADMIN" || currentUser?.role === "OPERATIONS_MANAGER";
+
+  if (!authChecking && currentUser && !isAllowed) {
+    const roleMeta = getRoleMeta(currentUser.role);
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center p-6">
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 max-w-md w-full text-center space-y-4 shadow-xl">
+          <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
+            <ShieldAlert className="w-7 h-7" />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-lg font-black text-slate-900 tracking-tight">Access Restricted</h2>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Your assigned operational role is <span className="font-bold text-slate-800">{roleMeta.title}</span>. Access to registered guest customer records is restricted to Super Administrators and Operations Directors.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard")}
+            className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
+          >
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50/50 py-6 px-4 sm:px-6">

@@ -35,6 +35,16 @@ export interface DestinationPreview {
 class DestinationService {
   private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
+  private getHeaders(isJson: boolean = true): Record<string, string> {
+    const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
+    const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
+    return {
+      ...(isJson ? { "Content-Type": "application/json" } : {}),
+      ...(adminKey ? { "x-admin-key": adminKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  }
+
   // Step 1: Upload raw image files to Cloudflare R2 batch endpoint
   async uploadImages(files: File[], folder: string = "destinations"): Promise<string[]> {
     const formData = new FormData();
@@ -43,6 +53,8 @@ class DestinationService {
 
     const res = await fetch(`${this.API_URL}/uploads/batch`, {
       method: "POST",
+      headers: this.getHeaders(false),
+      credentials: "include",
       body: formData,
     });
 
@@ -58,14 +70,13 @@ class DestinationService {
   async createDestination(payload: DestinationPayload) {
     const res = await fetch(`${this.API_URL}/destinations`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(true),
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      const error = await res.json();
+      const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to create destination");
     }
 
@@ -74,10 +85,14 @@ class DestinationService {
 
   // ADMIN 1: Fetch all raw multilingual destinations for the admin management list
   async getAdminDestinations(): Promise<DestinationPayload[]> {
-    const res = await fetch(`${this.API_URL}/destinations/admin`);
+    const res = await fetch(`${this.API_URL}/destinations/admin`, {
+      headers: this.getHeaders(true),
+      credentials: "include",
+      cache: "no-store",
+    });
 
     if (!res.ok) {
-      const error = await res.json();
+      const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to fetch admin destinations");
     }
 
@@ -86,10 +101,14 @@ class DestinationService {
 
   // ADMIN 2: Fetch a single raw destination by ID to pre-fill the edit form
   async getAdminDestinationById(id: string): Promise<DestinationPayload> {
-    const res = await fetch(`${this.API_URL}/destinations/admin/${id}`);
+    const res = await fetch(`${this.API_URL}/destinations/admin/${id}`, {
+      headers: this.getHeaders(true),
+      credentials: "include",
+      cache: "no-store",
+    });
 
     if (!res.ok) {
-      const error = await res.json();
+      const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to fetch destination details");
     }
 
@@ -100,14 +119,13 @@ class DestinationService {
   async updateDestination(id: string, payload: DestinationPayload) {
     const res = await fetch(`${this.API_URL}/destinations/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(true),
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      const error = await res.json();
+      const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to update destination");
     }
 
@@ -117,10 +135,13 @@ class DestinationService {
   // Fetch all destination previews (for frontend cards)
   async getPreviews(lang?: string): Promise<DestinationPreview[]> {
     const url = lang ? `${this.API_URL}/destinations/previews?lang=${lang}` : `${this.API_URL}/destinations/previews`;
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: this.getHeaders(true),
+      credentials: "include",
+    });
 
     if (!res.ok) {
-      const error = await res.json();
+      const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to fetch destination previews");
     }
 
@@ -131,14 +152,13 @@ class DestinationService {
   async findPackagePreviewsByIds(ids: string[]): Promise<DestinationPreview[]> {
     const res = await fetch(`${this.API_URL}/destinations/package/batch`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(true),
+      credentials: "include",
       body: JSON.stringify({ ids }),
     });
 
     if (!res.ok) {
-      const error = await res.json();
+      const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to fetch destination package previews");
     }
 
@@ -149,10 +169,12 @@ class DestinationService {
   async deleteDestination(id: string) {
     const res = await fetch(`${this.API_URL}/destinations/${id}`, {
       method: "DELETE",
+      headers: this.getHeaders(true),
+      credentials: "include",
     });
 
     if (!res.ok) {
-      const error = await res.json();
+      const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to delete destination");
     }
 
@@ -164,9 +186,8 @@ class DestinationService {
     try {
       const res = await fetch(`${this.API_URL}/destinations/${id}/visibility`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: this.getHeaders(true),
+        credentials: "include",
         body: JSON.stringify({ isLive }),
       });
 

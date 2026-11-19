@@ -51,12 +51,12 @@ class AvailabilityService {
 
   private getHeaders(): HeadersInit {
     const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
+    const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
+      ...(adminKey ? { "x-admin-key": adminKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
-    if (adminKey) {
-      headers["x-admin-key"] = adminKey;
-    }
     return headers;
   }
 
@@ -74,6 +74,7 @@ class AvailabilityService {
     const res = await fetch(`${this.API_URL}/availability`, {
       method: "GET",
       headers: this.getHeaders(),
+      credentials: "include",
       cache: "no-store",
     });
 
@@ -97,6 +98,7 @@ class AvailabilityService {
     const res = await fetch(`${this.API_URL}/availability`, {
       method: "POST",
       headers: this.getHeaders(),
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 

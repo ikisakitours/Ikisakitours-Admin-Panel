@@ -129,15 +129,19 @@ export function BookingDetailsModal({
   // Sync local state & fetch freshest booking details from server when modal opens
   useEffect(() => {
     if (!booking) {
-      setDetail(null);
+      queueMicrotask(() => {
+        setDetail(null);
+      });
       return;
     }
 
-    setDetail(booking);
-    setStatus(booking.status);
-    setPaymentStatus(booking.paymentStatus || "unpaid");
-    setPaymentMethod(booking.paymentMethod || "");
-    setPaymentTransactionId(booking.paymentTransactionId || "");
+    queueMicrotask(() => {
+      setDetail(booking);
+      setStatus(booking.status);
+      setPaymentStatus(booking.paymentStatus || "unpaid");
+      setPaymentMethod(booking.paymentMethod || "");
+      setPaymentTransactionId(booking.paymentTransactionId || "");
+    });
 
     let cancelled = false;
     const fetchFresh = async () => {

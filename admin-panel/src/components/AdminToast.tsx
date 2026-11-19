@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
 
-export type ToastVariant = "success" | "error" | "info";
+export type ToastVariant = "success" | "error" | "warning" | "info";
 
 export interface AdminToastState {
   id: number;
@@ -30,14 +30,15 @@ export function AdminToast({ toast, onDismiss }: AdminToastProps) {
   const styles: Record<ToastVariant, string> = {
     success: "bg-emerald-950 text-emerald-50 border-emerald-700/60 shadow-emerald-950/30",
     error: "bg-rose-950 text-rose-50 border-rose-700/60 shadow-rose-950/30",
+    warning: "bg-amber-950 text-amber-50 border-amber-700/60 shadow-amber-950/30",
     info: "bg-slate-900 text-slate-50 border-slate-700 shadow-slate-950/30",
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-[120] pointer-events-none animate-in fade-in slide-in-from-bottom-3 duration-200 max-w-[calc(100vw-2.5rem)] flex justify-end">
+    <div className="fixed bottom-5 right-5 z-120 pointer-events-none animate-in fade-in slide-in-from-bottom-3 duration-200 max-w-[calc(100vw-2.5rem)] flex justify-end">
       <div
         role="status"
-        className={`pointer-events-auto inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2 shadow-xl backdrop-blur-md w-auto max-w-lg min-w-[180px] transition-all duration-200 ${styles[toast.variant]}`}
+        className={`pointer-events-auto inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2 shadow-xl backdrop-blur-md w-auto max-w-lg min-w-45 transition-all duration-200 ${styles[toast.variant]}`}
       >
         <div className="shrink-0">
           {toast.variant === "success" && (
@@ -46,11 +47,14 @@ export function AdminToast({ toast, onDismiss }: AdminToastProps) {
           {toast.variant === "error" && (
             <AlertTriangle className="h-4 w-4 text-rose-400" />
           )}
+          {toast.variant === "warning" && (
+            <AlertTriangle className="h-4 w-4 text-amber-400" />
+          )}
           {toast.variant === "info" && (
             <Info className="h-4 w-4 text-sky-400" />
           )}
         </div>
-        <p className="text-[11px] sm:text-xs font-semibold leading-tight whitespace-normal break-words text-left select-text">
+        <p className="text-[11px] sm:text-xs font-semibold leading-tight whitespace-normal wrap-break-word text-left select-text">
           {toast.message}
         </p>
         <button

@@ -32,13 +32,14 @@
 
 - [Overview](#overview)
 - [System Architecture](#system-architecture)
-- [Module Directory (All 11 Groups)](#module-directory-all-11-groups)
+- [Module Directory (All 12 Groups)](#module-directory-all-12-groups)
 - [Core Engineering Highlights](#core-engineering-highlights)
   - [1. Unified Dynamic Group Pricing (`pricingConfig`)](#1-unified-dynamic-group-pricing-pricingconfig)
   - [2. Multilingual `JSONB` CMS & Gold Title Highlighting](#2-multilingual-jsonb-cms--gold-title-highlighting)
   - [3. Strict WebP Media Pipeline & Brand Assets](#3-strict-webp-media-pipeline--brand-assets)
   - [4. Interactive In-App Operations Manual (`/manual`)](#4-interactive-in-app-operations-manual-manual)
-  - [5. Enterprise Zero-Trust Admin Authentication, RBAC & Seeding (`npm run seed:admin`)](#5-enterprise-zero-trust-admin-authentication-rbac--seeding-npm-run-seedadmin)
+  - [5. Enterprise Zero-Trust Admin Authentication, 10-Role RBAC & 2FA Engine](#5-enterprise-zero-trust-admin-authentication-10-role-rbac--2fa-engine)
+  - [6. Dual-Lock Route Guard, Zero-Flash Protection & Cloudflare R2 WebP Profile Engine](#6-dual-lock-route-guard-zero-flash-protection--cloudflare-r2-webp-profile-engine)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -81,11 +82,12 @@ flowchart LR
 
 ---
 
-## Module Directory (All 11 Groups)
+## Module Directory (All 12 Groups)
 
 | Group | Route(s) | Operational Capabilities |
 | :--- | :--- | :--- |
 | **Authentication & Access** | `/login` | Zero Trust executive login portal with 256-bit encrypted session handling, Edge Middleware route protection, and instant sidebar Sign Out |
+| **Staff & Team (RBAC)** | `/staff` | 10-role internal staff directory, role provisioning, status toggles (Active/Suspended) with immediate session invalidation, temporary password resets, and 2FA compliance tracking |
 | **Overview** | `/dashboard` | Monthly KPI cards (Visitors, Feed Impressions, Total Clicks, Avg. SEO Rank) + interactive Recharts `GrowthChart` |
 | **Bookings & Operations** | `/tours`, `/tourservices` | One-Day / Multi-Day package booking statuses (`Pending`, `Confirmed`, `Completed`, `Cancelled`); tabbed service inquiries (`Custom Made Tours`, `Private Chauffeur`, `Transfers`) with status filters (`Pending`, `Approved`, `Active`, `Rejected`) |
 | **User Management** | `/users` | Customer directory with total count badge and live **VIP**, **Active Access**, and **Verified** status toggles |
@@ -187,16 +189,31 @@ Built as a modular, data-driven documentation hub inside [`admin-panel/src/app/m
 - Direct 1-click downloads for One-Day and Multi-Day sample JSON templates
 - Interactive Pre-Publish Checklist with live progress bar + expandable Troubleshooting Accordion
 
-### 5. Enterprise Zero-Trust Admin Authentication, RBAC & Seeding (`npm run seed:admin`)
+### 5. Enterprise Zero-Trust Admin Authentication, 10-Role RBAC & 2FA Engine
 
 The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authentication architecture designed to prevent unauthorized access, credential theft, session hijacking, and brute-force attacks:
 
-- **Next.js 16 Edge Route Guard (`src/proxy.ts` / `middleware.ts`)**: Every single administrative route (`/dashboard`, `/tours`, `/managepackages`, `/destinations`, `/blogs`, etc.) is intercepted at the Vercel edge. Unauthenticated requests are immediately halted and redirected to `/login?redirect=<target>` before any page renders.
+- **Next.js 16 Edge Route Guard (`src/proxy.ts` / `middleware.ts`)**: Every single administrative route (`/dashboard`, `/staff`, `/tours`, `/managepackages`, `/destinations`, `/blogs`, etc.) is intercepted at the Vercel edge. Unauthenticated requests are immediately halted and redirected to `/login?redirect=<target>` before any page renders.
 - **Light Luxury Login Portal (`/login`)**: Redesigned with a crisp executive light aesthetic (`bg-slate-50`, polished white cards, `emerald-600` accent buttons, and 256-bit encryption indicators) matching the Ikisaki brand.
-- **Role-Based Access Control (RBAC)**: Supports 3 strict administrative tiers:
-  - `SUPER_ADMIN`: Full root system control, user provisioning, rate/pricing approval, and audit log access.
-  - `ADMIN`: Daily operations, package creation, blog publishing, customer review moderation, and bookings management.
-  - `OPERATIONS_MANAGER`: Read/write access restricted to bookings, availability calendars, and customer service notes.
+- **Enterprise 10-Role RBAC Architecture (`src/app/staff/data/staffRoles.ts`)**:
+  1. `SUPER_ADMIN`: Executive Root / Owner — Full unrestricted platform access across all 12 modules, user provisioning, and audit logs.
+  2. `OPERATIONS_MANAGER`: Tour Operations Director — Oversees bookings, logistics dispatch, chauffeur guidelines, and customer records.
+  3. `PACKAGE_MANAGER`: Tour Package Lead — Full authoring and editing of tour packages, itineraries, tier pricing, and media.
+  4. `DESTINATION_EXPERT`: Destination Specialist — Curates Sri Lanka travel destinations, province guides, and attractions.
+  5. `CONTENT_EDITOR`: Multilingual Content Editor — Publishes SEO travel blogs, cultural articles, and localized FAQs.
+  6. `BOOKING_AGENT`: Tour Booking Specialist — Manages package reservations, date availability calendars, and traveler counts.
+  7. `TRANSPORT_COORDINATOR`: Transport & Fleet Manager — Manages private chauffeurs, vehicle specs, and transfer rates.
+  8. `CUSTOMER_SUPPORT`: Customer Support Executive — Handles web contact inquiries, FAQs, and customer messages.
+  9. `REVIEW_MODERATOR`: Guest Reviews Moderator — Moderates traveler reviews, toggles public visibility, and posts official admin replies.
+  10. `LEGAL_COMPLIANCE`: Legal & Compliance Officer — Maintains terms, privacy policies, and security audit logs.
+- **Two-Factor Authentication (2FA / TOTP) Engine**:
+  - Implements the **RFC 6238** TOTP standard using Node.js native `crypto` for 100% serverless Vercel compatibility.
+  - Compatible with **Google Authenticator**, **Authy**, and 1Password via standard `otpauth://` QR codes.
+  - Enforces a 2FA challenge at login: if enabled on the staff account, password verification yields `{ requiresTwoFactor: true }` and prompts for the live 6-digit TOTP code before granting access tokens.
+- **Staff Lifecycle & Session Invalidation**:
+  - Suspending an account (`is_active: false`) immediately revokes all active sessions for that user in `admin_sessions`.
+  - Self-suspension and self-deletion safeguards prevent Super Admins from accidentally locking themselves out.
+  - Super Admins can reset temporary passwords in 1 click, which automatically invalidates prior sessions.
 - **Brute-Force & Lockout Defense**:
   - Tracks consecutive failed login attempts in the database (`failed_login_attempts`, `locked_until`).
   - On **5 consecutive incorrect attempts**, the account and IP are locked for **30 minutes** (returning `HTTP 429 Too Many Requests`).
@@ -205,11 +222,27 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Stored inside an `HttpOnly`, `Secure`, `SameSite=Strict` cookie (`admin_session`) — inaccessible to browser JavaScript, completely eliminating XSS token theft.
   - Automatic refresh token rotation: if a revoked refresh token is reused, all active sessions for that admin user are instantly invalidated.
 - **Database Audit Logs (`admin_audit_logs`)**:
-  - Automatically records timestamp, user ID, event type (`LOGIN_SUCCESS`, `LOGIN_FAILED`, `LOGOUT`), client IP address, and User-Agent for forensic review.
+  - Automatically records timestamp, user ID, event type (`LOGIN_SUCCESS`, `LOGIN_FAILED`, `LOGOUT`, `STAFF_CREATED`, `2FA_ENABLED`), client IP address, and User-Agent for forensic review.
 - **Supabase Row Level Security (RLS) Isolation**:
   - The tables `admin_users`, `admin_sessions`, and `admin_audit_logs` are protected with Row Level Security.
-  - Anyone attempting to access these tables via public Supabase `anon` API keys is completely blocked (`403 Forbidden` / 0 rows).
+  - Public users using Supabase `anon` API keys are completely blocked (`403 Forbidden` / 0 rows).
   - Only the NestJS backend connecting via direct PostgreSQL pool credentials (`DATABASE_URL`) can read or write administrative tables.
+
+### 6. Dual-Lock Route Guard, Zero-Flash Protection & Cloudflare R2 WebP Profile Engine
+
+- **Global Route Interceptor (`AdminShell.tsx`)**:
+  - Evaluates `isRoutePermitted(pathname, user.role)` before mounting `{children}`.
+  - Eliminates the **Flash of Unauthorized Content (FOUC)**: Unauthorized page components are never mounted into the DOM, and their data-fetching API requests are never dispatched.
+- **Unified Access Restricted Screen (`AdminAccessRestricted.tsx`)**:
+  - Styled to match the Ikisaki Tours executive light luxury design system (`emerald-600`, `slate-900`, `amber-500`).
+  - Displays the active staff role, target module name, authorized roles chip matrix, and a 1-click **Return to Dashboard** action.
+- **Backend Route Protection (`RolesGuard`)**:
+  - NestJS Controllers enforce `@UseGuards(AdminAuthGuard, RolesGuard)` and `@Roles(...)`.
+  - Even if a client bypasses the frontend, the backend returns HTTP 403 Forbidden, keeping the database 100% secure.
+- **Cloudflare R2 WebP Profile Photo Engine & Automatic Asset Cleanup**:
+  - Photos uploaded in the Admin Profile modal are converted client-side to compressed `.webp` format before upload.
+  - Avatar URLs include unique versioning timestamps to bust browser caches immediately upon replacement.
+  - Automatic backend cleanup: When a new avatar photo replaces an existing one or when a staff member is deleted, the backend automatically issues an S3/R2 `DeleteObjectCommand`, removing old orphaned files from Cloudflare R2.
 
 ---
 
@@ -219,7 +252,8 @@ All backend communication lives in strongly typed modules under [`admin-panel/sr
 
 | Service File | Primary Endpoint(s) | Purpose |
 | :--- | :--- | :--- |
-| `auth.service.ts` | `/api/admin/auth/login`, `/api/admin/auth/logout`, `/api/admin/auth/me` | Zero-Trust login, session token persistence, profile check, and logout |
+| `auth.service.ts` | `/api/admin/auth/login`, `/logout`, `/me`, `/profile`, `/change-password`, `/2fa/*` | Zero-Trust login, RFC 6238 2FA challenge, profile WebP updates, and password changes |
+| `staff.service.ts` | `/api/admin/staff`, `/api/admin/staff/:id/*` | 10-Role Staff directory, onboarding, role updates, account suspension/session revocation, password reset & deletion |
 | `package.service.ts` | `/addpackages` (`GET`, `POST`, `PATCH`, `DELETE`) | Create packages (`FormData` + images), fetch by slug, text-only updates |
 | `package-booking.service.ts` | `/package-bookings`, `/package-bookings/:id/status` | List fixed tour bookings, update status, delete |
 | `tourservice.service.ts` | `/services/custom`, `/services/chauffeur`, `/services/transfer` | Manage tailor-made tour, chauffeur & transfer requests |
@@ -271,6 +305,7 @@ Ikisakitours-Admin-Panel/
     │   ├── app/
     │   │   ├── layout.tsx                 # Root layout, Google Fonts, OG/Twitter metadata
     │   │   ├── dashboard/                 # Analytics KPI cards & GrowthChart
+    │   │   ├── staff/                     # 10-Role Staff Management & RBAC engine
     │   │   ├── tours/                     # Fixed One-Day & Multi-Day bookings
     │   │   ├── tourservices/              # Custom tours, chauffeur & transfer requests
     │   │   ├── users/                     # Customer directory & VIP/Access controls
@@ -292,9 +327,9 @@ Ikisakitours-Admin-Panel/
     │   │       ├── page.tsx
     │   │       ├── data/manualMockData.ts # Centralized guide content store
     │   │       └── components/            # 11 modular React guide components
-    │   ├── components/                    # Sidebar, DesktopOnlyGuard, Shadcn UI
+    │   ├── components/                    # Sidebar, DesktopOnlyGuard, AdminShell, AdminAccessRestricted, Modals
     │   ├── lib/                           # API client fetcher & Tailwind utils
-    │   └── services/                      # 15 typed REST API service modules
+    │   └── services/                      # 16 typed REST API service modules
     ├── next.config.ts
     └── package.json
 ```
@@ -425,6 +460,10 @@ When executing the SQL table schema migrations in Supabase SQL Editor for Sectio
 - [x] Modular in-app **Admin Manual Guide (`/manual`)** integrated into Sidebar
 - [x] Zero Trust Admin Authentication & Edge Route Guard (`src/proxy.ts`)
 - [x] Executive Light-Luxury Login Portal (`/login`) with 256-bit encrypted session handling
+- [x] Enterprise 10-Role RBAC Staff Directory (`/staff`) with category filter pills & unified role dropdown
+- [x] Native RFC 6238 TOTP Two-Factor Authentication (2FA) Engine (Google Authenticator / Authy challenge)
+- [x] Dual-Lock Route Guard & Zero-Flash Pre-Render Protection (`AdminShell` + `AdminAccessRestricted`)
+- [x] Cloudflare R2 Client-Side WebP Avatar Compression & Automated Orphaned Asset Cleanup
 - [x] Universal 1-Click Live Visibility Toggle across Packages, Blogs, Destinations & FAQs
 - [x] Edit-Mode Image Upload Isolation (`hideImageUpload={true}`) preventing accidental overwrites
 - [x] Reusable Top-Centered `AdminDeleteModal` and dynamic-width `AdminToast` system

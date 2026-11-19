@@ -72,7 +72,7 @@ export function DesktopOnlyGuard({ children }: { children: React.ReactNode }) {
           - Before client check finishes: CSS `lg:hidden` immediately blocks <1024px viewports (zero flash!)
           - After client check: if blocked (including Mobile "Desktop Site" mode!), shows unconditionally */}
       <div
-        className={`fixed inset-0 z-[9999] bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center ${
+        className={`fixed inset-0 z-9999 bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center ${
           isBlocked ? "flex" : status === "allowed" ? "hidden" : "flex lg:hidden"
         }`}
       >

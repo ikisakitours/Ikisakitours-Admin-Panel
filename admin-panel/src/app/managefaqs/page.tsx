@@ -59,7 +59,9 @@ export default function ManageFaqsPage() {
   }, [notify]);
 
   useEffect(() => {
-    fetchFaqs();
+    queueMicrotask(() => {
+      fetchFaqs();
+    });
   }, [fetchFaqs]);
 
   // Extract all distinct categories for filter dropdown

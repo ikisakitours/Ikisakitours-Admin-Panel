@@ -60,7 +60,9 @@ export default function ManageDestinationsPage() {
   }, [notify]);
 
   useEffect(() => {
-    fetchDestinations();
+    queueMicrotask(() => {
+      fetchDestinations();
+    });
   }, [fetchDestinations]);
 
   const handleDestinationCreated = () => {

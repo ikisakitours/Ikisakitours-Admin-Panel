@@ -1,9 +1,9 @@
 # Ikisaki Tours — Enterprise Backend Integration Specifications
-## Scope: 10-Role Staff Management & Access Control Engine (RBAC)
+## Scope: Automatic Cloudflare R2 Asset Cleanup (Orphaned Avatar Deletion)
 > **Target:** NestJS Backend Engineering Agent  
 > **Date:** November 20, 2026  
-> **Frontend Status:** 100% Implemented & Verified in Admin Panel  
-> **Note:** 2FA TOTP Engine & Admin Profile / R2 Storage are **already completed and working**. This task scope is **strictly for the new Staff & RBAC module**.
+> **Frontend Status:** 100% Implemented & Verified in Admin Panel (`authService.updateProfile` passing `oldAvatarUrl` + client WebP engine)  
+> **Previous Scope Status:** 2FA TOTP Engine & 10-Role Staff RBAC are **fully completed and live**. This file contains strictly the single pending backend task: **Automatic Cloudflare R2 Asset Cleanup for Avatars**.
 
 ---
 
@@ -12,145 +12,132 @@
 ```markdown
 Hi Backend Agent,
 
-Two-Factor Authentication (2FA / TOTP) and Admin Profile updates are already implemented and working. 
+The 2FA/TOTP Engine and 10-Role Staff Management (RBAC) modules are completely finished and verified.
 
-Please implement the new Staff & Team Management (RBAC) Module for Ikisaki Tours under `/api/admin/staff` in the NestJS Backend.
-
-### 1. Database Alignment (Supabase `admin_users` table)
-Verify that the `admin_users` table supports the 10 role types and account status:
-- `role` (varchar, default 'SUPER_ADMIN')
-- `is_active` (boolean, default true)
-- `last_login_at` (timestamptz, nullable)
-- `last_login_ip` (varchar, nullable)
-
-```sql
--- Run in Supabase SQL Editor if columns are missing:
-ALTER TABLE public.admin_users
-  ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'SUPER_ADMIN' NOT NULL,
-  ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE NOT NULL,
-  ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ,
-  ADD COLUMN IF NOT EXISTS last_login_ip VARCHAR(100);
-```
+Now, please implement **Automatic Cloudflare R2 Asset Cleanup for Profile Avatars** in the NestJS Backend (`ikisakitours-backend`).
 
 ---
 
-### 2. The 10 Specialized Roles
-1. `SUPER_ADMIN` (Executive Root / Owner — Full unrestricted platform access)
-2. `OPERATIONS_MANAGER` (Tour Operations, logistics dispatch, chauffeur guidelines)
-3. `PACKAGE_MANAGER` (Tour packages, itineraries, tier pricing, media upload)
-4. `DESTINATION_EXPERT` (Sri Lanka travel destinations, province guides)
-5. `CONTENT_EDITOR` (Multilingual blogs, cultural articles, SEO stories)
-6. `BOOKING_AGENT` (Tour reservations, date calendars, traveler counts)
-7. `TRANSPORT_COORDINATOR` (Private chauffeur fleet, vehicle rates, transfer notes)
-8. `CUSTOMER_SUPPORT` (Customer contact inquiries, WhatsApp web leads, FAQs)
-9. `REVIEW_MODERATOR` (Guest testimonials, reviews, public comments)
-10. `LEGAL_COMPLIANCE` (Legal terms, privacy policies, cookie consents, audit logs)
+### 1. Objective & Context
+Currently, each time an administrator or staff member updates their profile photo via the Admin Panel, the frontend converts the image to `.webp` and uploads it to Cloudflare R2 (`/uploads/batch`), generating a timestamped file key (e.g. `admin/avatar-1732025987123.webp`).
+Because the old image was not being deleted, orphaned avatar files accumulated in Cloudflare R2 storage.
+
+**Your Goal:**
+1. Automatically delete the previous avatar file from Cloudflare R2 whenever a staff member or admin updates their profile picture with a new one (`PATCH /api/admin/auth/profile`).
+2. Automatically delete the staff member's avatar file from Cloudflare R2 whenever that staff account is deleted (`DELETE /api/admin/staff/:id`).
+3. Keep this cleanup strictly isolated to profile avatar updates so Tour Packages, Destinations, and Blogs (which use multi-image galleries) are never affected.
 
 ---
 
-### 3. Implement Staff Management Endpoints under `/api/admin/staff`
-All endpoints below must be protected by `AdminAuthGuard` and `@Roles('SUPER_ADMIN')`:
+### 2. Implementation Specifications
 
-1. `GET /api/admin/staff`
-   - Returns array of all internal staff members (excluding password hashes and 2FA secrets):
-     ```json
-     [
-       {
-         "id": "uuid",
-         "email": "kamal@ikisakitours.com",
-         "fullName": "Kamal Perera",
-         "role": "PACKAGE_MANAGER",
-         "avatarUrl": "https://pub-...r2.dev/admin/kamal.webp",
-         "isActive": true,
-         "isTwoFactorEnabled": false,
-         "lastLoginAt": "2026-11-20T10:00:00Z",
-         "lastLoginIp": "116.206.246.1",
-         "createdAt": "2026-11-20T09:00:00Z"
-       }
-     ]
-     ```
+#### A. Reusable Cloudflare R2 Delete Helper
+Create or export an S3/R2 delete utility inside your uploads/storage module (e.g. `src/uploads/r2-storage.service.ts` or `src/common/utils/r2-delete.util.ts`):
 
-2. `POST /api/admin/staff`
-   - Body: `{ fullName: string, email: string, password: string, role: string }`
-   - Validates that `email` is not already registered.
-   - Validates that `role` is one of the 10 allowed roles.
-   - Hashes `password` using `bcrypt.hash(password, 12)`.
-   - Inserts record into `admin_users` with `is_active = true`.
-   - Logs `STAFF_CREATED` in `admin_audit_logs`.
-   - Returns HTTP 201 with created staff profile.
+```typescript
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { Logger } from '@nestjs/common';
 
-3. `PATCH /api/admin/staff/:id/role`
-   - Body: `{ role: string }`
-   - Updates `role` in `admin_users`.
-   - Returns: `{ "success": true, "message": "Staff role updated successfully!" }`
+const logger = new Logger('R2Cleanup');
 
-4. `PATCH /api/admin/staff/:id/status`
-   - Body: `{ isActive: boolean }`
-   - Updates `is_active` in `admin_users`.
-   - If setting `isActive = false` (suspension), immediately revokes all active sessions for that user in `admin_sessions`:
-     `UPDATE admin_sessions SET is_revoked = true WHERE admin_id = :id`
-   - Returns: `{ "success": true, "message": "Staff status updated successfully!" }`
-
-5. `PATCH /api/admin/staff/:id/reset-password`
-   - Body: `{ newPassword: string }`
-   - Hashes `newPassword` with bcrypt and updates `password_hash` in `admin_users`.
-   - Revokes existing sessions in `admin_sessions` so the user must sign in with the new key.
-   - Returns: `{ "success": true, "message": "Password reset successfully!" }`
-
-6. `DELETE /api/admin/staff/:id`
-   - Validates that the requesting admin is NOT deleting their own account (`req.user.id !== id`).
-   - Deletes record from `admin_users` (and cascades associated sessions/audit references).
-   - Logs `STAFF_DELETED` in `admin_audit_logs`.
-   - Returns: `{ "success": true, "message": "Staff member deleted successfully." }`
-
----
-
-### 4. Account Suspension Check on Login (`POST /api/admin/auth/login`)
-Ensure the existing login handler rejects suspended staff accounts:
-- If `user.is_active === false`:
-  - Return HTTP 403 Forbidden:
-    ```json
-    {
-      "success": false,
-      "message": "Your staff account has been suspended. Please contact your Super Administrator."
+/**
+ * Extracts object key from a full Cloudflare R2 public URL.
+ * Example: "https://pub-xxxxxx.r2.dev/admin/avatar-1732025987123.webp" -> "admin/avatar-1732025987123.webp"
+ */
+export function extractR2KeyFromUrl(url?: string | null): string | null {
+  if (!url || typeof url !== 'string') return null;
+  try {
+    const parsed = new URL(url);
+    // Ignore external placeholders, Google photos, or data URIs
+    if (!parsed.hostname.includes('r2.dev') && !parsed.hostname.includes('cloudflare') && !parsed.hostname.includes('ikisaki')) {
+      return null;
     }
-    ```
+    const key = parsed.pathname.replace(/^\/+/, '');
+    return key || null;
+  } catch {
+    return null;
+  }
+}
 
----
+/**
+ * Safely deletes an object from Cloudflare R2.
+ * Never throws an unhandled exception so database operations proceed smoothly even if the asset was already gone.
+ */
+export async function deleteR2Asset(s3Client: S3Client, bucketName: string, fileUrlOrKey?: string | null): Promise<boolean> {
+  if (!fileUrlOrKey) return false;
+  const key = fileUrlOrKey.startsWith('http') ? extractR2KeyFromUrl(fileUrlOrKey) : fileUrlOrKey;
+  if (!key) return false;
 
-### 5. Route Protection Matrix (`RolesGuard`)
-Apply `@UseGuards(AdminAuthGuard, RolesGuard)` across controllers:
-- `/api/admin/staff/*` -> `@Roles('SUPER_ADMIN')`
-- `/api/packages/*` -> `@Roles('SUPER_ADMIN', 'PACKAGE_MANAGER')`
-- `/api/destinations/*` -> `@Roles('SUPER_ADMIN', 'PACKAGE_MANAGER', 'DESTINATION_EXPERT')`
-- `/api/blogs/*` -> `@Roles('SUPER_ADMIN', 'PACKAGE_MANAGER', 'CONTENT_EDITOR')`
-- `/api/bookings/*` -> `@Roles('SUPER_ADMIN', 'OPERATIONS_MANAGER', 'BOOKING_AGENT')`
-- `/api/services/*` -> `@Roles('SUPER_ADMIN', 'OPERATIONS_MANAGER', 'TRANSPORT_COORDINATOR')`
-- `/api/contact/*` -> `@Roles('SUPER_ADMIN', 'OPERATIONS_MANAGER', 'CUSTOMER_SUPPORT')`
-- `/api/comments/*` -> `@Roles('SUPER_ADMIN', 'REVIEW_MODERATOR')`
-- `/api/legaldocs/*` -> `@Roles('SUPER_ADMIN', 'LEGAL_COMPLIANCE')`
-- `/api/admin/auth/me`, `/profile`, `/change-password`, `/2fa/*` -> Open to ALL authenticated staff members.
-
----
-
-### 6. Build & Deploy
-1. Run `npm run build` to confirm 0 TypeScript errors.
-2. Push to remote git repository so Vercel can deploy the updated NestJS API.
+  try {
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+      })
+    );
+    logger.log(`[R2 Asset Cleaned] Successfully purged orphaned object: ${key}`);
+    return true;
+  } catch (err: any) {
+    logger.warn(`[R2 Asset Cleanup Warning] Failed to delete ${key}: ${err.message}`);
+    return false;
+  }
+}
 ```
 
 ---
 
-## 2. Comprehensive 10-Role Permissions Matrix
+#### B. Update `PATCH /api/admin/auth/profile`
+In `AdminAuthController` / `AdminAuthService`:
 
-| Platform Module / API | `SUPER_ADMIN` | `OPERATIONS_MANAGER` | `PACKAGE_MANAGER` | `DESTINATION_EXPERT` | `CONTENT_EDITOR` | `BOOKING_AGENT` | `TRANSPORT_COORDINATOR` | `CUSTOMER_SUPPORT` | `REVIEW_MODERATOR` | `LEGAL_COMPLIANCE` |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Staff & RBAC** (`/staff`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Tour Packages** (`/packages`) | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Destinations** (`/destinations`) | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Blogs** (`/blogs`) | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Tour Bookings** (`/tours`) | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Transfers & Fleet** (`/services`) | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Contact Inquiries** (`/contact`) | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| **Reviews & Feedback** (`/comments`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **Legal & Audit Logs** (`/legaldocs`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| **Self Profile, WebP & 2FA** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+1. **Accept Payload:** `{ fullName?: string; avatarUrl?: string; oldAvatarUrl?: string }`.
+2. **Retrieve Current Avatar:** Query the database (`admin_users`) for the requesting user's current `avatar_url` (or fallback to `body.oldAvatarUrl`).
+3. **Compare & Delete:**
+   ```typescript
+   if (body.avatarUrl && body.avatarUrl !== currentAvatarUrl) {
+     const targetToDelete = body.oldAvatarUrl || currentAvatarUrl;
+     if (targetToDelete) {
+       await deleteR2Asset(this.s3Client, this.bucketName, targetToDelete);
+     }
+   }
+   ```
+4. **Update Database:** Update `full_name` and `avatar_url` in `admin_users`.
+5. **Audit Log:** If an asset was deleted, record an entry in `admin_audit_logs` (event: `R2_AVATAR_CLEANUP`).
+6. **Return Updated User Profile.**
+
+---
+
+#### C. Update `DELETE /api/admin/staff/:id`
+In `StaffController` / `StaffService`:
+
+1. Before deleting the staff record from `admin_users`, query the target staff member's record:
+   ```typescript
+   const staff = await this.db.query.adminUsers.findFirst({
+     where: eq(adminUsers.id, staffId),
+   });
+   ```
+2. If `staff.avatarUrl` exists:
+   ```typescript
+   if (staff.avatarUrl) {
+     await deleteR2Asset(this.s3Client, this.bucketName, staff.avatarUrl);
+   }
+   ```
+3. Delete the staff record from `admin_users` (and cascade sessions).
+4. Record `STAFF_DELETED` in `admin_audit_logs`.
+5. Return: `{ success: true, message: "Staff member and associated assets deleted successfully." }`.
+
+---
+
+### 3. Build & Verify
+1. Run `npm run build` in `ikisakitours-backend` to ensure 0 TypeScript compilation errors.
+2. Verify that deleting an avatar or deleting a staff member logs `[R2 Asset Cleaned]` in server logs.
+3. Push to remote git repository for Vercel deployment.
+```
+
+---
+
+## 2. Summary of Frontend Adjustments in Admin Panel
+The Admin Panel has already been prepared to work seamlessly with this backend cleanup:
+1. **`src/services/auth.service.ts`**: `updateProfile` accepts `oldAvatarUrl?: string` alongside `avatarUrl`.
+2. **`src/components/AdminSecurityModal.tsx`**: When an admin uploads a new WebP photo, the previous avatar URL is automatically sent as `oldAvatarUrl`.
+3. **Client-Side WebP Conversion**: Photos are converted to `.webp` in the browser before sending to `/uploads/batch`.
+4. **Cache Busting**: Avatar URLs include unique version timestamps so the browser refreshes the image instantly.

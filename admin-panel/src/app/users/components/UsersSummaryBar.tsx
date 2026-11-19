@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Users, ShieldCheck, Crown, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Crown, ShieldAlert, CheckCircle2 } from "lucide-react";
 import type { User } from "@/services/users.service";
 
 interface UsersSummaryBarProps {
@@ -27,7 +27,7 @@ export function UsersSummaryBar({ users }: UsersSummaryBarProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5 mb-6">
       {/* 1. Total Registered Users (Hero Card) */}
-      <div className="col-span-2 sm:col-span-1 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-4 text-white shadow-md relative overflow-hidden">
+      <div className="col-span-2 sm:col-span-1 rounded-2xl bg-linear-to-br from-slate-900 to-slate-800 p-4 text-white shadow-md relative overflow-hidden">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
             Total Customers

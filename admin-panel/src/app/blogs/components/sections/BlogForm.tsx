@@ -55,17 +55,19 @@ export default function BlogForm({
                 ])
             );
 
-            setAvailableLanguages(detectedLangs);
-            setFormData({
-                title: { en: "", ja: "", ...(initialData.title || {}) },
-                slug: initialData.slug || "",
-                summary: { en: "", ja: "", ...(initialData.summary || {}) },
-                category: { en: "", ja: "", ...(initialData.category || {}) },
-                readTime: { en: "", ja: "", ...(initialData.readTime || {}) },
-                author: initialData.author || "",
-                blog: { en: "", ja: "", ...(initialData.blog || {}) },
+            queueMicrotask(() => {
+                setAvailableLanguages(detectedLangs);
+                setFormData({
+                    title: { en: "", ja: "", ...(initialData.title || {}) },
+                    slug: initialData.slug || "",
+                    summary: { en: "", ja: "", ...(initialData.summary || {}) },
+                    category: { en: "", ja: "", ...(initialData.category || {}) },
+                    readTime: { en: "", ja: "", ...(initialData.readTime || {}) },
+                    author: initialData.author || "",
+                    blog: { en: "", ja: "", ...(initialData.blog || {}) },
+                });
+                setIsCustomSlug(true);
             });
-            setIsCustomSlug(true);
         }
     }, [initialData]);
 

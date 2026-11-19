@@ -17,6 +17,8 @@ import { StaffRoleDropdown } from "./StaffRoleDropdown";
 
 interface StaffCardProps {
   staff: AdminStaffUser;
+  currentAdminId?: string;
+  currentAdminEmail?: string;
   onRoleChange: (staff: AdminStaffUser, newRole: AdminRole) => void;
   onRequestToggleStatus: (staff: AdminStaffUser) => void;
   onRequestResetPassword: (staff: AdminStaffUser) => void;
@@ -25,6 +27,8 @@ interface StaffCardProps {
 
 export function StaffCard({
   staff,
+  currentAdminId,
+  currentAdminEmail,
   onRoleChange,
   onRequestToggleStatus,
   onRequestResetPassword,
@@ -32,6 +36,9 @@ export function StaffCard({
 }: StaffCardProps) {
   const roleMeta = getRoleMeta(staff.role);
   const IconComponent = roleMeta.icon;
+  const isSelf =
+    (currentAdminId && staff.id === currentAdminId) ||
+    (currentAdminEmail && staff.email.toLowerCase() === currentAdminEmail.toLowerCase());
 
   return (
     <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-4">
@@ -57,7 +64,14 @@ export function StaffCard({
             </div>
 
             <div className="min-w-0">
-              <h3 className="font-extrabold text-slate-900 text-sm truncate">{staff.fullName}</h3>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 className="font-extrabold text-slate-900 text-sm truncate">{staff.fullName}</h3>
+                {isSelf && (
+                  <span className="inline-flex items-center px-1.5 py-0.2 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    You
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-slate-400 font-mono truncate">{staff.email}</p>
             </div>
           </div>
@@ -144,8 +158,19 @@ export function StaffCard({
         <button
           type="button"
           onClick={() => onRequestToggleStatus(staff)}
+          title={
+            isSelf
+              ? "Cannot suspend your own account"
+              : staff.role === "SUPER_ADMIN" && staff.isActive
+              ? "Super Admin accounts cannot be suspended"
+              : staff.isActive
+              ? "Suspend staff account"
+              : "Re-activate staff account"
+          }
           className={`flex-1 py-1.5 px-3 rounded-xl border text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
-            staff.isActive
+            isSelf
+              ? "opacity-40 cursor-not-allowed text-slate-400 border-slate-200"
+              : staff.isActive
               ? "text-slate-600 hover:text-amber-700 hover:bg-amber-50 border-slate-200"
               : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 border-slate-200"
           }`}
@@ -166,8 +191,18 @@ export function StaffCard({
         <button
           type="button"
           onClick={() => onRequestDelete(staff)}
-          title="Delete Staff"
-          className="p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+          title={
+            isSelf
+              ? "Cannot delete your own account"
+              : staff.role === "SUPER_ADMIN"
+              ? "Super Admin accounts cannot be deleted directly"
+              : "Delete staff member"
+          }
+          className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+            isSelf
+              ? "opacity-30 cursor-not-allowed text-slate-300 border-slate-200"
+              : "border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+          }`}
         >
           <Trash2 className="w-4 h-4" />
         </button>

@@ -171,9 +171,11 @@ export function CommentDetailsModal({
 
   useEffect(() => {
     if (item) {
-      setDetail(item);
-      setReplyText(item.adminReply || "");
-      setSelectedTemplateId(null);
+      queueMicrotask(() => {
+        setDetail(item);
+        setReplyText(item.adminReply || "");
+        setSelectedTemplateId(null);
+      });
     }
   }, [item]);
 

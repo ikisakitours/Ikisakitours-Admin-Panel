@@ -75,7 +75,9 @@ export default function LegalDocManager() {
   };
 
   useEffect(() => {
-    loadDocuments();
+    queueMicrotask(() => {
+      loadDocuments();
+    });
   }, []);
 
   const addCustomLanguage = () => {

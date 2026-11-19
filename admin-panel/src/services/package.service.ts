@@ -2,6 +2,16 @@ import { PackageFormData } from "@/app/addpackage/types/package.types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+function getPackageHeaders(isJson: boolean = true): Record<string, string> {
+  const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
+  const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
+  return {
+    ...(isJson ? { "Content-Type": "application/json" } : {}),
+    ...(adminKey ? { "x-admin-key": adminKey } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
 export interface PackageListItem {
   id: string;
   slug: string;
@@ -76,11 +86,13 @@ export const packageService = {
 
     const response = await fetch(`${API_URL}/addpackages`, {
       method: "POST",
+      headers: getPackageHeaders(false),
+      credentials: "include",
       body: data,
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || "Failed to create package");
     }
 
@@ -88,7 +100,11 @@ export const packageService = {
   },
 
   async getAllPackages(): Promise<PackageListItem[]> {
-    const response = await fetch(`${API_URL}/addpackages`);
+    const response = await fetch(`${API_URL}/addpackages`, {
+      headers: getPackageHeaders(true),
+      credentials: "include",
+      cache: "no-store",
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch packages");
     }
@@ -96,7 +112,11 @@ export const packageService = {
   },
 
   async getPackageBySlug(slug: string): Promise<PackageFormData> {
-    const response = await fetch(`${API_URL}/addpackages/${slug}`);
+    const response = await fetch(`${API_URL}/addpackages/${slug}`, {
+      headers: getPackageHeaders(true),
+      credentials: "include",
+      cache: "no-store",
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch package details");
     }
@@ -119,12 +139,13 @@ export const packageService = {
 
     const response = await fetch(`${API_URL}/addpackages/${slug}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: getPackageHeaders(true),
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || "Failed to update package");
     }
 
@@ -134,10 +155,12 @@ export const packageService = {
   async deletePackage(slug: string) {
     const response = await fetch(`${API_URL}/addpackages/${slug}`, {
       method: "DELETE",
+      headers: getPackageHeaders(true),
+      credentials: "include",
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || "Failed to delete package");
     }
 
@@ -148,7 +171,8 @@ export const packageService = {
     try {
       const response = await fetch(`${API_URL}/packages/${slug}/visibility`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getPackageHeaders(true),
+        credentials: "include",
         body: JSON.stringify({ isLive }),
       });
       if (response.ok) {

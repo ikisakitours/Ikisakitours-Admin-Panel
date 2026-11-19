@@ -17,6 +17,8 @@ import { StaffRoleDropdown } from "./StaffRoleDropdown";
 interface StaffTableProps {
   staffList: AdminStaffUser[];
   loading: boolean;
+  currentAdminId?: string;
+  currentAdminEmail?: string;
   onRoleChange: (staff: AdminStaffUser, newRole: AdminRole) => void;
   onRequestToggleStatus: (staff: AdminStaffUser) => void;
   onRequestResetPassword: (staff: AdminStaffUser) => void;
@@ -26,6 +28,8 @@ interface StaffTableProps {
 export function StaffTable({
   staffList,
   loading,
+  currentAdminId,
+  currentAdminEmail,
   onRoleChange,
   onRequestToggleStatus,
   onRequestResetPassword,
@@ -63,6 +67,9 @@ export function StaffTable({
               staffList.map((staff) => {
                 const roleMeta = getRoleMeta(staff.role);
                 const IconComponent = roleMeta.icon;
+                const isSelf =
+                  (currentAdminId && staff.id === currentAdminId) ||
+                  (currentAdminEmail && staff.email.toLowerCase() === currentAdminEmail.toLowerCase());
 
                 return (
                   <tr key={staff.id} className="hover:bg-slate-50/70 transition-colors">
@@ -86,7 +93,14 @@ export function StaffTable({
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-slate-900 truncate leading-snug">{staff.fullName}</p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="font-bold text-slate-900 truncate leading-snug">{staff.fullName}</p>
+                            {isSelf && (
+                              <span className="inline-flex items-center px-1.5 py-0.2 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                You
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[11px] text-slate-400 font-mono truncate">{staff.email}</p>
                         </div>
                       </div>
@@ -167,9 +181,19 @@ export function StaffTable({
                         <button
                           type="button"
                           onClick={() => onRequestToggleStatus(staff)}
-                          title={staff.isActive ? "Suspend staff account" : "Re-activate staff account"}
+                          title={
+                            isSelf
+                              ? "Cannot suspend your own account"
+                              : staff.role === "SUPER_ADMIN" && staff.isActive
+                              ? "Super Admin accounts cannot be suspended"
+                              : staff.isActive
+                              ? "Suspend staff account"
+                              : "Re-activate staff account"
+                          }
                           className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
-                            staff.isActive
+                            isSelf
+                              ? "opacity-40 cursor-not-allowed text-slate-400 border-slate-200"
+                              : staff.isActive
                               ? "text-slate-500 hover:text-amber-600 hover:bg-amber-50 border-slate-200"
                               : "text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 border-slate-200"
                           }`}
@@ -191,8 +215,18 @@ export function StaffTable({
                         <button
                           type="button"
                           onClick={() => onRequestDelete(staff)}
-                          title="Delete staff member"
-                          className="p-1.5 rounded-xl border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                          title={
+                            isSelf
+                              ? "Cannot delete your own account"
+                              : staff.role === "SUPER_ADMIN"
+                              ? "Super Admin accounts cannot be deleted directly"
+                              : "Delete staff member"
+                          }
+                          className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
+                            isSelf
+                              ? "opacity-30 cursor-not-allowed text-slate-300 border-slate-200"
+                              : "border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                          }`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

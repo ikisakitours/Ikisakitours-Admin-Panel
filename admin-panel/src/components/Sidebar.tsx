@@ -122,18 +122,40 @@ export default function Sidebar() {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [userLoading, setUserLoading] = useState(true);
   const activeItemRef = useRef<HTMLAnchorElement | null>(null);
 
   useEffect(() => {
-    setUserLoading(true);
-    authService.getMe().then((user) => {
-      if (user) setAdminUser(user);
-      setUserLoading(false);
-    }).catch(() => {
-      setUserLoading(false);
+    queueMicrotask(() => {
+      setMounted(true);
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("admin_user");
+        if (saved) {
+          try {
+            setAdminUser(JSON.parse(saved));
+          } catch {
+            // ignore
+          }
+        }
+      }
     });
+
+    authService
+      .getMe()
+      .then((user) => {
+        if (user) {
+          setAdminUser(user);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("admin_user", JSON.stringify(user));
+          }
+        }
+        setUserLoading(false);
+      })
+      .catch(() => {
+        setUserLoading(false);
+      });
   }, []);
 
   // Ensure active navigation item stays in view upon route change or sidebar collapse/expand
@@ -160,53 +182,30 @@ export default function Sidebar() {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  // Role-based navigation filtering
+  // Role-based navigation filtering using centralized role permissions
   const visibleNavGroups = useMemo(() => {
-    const role = adminUser?.role || "SUPER_ADMIN";
+    // Prevent SSR hydration mismatch: on initial SSR pre-render keep static navGroups consistent
+    if (!mounted || !adminUser) return navGroups;
+
+    const role = adminUser.role;
     if (role === "SUPER_ADMIN") return navGroups;
 
-    if (role === "PACKAGE_MANAGER") {
-      return navGroups
-        .map((group) => {
-          if (group.title === "Overview") return group;
-          if (
-            group.title === "Tour Packages" ||
-            group.title === "Destinations" ||
-            group.title === "Blog Articles" ||
-            group.title === "Media & Engagement"
-          ) {
-            return group;
-          }
-          return null;
-        })
-        .filter(Boolean) as NavGroup[];
-    }
+    const roleMeta = getRoleMeta(role);
+    if (!roleMeta || roleMeta.allowedRoutes.includes("*")) return navGroups;
 
-    if (role === "OPERATIONS_MANAGER") {
-      return navGroups
-        .map((group) => {
-          if (
-            group.title === "Overview" ||
-            group.title === "Bookings & Operations" ||
-            group.title === "User Management" ||
-            group.title === "Media & Engagement" ||
-            group.title === "Help & Guide"
-          ) {
-            if (group.title === "User Management") {
-              return {
-                ...group,
-                items: group.items.filter((item) => item.href !== "/staff"),
-              };
-            }
-            return group;
-          }
-          return null;
-        })
-        .filter(Boolean) as NavGroup[];
-    }
-
-    return navGroups;
-  }, [adminUser?.role]);
+    return navGroups
+      .map((group) => {
+        const allowedItems = group.items.filter((item) =>
+          roleMeta.allowedRoutes.includes(item.href)
+        );
+        if (allowedItems.length === 0) return null;
+        return {
+          ...group,
+          items: allowedItems,
+        };
+      })
+      .filter(Boolean) as NavGroup[];
+  }, [mounted, adminUser]);
 
   const handleOpenSecurityModal = () => {
     setIsExpanded(false);
@@ -385,10 +384,10 @@ export default function Sidebar() {
                     {adminUser?.role === "SUPER_ADMIN"
                       ? "Super Admin"
                       : adminUser?.role === "PACKAGE_MANAGER"
-                      ? "Package Manager"
-                      : adminUser?.role === "OPERATIONS_MANAGER"
-                      ? "Ops Manager"
-                      : "Staff"}
+                        ? "Package Manager"
+                        : adminUser?.role === "OPERATIONS_MANAGER"
+                          ? "Ops Manager"
+                          : "Staff"}
                   </p>
                 </div>
               </button>

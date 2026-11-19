@@ -96,28 +96,32 @@ export default function AvailabilityManager() {
   };
 
   useEffect(() => {
-    loadAvailability();
+    queueMicrotask(() => {
+      loadAvailability();
+    });
   }, []);
 
   // When selectedDate changes, populate the form
   useEffect(() => {
     if (selectedDate) {
-      const existing = dateDetails[selectedDate];
-      if (existing) {
-        const types = getTourTypesForDate(existing);
-        setSelectedTourTypes(types.length > 0 ? types : ["all"]);
+      queueMicrotask(() => {
+        const existing = dateDetails[selectedDate];
+        if (existing) {
+          const types = getTourTypesForDate(existing);
+          setSelectedTourTypes(types.length > 0 ? types : ["all"]);
 
-        if (existing.notes && typeof existing.notes === "object") {
-          setSelectedNotes({ en: "", ja: "", ...existing.notes });
-        } else if (existing.note) {
-          setSelectedNotes({ en: existing.note, ja: "" });
+          if (existing.notes && typeof existing.notes === "object") {
+            setSelectedNotes({ en: "", ja: "", ...existing.notes });
+          } else if (existing.note) {
+            setSelectedNotes({ en: existing.note, ja: "" });
+          } else {
+            setSelectedNotes({ en: "", ja: "" });
+          }
         } else {
+          setSelectedTourTypes([]);
           setSelectedNotes({ en: "", ja: "" });
         }
-      } else {
-        setSelectedTourTypes([]);
-        setSelectedNotes({ en: "", ja: "" });
-      }
+      });
     }
   }, [selectedDate, dateDetails]);
 

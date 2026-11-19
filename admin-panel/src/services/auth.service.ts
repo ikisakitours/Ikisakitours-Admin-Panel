@@ -232,9 +232,9 @@ export const authService = {
   },
 
   /**
-   * Update admin profile (full name, avatar WebP)
+   * Update admin profile (full name, avatar WebP, optional oldAvatarUrl for R2 cleanup)
    */
-  async updateProfile(payload: { fullName?: string; avatarUrl?: string }): Promise<{ success: boolean; user?: AdminUser; message: string }> {
+  async updateProfile(payload: { fullName?: string; avatarUrl?: string; oldAvatarUrl?: string }): Promise<{ success: boolean; user?: AdminUser; message: string }> {
     try {
       const response = await fetch(`${API_BASE_URL}/admin/auth/profile`, {
         method: 'PATCH',

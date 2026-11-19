@@ -28,7 +28,9 @@ export function DestinationList() {
   };
 
   useEffect(() => {
-    fetchDestinations();
+    queueMicrotask(() => {
+      fetchDestinations();
+    });
   }, []);
 
   const resolveTitle = (titleField: any): string => {
