@@ -40,6 +40,8 @@
   - [4. Interactive In-App Operations Manual (`/manual`)](#4-interactive-in-app-operations-manual-manual)
   - [5. Enterprise Zero-Trust Admin Authentication, 10-Role RBAC & 2FA Engine](#5-enterprise-zero-trust-admin-authentication-10-role-rbac--2fa-engine)
   - [6. Dual-Lock Route Guard, Zero-Flash Protection & Cloudflare R2 WebP Profile Engine](#6-dual-lock-route-guard-zero-flash-protection--cloudflare-r2-webp-profile-engine)
+  - [7. Customer Account Suspension & Zero-Trust Access Guard](#7-customer-account-suspension--zero-trust-access-guard)
+  - [8. Branded Customer Reference ID Engine & UI/UX Resilience](#8-branded-customer-reference-id-engine--uiux-resilience)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -243,6 +245,36 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Photos uploaded in the Admin Profile modal are converted client-side to compressed `.webp` format before upload.
   - Avatar URLs include unique versioning timestamps to bust browser caches immediately upon replacement.
   - Automatic backend cleanup: When a new avatar photo replaces an existing one or when a staff member is deleted, the backend automatically issues an S3/R2 `DeleteObjectCommand`, removing old orphaned files from Cloudflare R2.
+
+### 7. Customer Account Suspension & Zero-Trust Access Guard
+
+- **Real-Time Database Verification (`JwtAuthGuard`)**:
+  - Customer JWT session tokens contain only `{ sub: user.id }`.
+  - On every incoming customer request, the NestJS `JwtAuthGuard` performs a real-time database lookup in PostgreSQL (`users` table).
+  - If `hasAccess === false`, the guard immediately throws `403 Forbidden` with a standardized structured payload (`ACCOUNT_SUSPENDED`), invalidating access instantaneously without waiting for JWT token expiration.
+- **Defense-in-Depth Mutation Protection**:
+  - `POST /api/comments` & `POST /api/comments/package-review`: Blocked with 403 `ACCOUNT_SUSPENDED`.
+  - `POST /api/package-bookings`: Rejected if caller or payload email matches a suspended account. Public guest bookings remain 100% operational.
+  - `POST /api/services/*` (Transfer, Chauffeur, Custom tours): Inquiries from suspended accounts are blocked. Public guest inquiries remain 100% operational.
+- **Customer Frontend Zero-Flash Lockout (`AccessGate.tsx`)**:
+  - Root layout wraps the application with `<AccessGate>`, reading cached user status synchronously from Frame 0.
+  - Suspended customers cannot view any protected pages (even for a millisecond); they are immediately locked onto the luxury `<AccessRestricted />` screen.
+  - The **"SIGN OUT"** action purges auth cookies and local state, instantly restoring public guest browsing capabilities.
+
+### 8. Branded Customer Reference ID Engine & UI/UX Resilience
+
+- **Branded Customer Reference ID System (`IKISAKI-XXXXXX`)**:
+  - High-readability 6-character alphanumeric codes excluding confusing characters (`0`, `O`, `1`, `I`), e.g., `IKISAKI-8F42M9`.
+  - Automatically generated upon email registration and Social OAuth (Google, Facebook, Instagram), with automatic on-the-fly backfill for legacy accounts.
+  - Displayed across customer profile screens and the `<AccessRestricted />` screen with a pre-filled support `mailto:` link for immediate issue resolution.
+  - Fully integrated into the Admin Panel `/users` table with 1-click clipboard copy and real-time omni-search filtering by Reference ID, Name, or Email.
+- **Dynamic Content-Adaptive Toast Engine (`AdminToast.tsx`)**:
+  - Toast width adjusts dynamically according to message content (`w-fit max-w-md sm:max-w-lg`) without forced fixed minimums.
+  - Maintains compact height (`py-2`), standard font scaling (`text-[11px] sm:text-xs`), and responsive `break-words` text wrapping.
+- **Sidebar Isolated Smooth Navigation & Auto-Centering (`Sidebar.tsx`)**:
+  - Container-scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll animations to the sidebar navigation rail, preventing undesirable main document/window jumps.
+  - Bottom navigation items (such as Staff Directory, Settings, and Legal Documents) smoothly elevate into the optimal upper-third viewport (~22% from the top) upon selection.
+  - Hover auto-scroll (`onMouseEnter`) gently guides the sidebar to the currently active page when expanding the collapsed navigation.
 
 ---
 

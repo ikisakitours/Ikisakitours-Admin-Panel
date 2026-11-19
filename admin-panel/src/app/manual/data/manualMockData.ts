@@ -772,17 +772,19 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         route: "/users",
         icon: "users",
         iconColorClass: "text-sky-600",
-        summary: "View every customer profile and update VIP, Access, and Verification statuses in 1 click.",
-        badges: ["Active / Blocked", "VIP Crown 👑", "Verified ✓"],
+        summary: "View every customer profile, search by Branded Reference ID, and manage VIP, Access, and Verification statuses with real-time Zero-Trust enforcement.",
+        badges: ["IKISAKI-XXXXXX Code", "Omni-Search", "Active / Suspended", "VIP Crown 👑", "Verified ✓"],
         steps: [
-          "Open /users — check the Total Users badge in the top-right and locate any customer card.",
-          "Toggle Account Access: Click the Access status badge (top-right of the card) to switch a user between Active and Blocked.",
+          "Search & Filter: Use the real-time Omni-Search bar to instantly locate customers by Branded Reference ID (e.g. IKISAKI-8F42M9), First Name, Last Name, or Email address.",
+          "Branded Customer Reference ID: Every customer is assigned a clean alphanumeric code (e.g. IKISAKI-8F42M9). Click the amber Reference ID badge to copy it to clipboard in 1 click for customer support or referral validation.",
+          "Real-Time Zero-Trust Suspension: Click the Access badge to toggle a customer between Active and Suspended. When suspended, the NestJS JwtAuthGuard and frontend AccessGate immediately lock them out across all devices and block bookings or reviews.",
           "Toggle VIP Member: Click the VIP toggle button to grant or remove VIP status (adds a gold Crown badge on their avatar).",
           "Toggle Verified: Click the Verified button to add or remove the blue Verified Checkmark.",
-          "Inspect User UUID: Click the Eye icon on the card to reveal or hide the internal User ID for support lookups.",
+          "Inspect Technical UUID: Click the Eye icon on the card or table row to reveal or hide the internal database User UUID for backend debugging.",
         ],
         bullets: [
-          "All toggles save live immediately via PATCH /auth/users/:id/status with spinner confirmation.",
+          "All toggles save live immediately via PATCH /auth/users/:id/status with spinner confirmation and instant synchronization.",
+          "Zero-Trust Backend Guard: Suspended accounts (hasAccess: false) attempting any mutation (package bookings, custom tour inquiries, chauffeur requests, reviews) are blocked with HTTP 403 ACCOUNT_SUSPENDED.",
         ],
       },
       {
@@ -1167,5 +1169,26 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "Frequent profile photo replacements could leave orphaned files in Cloudflare R2 bucket storage if not automatically pruned.",
     solution:
       "The Ikisaki profile engine handles this automatically: images are compressed client-side into .webp, and when saving a new avatar, the backend automatically issues a DeleteObjectCommand to Cloudflare R2, removing the previous image so storage never accumulates clutter.",
+  },
+  {
+    question: "Customer reports their account is suspended or sees the Access Restricted screen",
+    module: "Customer Management & Security",
+    cause: "An administrator switched the customer's account status to Suspended on /users (hasAccess: false), triggering real-time 403 ACCOUNT_SUSPENDED enforcement in the backend JwtAuthGuard and frontend AccessGate.",
+    solution:
+      "Open the /users page, locate the customer using Omni-Search (by name, email, or IKISAKI-XXXXXX code), and click the Access badge to toggle their status back to Active (Green). The change takes effect immediately without requiring re-registration or token refresh.",
+  },
+  {
+    question: "How does the Branded Customer Reference ID (IKISAKI-XXXXXX) work and where can I search it?",
+    module: "Customer Management & Support",
+    cause: "To avoid exposing raw database UUIDs and streamline customer support, email inquiries, and future referral tracking, every registered customer is assigned a clean 6-character alphanumeric code.",
+    solution:
+      "Admins can paste or type the reference code (e.g. IKISAKI-8F42M9) directly into the /users Omni-Search bar to instantly locate the customer. Clicking the amber badge copies the ID to the clipboard in 1 click. If a suspended customer contacts support from the Access Restricted screen, their code is automatically pre-filled in the email subject.",
+  },
+  {
+    question: "How do the new dynamic toast notifications and sidebar auto-centering work?",
+    module: "UI/UX Resilience",
+    cause: "Long toast messages previously caused text truncation, and clicking bottom sidebar items previously scrolled the entire browser window.",
+    solution:
+      "AdminToast now dynamically adjusts its width to fit the content size (w-fit max-w-md sm:max-w-lg) without forced fixed minimums, keeping height compact (py-2) and text crisp (text-[11px] sm:text-xs) with clean word-wrapping. The sidebar strictly confines scrolling to its internal navigation container (navRef.scrollTo) with zero parent window jump, elevating bottom items (Staff, Settings, Legal Docs) smoothly into the comfortable upper viewport.",
   },
 ];

@@ -875,7 +875,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                         value={totpCode}
                         onChange={(e) => setTotpCode(e.target.value.replace(/[^0-9]/g, ""))}
                         placeholder="123456"
-                        className="w-full text-center text-lg tracking-widest font-mono font-bold px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 outline-none focus:bg-white focus:border-emerald-600"
+                        className="w-48 text-center text-lg tracking-widest font-mono font-bold px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 outline-none focus:bg-white focus:border-emerald-600 block"
                       />
                     </div>
 
