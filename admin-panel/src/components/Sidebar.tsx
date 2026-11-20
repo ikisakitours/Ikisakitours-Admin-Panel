@@ -128,7 +128,7 @@ export default function Sidebar() {
   const navRef = useRef<HTMLElement | null>(null);
   const activeItemRef = useRef<HTMLAnchorElement | null>(null);
 
-  // Smoothly scroll ONLY the sidebar's internal <nav> without affecting the parent page/window
+  // Smoothly bring active item into view with natural breathing room (no over-scrolling or massive empty gaps)
   const scrollToActiveItem = useCallback(() => {
     if (!navRef.current || !activeItemRef.current) return;
     const nav = navRef.current;
@@ -137,17 +137,29 @@ export default function Sidebar() {
     const navRect = nav.getBoundingClientRect();
     const itemRect = item.getBoundingClientRect();
 
-    // Calculate item position relative to the scroll container
     const currentScrollTop = nav.scrollTop;
     const itemRelativeTop = itemRect.top - navRect.top + currentScrollTop;
+    const itemRelativeBottom = itemRelativeTop + item.offsetHeight;
 
-    // Bring it comfortably up higher (place item at ~15% from top of sidebar nav)
-    const targetScrollTop = Math.max(0, itemRelativeTop - nav.clientHeight * 0.15);
+    const visibleTop = currentScrollTop;
+    const visibleBottom = currentScrollTop + nav.clientHeight;
 
-    nav.scrollTo({
-      top: targetScrollTop,
-      behavior: "smooth",
-    });
+    // Only scroll if item is partially outside visible bounds
+    if (itemRelativeBottom > visibleBottom - 16) {
+      // Modestly scroll down just enough to reveal the item with ~16px breathing room above the bottom card
+      const targetScrollTop = itemRelativeBottom - nav.clientHeight + 16;
+      nav.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: "smooth",
+      });
+    } else if (itemRelativeTop < visibleTop + 16) {
+      // Modestly scroll up just enough to reveal the item with ~16px breathing room below the top header
+      const targetScrollTop = itemRelativeTop - 16;
+      nav.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: "smooth",
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -261,9 +273,11 @@ export default function Sidebar() {
         className={`absolute inset-y-0 left-0 flex flex-col overflow-hidden border-r border-white/10 bg-slate-950/90 text-slate-300 backdrop-blur-md transition-[width,box-shadow] duration-300 ease-out motion-reduce:transition-none ${isExpanded ? "w-72 shadow-2xl shadow-black/70" : "w-22"
           }`}
       >
-        {/* Header Brand */}
-        <div
-          className={`group flex h-16 shrink-0 items-center border-b border-white/5 transition-all duration-300 ${isExpanded ? "justify-start px-5 gap-3.5" : "justify-center px-0"
+        {/* Header Brand (Clickable link to /dashboard) */}
+        <Link
+          href="/dashboard"
+          title="Go to Dashboard"
+          className={`group flex h-16 shrink-0 items-center border-b border-white/5 transition-all duration-300 cursor-pointer ${isExpanded ? "justify-start px-5 gap-3.5" : "justify-center px-0"
             }`}
         >
           {/* Logo Icon (Centered in collapsed mode) */}
@@ -297,13 +311,13 @@ export default function Sidebar() {
               </div>
             </div>
           )}
-        </div>
+        </Link>
 
         {/* Scrollable Navigation Area with Hidden Scrollbars */}
         <nav
           ref={navRef}
           aria-label="Main navigation"
-          className="flex-1 overflow-y-auto overflow-x-hidden px-3 pt-3 pb-64 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="flex-1 overflow-y-auto overflow-x-hidden px-3 pt-3 pb-6 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {visibleNavGroups.map((group, groupIndex) => (
             <div key={group.title} className={groupIndex > 0 ? "mt-3" : ""}>

@@ -439,7 +439,9 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Maintains compact height (`py-2`), standard crisp font sizing (`text-[11px] sm:text-xs font-semibold`), and length-scaled display duration (4.5s to 10s).
 - **Sidebar Isolated Smooth Navigation (`Sidebar.tsx`):**
   - Scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll movement to the sidebar navigation container, preventing accidental main page/window scrolling.
-  - Built-in `pb-64` bottom scroll runway (256px) provides sufficient scroll margin so bottom-most items (such as `Admin Manual Guide` and `Audit Logs`) smoothly glide into the comfortable upper viewport (~15% from top) upon click or route transition.
+  - **Bounded Nearest-Edge Auto-Scroll**: `scrollToActiveItem` uses smart nearest-edge bounded scrolling (~16px margin) so bottom items like `Admin Manual Guide` rest naturally right at the visible guideline above the user profile card without excessive upward overshooting.
+  - **Clean Bottom Spacing**: Streamlined bottom padding from an excessive 256px void (`pb-64`) down to a clean `pb-6` (24px) margin, ensuring the navigation seamlessly meets the profile card without dead space.
+  - **Brand Header Direct Dashboard Link**: Clicking the brand icon badge (`IT`) or `IKISAKI TOURS Admin Panel` in the sidebar header instantly navigates to `/dashboard` across both collapsed and expanded states.
   - Hover auto-scroll (`onMouseEnter` with 180ms delay) automatically and smoothly glides the sidebar to the currently active page when expanding the navigation.
 
 ### 13.14 Customer Two-Factor Authentication (2FA / RFC 6238 TOTP) Architecture
@@ -453,8 +455,8 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Customer 2FA status is surfaced directly in the `/users` table and card views with a teal `2FA` shield badge for operational awareness.
 
 ### 13.15 Session Timeout Interceptor, 401 Recovery Modal & Return URL Navigation
-- **15-Minute Token Expiration & Global 401 Interception:**
-  - Administrative JWT tokens expire after 15 minutes of inactivity (`exp` timestamp check).
+- **3-Hour Token Expiration & Global 401 Interception:**
+  - Administrative JWT tokens are active for 3 hours (`exp` timestamp check) so staff can conduct extensive operations without abrupt session cutoffs.
   - API interceptors in `api-client.ts`, `auth.service.ts`, and `service-notes.service.ts` catch HTTP 401 responses and dispatch a centralized `admin:session-expired` event.
 - **Background Scroll Locking & Executive Recovery Modal:**
   - When the Session Expired modal is open, background page scrolling is locked (`document.body.style.overflow = "hidden"`), preserving user position and context.
@@ -467,6 +469,31 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - When a customer or admin replaces their profile avatar or deletes their account, the backend automatically issues an asynchronous S3/R2 `DeleteObjectCommand` to Cloudflare R2.
   - External OAuth avatars (Google `lh3.googleusercontent.com` and Facebook `graph.facebook.com`) are automatically preserved and never targeted for deletion.
   - Prevents orphaned image accumulation, keeping Cloudflare R2 storage clutter-free.
+
+### 13.17 Admin Profile & Security Modal Ergonomics, Centered Notifications & 2FA Password Verification
+- **Centered Content-Adaptive Notifications (`AdminSecurityModal.tsx`):**
+  - Feedback toasts (`profileMsg`, `passwordMsg`, `twoFactorMsg`) automatically scale to message length (`w-fit max-w-md mx-auto`), horizontally centered with backdrop blur, dismiss (`X`) button, and auto-dismiss after 4.5 seconds.
+  - Discarding manual dismissal fatigue: alerts disappear smoothly after 4.5 seconds so staff can continue editing without clutter.
+- **Centered Manual Setup Key (2FA TOTP):**
+  - The Base32 setup key container auto-adjusts its width (`w-fit max-w-full mx-auto`), features responsive horizontal scrolling, and includes a 1-click clipboard copy button.
+- **Responsive Field Width Constraints:**
+  - Form fields (`Administrator Display Name`, `Staff Email Address`, `Current Password`, `New Password`, `Confirm Password`, and `2FA disable password`) are ergonomically constrained (`max-w-sm sm:max-w-[340px]`), preventing awkward full-width stretching on large screens.
+- **High-Assurance 2FA Deactivation:**
+  - Disabling 2FA strictly requires entering the administrator's current account password, protecting staff accounts against unauthorized physical or browser takeovers.
+
+### 13.18 Login UX Resilience: Single-Line Session Timeout Notice & 3-Hour Expiry Policy
+- **Concise Single-Line Timeout Banner:**
+  - Replaced bulky multiline warning banners with the concise `"Session expired. Please sign in again."` notice.
+  - Guarantees zero text truncation, zero single-word wrapping, and clean presentation on both mobile and desktop viewports.
+- **Footer Session Indicator:**
+  - Accurately displays `Session: 3-Hour Expiry` matching the NestJS backend JWT session duration (`expiresIn: '3h'`).
+
+### 13.19 Transfer Services Dynamic Notes & Multi-Table Operations Standardization
+- **Dynamic Service Notes (`/servicenotes`):**
+  - Centralized management of Transfer Service vehicle specifications, maximum passenger capacities, luggage allowances, and airport pickup (BIA) guidelines.
+  - Localized in English and Japanese with real-time validation and reactive updates to the customer booking forms.
+- **Standardized Administrative Management Tables:**
+  - All operational tables (`/tours`, `/tourservices`, `/managepackages`, `/managefaqs`, `/users`) share standardized KPI summary bars (`BookingsSummaryBar`, `TourServicesSummaryBar`, `PackagesSummaryBar`, `FaqSummaryBar`, `UsersSummaryBar`) with real-time metrics, active filter pills, and unified `AdminDeleteModal` confirmation guards.
 
 ---
 

@@ -884,6 +884,9 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         ],
         bullets: [
           "Disabling 2FA requires confirming your current account password to prevent unauthorized tampering.",
+          "Profile, Password, and 2FA feedback notifications dynamically adjust to message width (w-fit max-w-md mx-auto), horizontally centered with backdrop blur, dismiss buttons, and a 4.5-second auto-dismiss timer.",
+          "Manual Setup Key container auto-adjusts width (w-fit max-w-full mx-auto) with responsive horizontal scrolling and 1-click clipboard copy.",
+          "Form fields are ergonomically constrained (max-w-sm sm:max-w-[340px]) to prevent excessive horizontal stretching on large displays.",
           "Built on Node.js native crypto for 100% serverless Vercel compatibility without ESM bundling conflicts.",
         ],
       },
@@ -1190,12 +1193,12 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     module: "UI/UX Resilience",
     cause: "Toast messages previously forced artificial fixed widths or line wraps, and bottom sidebar items were restricted by the scroll boundary.",
     solution:
-      "AdminToast now dynamically adapts its width to the exact content size (w-auto max-w-[min(52rem,calc(100vw-3rem))]) and guarantees standard sentences under 95 characters remain on a single line (whitespace-nowrap) with compact height (py-2) and crisp text (text-[11px] sm:text-xs). The sidebar features an extended 256px bottom scroll runway (pb-64), smoothly gliding bottom-most items (like Admin Manual Guide) into the comfortable upper 15% viewport on click, route changes, or hover expand.",
+      "AdminToast now dynamically adapts its width to the exact content size (w-auto max-w-[min(52rem,calc(100vw-3rem))]) and guarantees standard sentences under 95 characters remain on a single line (whitespace-nowrap) with compact height (py-2) and crisp text (text-[11px] sm:text-xs). The sidebar utilizes bounded nearest-edge scrolling (~16px margin) with streamlined pb-6 bottom padding, keeping items like Admin Manual Guide resting naturally right at the visible guideline above the user card without excessive over-scrolling.",
   },
   {
-    question: "What happens when an admin session times out after 15 minutes of inactivity?",
+    question: "What happens when an admin session times out after 3 hours of inactivity?",
     module: "Security & Session Management",
-    cause: "Administrative JWT tokens are issued with a strict 15-minute expiration timestamp to comply with Zero-Trust security standards and prevent unattended terminal exploitation.",
+    cause: "Administrative JWT tokens are issued with a 3-hour expiration timestamp so staff can work comfortably throughout their shift without unexpected disruptions.",
     solution:
       "When an admin session times out, global API interceptors catch the HTTP 401 response and open the executive Session Expired modal. Background page scrolling is locked to maintain your screen position. Clicking 'Sign In Again' preserves your active workspace URL (/login?expired=true&redirect=<target>). Once you re-enter your credentials and 6-digit 2FA Authenticator code, you are instantly returned directly to your in-progress workspace.",
   },
@@ -1212,5 +1215,33 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "Frequent profile avatar replacements could leave thousands of orphaned image files accumulating in Cloudflare R2 bucket storage over time.",
     solution:
       "The automatic cleanup engine resolves targetToDelete whenever an admin or customer updates or removes their avatar. The backend immediately purges the old image from Cloudflare R2 via an asynchronous DeleteObjectCommand without blocking the user response. External social OAuth avatars (Google lh3.googleusercontent.com and Facebook graph.facebook.com) are automatically recognized and protected from deletion.",
+  },
+  {
+    question: "How do the centered toasts, Manual Setup Key, and input fields work in Admin Profile & Security modal?",
+    module: "Admin Profile & Security",
+    cause: "Feedback toasts previously stretched full width across the modal and remained on screen indefinitely, while form fields were overly wide on large monitors.",
+    solution:
+      "Feedback toasts (profile, password, 2FA) now dynamically calculate their width according to message length (w-fit max-w-md mx-auto), are horizontally centered with backdrop blur, dismiss buttons, and auto-dismiss smoothly after 4.5 seconds. The Manual Setup Key container auto-adjusts width (w-fit max-w-full mx-auto) with responsive scrolling and 1-click clipboard copy. Form inputs are ergonomically constrained (max-w-sm sm:max-w-[340px]), and disabling 2FA requires confirming your current account password.",
+  },
+  {
+    question: "How does the sidebar brand logo shortcut and bounded auto-scroll work?",
+    module: "Navigation & UX",
+    cause: "Admins navigating deep inside sub-pages needed a quick 1-click way to return to the Dashboard, and bottom navigation items previously had an excessive 256px blank void.",
+    solution:
+      "Clicking the 'IT' badge or 'IKISAKI TOURS Admin Panel' header in the sidebar instantly routes to /dashboard in both collapsed and expanded states. The active item auto-scroller uses bounded nearest-edge scrolling (~16px margin) with streamlined pb-6 bottom padding, keeping items like Admin Manual Guide resting naturally right at the visible guideline above the profile card.",
+  },
+  {
+    question: "Why does the login page show 'Session expired. Please sign in again.' and 'Session: 3-Hour Expiry'?",
+    module: "Authentication & Login",
+    cause: "The backend administrative JWT access token lifetime was extended from 15 minutes to 3 hours to allow uninterrupted daily operations.",
+    solution:
+      "The login footer reflects the 3-hour session window ('Session: 3-Hour Expiry'). If an admin session expires or times out, the login page displays a concise, single-line warning ('Session expired. Please sign in again.') preventing awkward line truncation, word breaks, or ellipses on smaller screens.",
+  },
+  {
+    question: "How do Transfer Service Notes and Vehicle guidelines work on /servicenotes?",
+    module: "Transfer & Fleet Guidelines",
+    cause: "Custom airport and intercity transfers require up-to-date vehicle capacity, luggage rules, baby seat requirements, and Colombo airport (BIA) meeting instructions.",
+    solution:
+      "Open /servicenotes to configure English and Japanese vehicle guidelines (Sedan, Mini Van, Van, Mini Coach) including max passenger counts, large/small suitcase limits, and baby seat availability. Changes save directly to the database and sync reactively with the customer website's transfer booking calculator.",
   },
 ];
