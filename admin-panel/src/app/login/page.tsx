@@ -214,12 +214,12 @@ function LoginForm() {
               </p>
             </div>
 
-            {/* Session Expired Banner (Strict single line, no text wrapping) */}
+            {/* Session Expired Banner (Concise, single line, zero truncation) */}
             {isExpired && (
-              <div className="py-2.5 px-3.5 bg-amber-50 border border-amber-200/90 rounded-2xl flex items-center gap-2.5 text-amber-900 shadow-2xs animate-in fade-in duration-200 overflow-hidden">
+              <div className="py-2 px-3 bg-amber-50 border border-amber-200/90 rounded-xl flex items-center gap-2 text-amber-900 shadow-2xs animate-in fade-in duration-200">
                 <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
                 <span className="font-semibold whitespace-nowrap text-[11px] sm:text-xs">
-                  Your administrative session has timed out. Please sign in again.
+                  Session expired. Please sign in again.
                 </span>
               </div>
             )}
@@ -356,7 +356,7 @@ function LoginForm() {
                 <KeyRound className="w-3 h-3 text-emerald-600" />
                 <span>Authorized Personnel Only</span>
               </span>
-              <span>Session: 15-Minute Expiry</span>
+              <span>Session: 3-Hour Expiry</span>
             </div>
           </div>
         </div>

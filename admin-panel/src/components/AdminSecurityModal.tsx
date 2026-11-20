@@ -144,6 +144,25 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
   const [showDisableForm, setShowDisableForm] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Auto-dismiss feedback alerts after 4.5 seconds
+  useEffect(() => {
+    if (!profileMsg) return;
+    const timer = setTimeout(() => setProfileMsg(null), 4500);
+    return () => clearTimeout(timer);
+  }, [profileMsg]);
+
+  useEffect(() => {
+    if (!passwordMsg) return;
+    const timer = setTimeout(() => setPasswordMsg(null), 4500);
+    return () => clearTimeout(timer);
+  }, [passwordMsg]);
+
+  useEffect(() => {
+    if (!twoFactorMsg) return;
+    const timer = setTimeout(() => setTwoFactorMsg(null), 4500);
+    return () => clearTimeout(timer);
+  }, [twoFactorMsg]);
+
   useEffect(() => {
     queueMicrotask(() => {
       setMounted(true);
@@ -454,18 +473,29 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
           {activeTab === "profile" && (
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               {profileMsg && (
-                <div
-                  className={`p-3 rounded-2xl text-xs font-medium flex items-start gap-2.5 ${profileMsg.type === "success"
-                    ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
-                    : "bg-rose-50 border border-rose-200 text-rose-800"
+                <div className="flex justify-center w-full animate-in fade-in duration-200">
+                  <div
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-semibold shadow-xs max-w-full transition-all ${
+                      profileMsg.type === "success"
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                        : "bg-rose-50 border border-rose-200 text-rose-800"
                     }`}
-                >
-                  {profileMsg.type === "success" ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  )}
-                  <span>{profileMsg.text}</span>
+                  >
+                    {profileMsg.type === "success" ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span className="whitespace-nowrap max-sm:whitespace-normal">{profileMsg.text}</span>
+                    <button
+                      type="button"
+                      onClick={() => setProfileMsg(null)}
+                      className="ml-1 opacity-60 hover:opacity-100 cursor-pointer p-0.5 text-slate-400 hover:text-slate-700"
+                      aria-label="Dismiss message"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -548,7 +578,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Pramod Siriwardhana"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600"
+                  className="w-full max-w-sm sm:max-w-[340px] px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 block"
                 />
               </div>
 
@@ -561,7 +591,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                   type="email"
                   disabled
                   value={email}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-xs font-medium outline-none cursor-not-allowed font-mono"
+                  className="w-full max-w-sm sm:max-w-[340px] px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-xs font-medium outline-none cursor-not-allowed font-mono block"
                 />
               </div>
 
@@ -596,18 +626,29 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
           {activeTab === "password" && (
             <form onSubmit={handlePasswordSubmit} autoComplete="off" className="space-y-4">
               {passwordMsg && (
-                <div
-                  className={`p-3 rounded-2xl text-xs font-medium flex items-start gap-2.5 ${passwordMsg.type === "success"
-                    ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
-                    : "bg-rose-50 border border-rose-200 text-rose-800"
+                <div className="flex justify-center w-full animate-in fade-in duration-200">
+                  <div
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-semibold shadow-xs max-w-full transition-all ${
+                      passwordMsg.type === "success"
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                        : "bg-rose-50 border border-rose-200 text-rose-800"
                     }`}
-                >
-                  {passwordMsg.type === "success" ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  )}
-                  <span>{passwordMsg.text}</span>
+                  >
+                    {passwordMsg.type === "success" ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span className="whitespace-nowrap max-sm:whitespace-normal">{passwordMsg.text}</span>
+                    <button
+                      type="button"
+                      onClick={() => setPasswordMsg(null)}
+                      className="ml-1 opacity-60 hover:opacity-100 cursor-pointer p-0.5 text-slate-400 hover:text-slate-700"
+                      aria-label="Dismiss message"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -616,7 +657,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 block">
                   Current Password
                 </label>
-                <div className="relative">
+                <div className="relative max-w-sm sm:max-w-[340px]">
                   <input
                     type={showCurrent ? "text" : "password"}
                     required
@@ -624,7 +665,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter existing password"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 font-mono"
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 font-mono"
                   />
                   <button
                     type="button"
@@ -641,7 +682,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 block">
                   New Password
                 </label>
-                <div className="relative">
+                <div className="relative max-w-sm sm:max-w-[340px]">
                   <input
                     type={showNew ? "text" : "password"}
                     required
@@ -649,7 +690,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Minimum 8 characters"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 font-mono"
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 font-mono"
                   />
                   <button
                     type="button"
@@ -662,7 +703,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
 
                 {/* Password Strength Meter */}
                 {newPassword.length > 0 && (
-                  <div className="pt-1.5 space-y-1">
+                  <div className="pt-1.5 space-y-1 max-w-sm sm:max-w-[340px]">
                     <div className="flex gap-1 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 ${strengthScore <= 2
@@ -706,7 +747,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter new password"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 font-mono"
+                  className="w-full max-w-sm sm:max-w-[340px] px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 font-mono block"
                 />
               </div>
 
@@ -741,18 +782,29 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
           {activeTab === "2fa" && (
             <div className="space-y-5">
               {twoFactorMsg && (
-                <div
-                  className={`p-3 rounded-2xl text-xs font-medium flex items-start gap-2.5 ${twoFactorMsg.type === "success"
-                    ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
-                    : "bg-rose-50 border border-rose-200 text-rose-800"
+                <div className="flex justify-center w-full animate-in fade-in duration-200">
+                  <div
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-semibold shadow-xs max-w-full transition-all ${
+                      twoFactorMsg.type === "success"
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                        : "bg-rose-50 border border-rose-200 text-rose-800"
                     }`}
-                >
-                  {twoFactorMsg.type === "success" ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  )}
-                  <span>{twoFactorMsg.text}</span>
+                  >
+                    {twoFactorMsg.type === "success" ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span className="whitespace-nowrap max-sm:whitespace-normal">{twoFactorMsg.text}</span>
+                    <button
+                      type="button"
+                      onClick={() => setTwoFactorMsg(null)}
+                      className="ml-1 opacity-60 hover:opacity-100 cursor-pointer p-0.5 text-slate-400 hover:text-slate-700"
+                      aria-label="Dismiss message"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -843,22 +895,26 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                       )}
                     </div>
 
-                    {/* Manual Secret Key */}
-                    <div className="flex items-center justify-between gap-2 p-2.5 bg-white rounded-xl border border-emerald-200">
-                      <div className="min-w-0">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block">Manual Setup Key</span>
-                        <code className="text-xs font-mono font-bold text-slate-900 tracking-wider truncate block">
-                          {secret}
-                        </code>
+                    {/* Manual Secret Key (Auto-adjust width to content, centered) */}
+                    <div className="flex justify-center pt-0.5">
+                      <div className="inline-flex items-center gap-3 py-2 px-3.5 bg-white rounded-xl border border-emerald-200 shadow-2xs">
+                        <div className="text-left">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Manual Setup Key
+                          </span>
+                          <code className="text-xs font-mono font-bold text-slate-900 tracking-widest select-all block">
+                            {secret}
+                          </code>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleCopySecret}
+                          className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+                        >
+                          {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-emerald-600" />}
+                          <span>{copied ? "Copied" : "Copy"}</span>
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleCopySecret}
-                        className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0"
-                      >
-                        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{copied ? "Copied" : "Copy"}</span>
-                      </button>
                     </div>
                   </div>
 
@@ -945,7 +1001,7 @@ export function AdminSecurityModal({ isOpen, onClose, onProfileUpdated }: AdminS
                         value={disablePassword}
                         onChange={(e) => setDisablePassword(e.target.value)}
                         placeholder="Current password"
-                        className="w-full px-3.5 py-2 rounded-xl bg-white border border-rose-200 text-xs text-slate-900 outline-none focus:border-rose-500 font-mono"
+                        className="w-full max-w-sm sm:max-w-[320px] px-3.5 py-2 rounded-xl bg-white border border-rose-200 text-xs text-slate-900 outline-none focus:border-rose-500 font-mono block"
                       />
                       <div className="flex items-center justify-end gap-2">
                         <button
