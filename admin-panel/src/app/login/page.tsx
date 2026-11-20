@@ -249,7 +249,7 @@ function LoginForm() {
 
                   {/* Password Field */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between">
+                    {/* <div className="flex items-center justify-between">
                       <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 block">
                         Access Secret Key
                       </label>
@@ -261,7 +261,7 @@ function LoginForm() {
                       >
                         Use Admin Key
                       </button>
-                    </div>
+                    </div> */}
                     <div className="relative">
                       <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
