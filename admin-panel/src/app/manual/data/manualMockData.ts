@@ -773,11 +773,12 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         icon: "users",
         iconColorClass: "text-sky-600",
         summary: "View every customer profile, search by Branded Reference ID, and manage VIP, Access, and Verification statuses with real-time Zero-Trust enforcement.",
-        badges: ["IKISAKI-XXXXXX Code", "Omni-Search", "Active / Suspended", "VIP Crown 👑", "Verified ✓"],
+        badges: ["IKISAKI-XXXXXX Code", "Omni-Search", "Active / Suspended", "VIP Crown 👑", "2FA Security 🛡️", "Verified ✓"],
         steps: [
           "Search & Filter: Use the real-time Omni-Search bar to instantly locate customers by Branded Reference ID (e.g. IKISAKI-8F42M9), First Name, Last Name, or Email address.",
           "Branded Customer Reference ID: Every customer is assigned a clean alphanumeric code (e.g. IKISAKI-8F42M9). Click the amber Reference ID badge to copy it to clipboard in 1 click for customer support or referral validation.",
           "Real-Time Zero-Trust Suspension: Click the Access badge to toggle a customer between Active and Suspended. When suspended, the NestJS JwtAuthGuard and frontend AccessGate immediately lock them out across all devices and block bookings or reviews.",
+          "Customer 2FA Indicator: Customers who enabled Google Authenticator / Authy on their profile display a teal '2FA' badge for security auditing.",
           "Toggle VIP Member: Click the VIP toggle button to grant or remove VIP status (adds a gold Crown badge on their avatar).",
           "Toggle Verified: Click the Verified button to add or remove the blue Verified Checkmark.",
           "Inspect Technical UUID: Click the Eye icon on the card or table row to reveal or hide the internal database User UUID for backend debugging.",

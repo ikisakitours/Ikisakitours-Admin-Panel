@@ -178,6 +178,14 @@ export const authService = {
         }
         return user;
       }
+      if (response.status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_user');
+          window.dispatchEvent(new CustomEvent('admin:session-expired'));
+        }
+        return null;
+      }
     } catch {
       // fallback
     }

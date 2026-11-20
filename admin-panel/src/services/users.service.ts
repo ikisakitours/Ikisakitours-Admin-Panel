@@ -13,6 +13,7 @@ export interface User {
   isVerified: boolean;
   isVip: boolean;
   hasAccess: boolean;
+  isTwoFactorEnabled?: boolean;
   createdAt: string;
 }
 

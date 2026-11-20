@@ -200,7 +200,8 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
    - Suspended customers are strictly blocked from submitting bookings, creating reviews, requesting custom chauffeur tours, or navigating any page.
 5. **Toggle VIP Tier (`👑`):** Click the VIP button to award or remove VIP Member status (adds a gold Crown badge to their avatar).
 6. **Toggle Verified (`✓`):** Click Verified to add or remove the blue verified checkmark.
-7. **View Technical UUID:** Click the **Eye icon** on any card or row to reveal or hide the internal database primary key.
+7. **Two-Factor Authentication (`2FA`):** A teal `2FA` badge appears automatically next to customer names who have activated Google Authenticator / Authy on their profile.
+8. **View Technical UUID:** Click the **Eye icon** on any card or row to reveal or hide the internal database primary key.
 
 ### Media Gallery (`/imageupload`)
 > [!IMPORTANT]
@@ -439,6 +440,16 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll movement to the sidebar navigation container, preventing accidental main page/window scrolling.
   - Bottom navigation items (such as Staff, Settings, and Legal Docs) are elevated into the comfortable upper viewport (positioned at ~22% from top) upon click or route transition.
   - Hover auto-scroll (`onMouseEnter`) automatically and smoothly glides to the currently active page when expanding the sidebar.
+
+### 13.14 Customer Two-Factor Authentication (2FA / RFC 6238 TOTP) Architecture
+- **Customer Account Protection:**
+  - Registered travelers can activate Google Authenticator / Authy from their Profile Security settings.
+  - Activation endpoints: `POST /api/auth/2fa/generate` produces an `otpauth://` QR Code Data URL and Base32 setup key; `POST /api/auth/2fa/enable` verifies the 6-digit TOTP code and commits `is_two_factor_enabled = true`.
+- **Two-Step Login Challenge (`POST /api/auth/login`):**
+  - If a customer with 2FA enabled submits their email and password, the server responds with `{ requiresTwoFactor: true }` without issuing JWT access tokens or session cookies.
+  - The customer frontend seamlessly transitions to the 2FA Challenge screen, prompting for the 6-digit TOTP code before granting authentication.
+- **Admin Panel Visibility:**
+  - Customer 2FA status is surfaced directly in the `/users` table and card views with a teal `2FA` shield badge for operational awareness.
 
 ---
 

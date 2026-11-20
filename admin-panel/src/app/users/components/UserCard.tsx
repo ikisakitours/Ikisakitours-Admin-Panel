@@ -82,6 +82,12 @@ export default function UserCard({
                     <CheckCircle2 className="w-4 h-4 text-blue-500 fill-blue-50 shrink-0" />
                   </span>
                 )}
+                {Boolean(user.isTwoFactorEnabled || (user as any).is_two_factor_enabled) && (
+                  <span title="Two-Factor Authentication (2FA) Protected" className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-black bg-teal-50 text-teal-700 border border-teal-200">
+                    <ShieldCheck className="w-2.5 h-2.5 text-teal-600 shrink-0" />
+                    <span>2FA</span>
+                  </span>
+                )}
               </div>
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 mt-0.5">
                 <Globe className="w-3 h-3 text-indigo-500 shrink-0" />
