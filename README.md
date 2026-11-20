@@ -42,6 +42,7 @@
   - [6. Dual-Lock Route Guard, Zero-Flash Protection & Cloudflare R2 WebP Profile Engine](#6-dual-lock-route-guard-zero-flash-protection--cloudflare-r2-webp-profile-engine)
   - [7. Customer Account Suspension & Zero-Trust Access Guard](#7-customer-account-suspension--zero-trust-access-guard)
   - [8. Branded Customer Reference ID Engine & UI/UX Resilience](#8-branded-customer-reference-id-engine--uiux-resilience)
+  - [9. Session Timeout Interceptor, 401 Recovery & Cloudflare R2 Asset Lifecycle](#9-session-timeout-interceptor-401-recovery--cloudflare-r2-asset-lifecycle)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -269,14 +270,30 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Displayed across customer profile screens and the `<AccessRestricted />` screen with a pre-filled support `mailto:` link for immediate issue resolution.
   - Fully integrated into the Admin Panel `/users` table with 1-click clipboard copy and real-time omni-search filtering by Reference ID, Name, or Email.
 - **Dynamic Content-Adaptive Toast Engine (`AdminToast.tsx`)**:
-  - Toast width adjusts dynamically according to message content (`w-fit max-w-md sm:max-w-lg`) without forced fixed minimums.
-  - Maintains compact height (`py-2`), standard font scaling (`text-[11px] sm:text-xs`), and responsive `break-words` text wrapping.
+  - Toast width adjusts dynamically according to message content (`w-auto max-w-[min(52rem,calc(100vw-3rem))]`) without forced fixed minimums or artificial width caps.
+  - Standard messages under 95 characters remain strictly on a single line (`whitespace-nowrap max-sm:whitespace-normal`), preventing single-word line breaks (e.g. `code.`).
+  - Maintains compact single-line height (`py-2`), standard crisp font scaling (`text-[11px] sm:text-xs font-semibold`), and dynamic display duration scaled to message length (4.5s to 10s).
 - **Sidebar Isolated Smooth Navigation & Auto-Centering (`Sidebar.tsx`)**:
   - Container-scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll animations to the sidebar navigation rail, preventing undesirable main document/window jumps.
-  - Bottom navigation items (such as Staff Directory, Settings, and Legal Documents) smoothly elevate into the optimal upper-third viewport (~22% from the top) upon selection.
-  - Hover auto-scroll (`onMouseEnter`) gently guides the sidebar to the currently active page when expanding the collapsed navigation.
+  - Built-in `pb-64` bottom scroll runway (256px) ensures bottom-most navigation items (such as `Admin Manual Guide` and `Audit Logs`) smoothly elevate into the optimal upper viewport (~15% from top) upon route changes or clicks.
+  - Hover auto-scroll (`onMouseEnter` with 180ms timing) automatically and gently glides the sidebar to the currently active page when expanding the collapsed navigation.
 - **Customer Two-Factor Authentication (2FA) Monitoring**:
   - The `/users` module monitors customer-side RFC 6238 TOTP adoption with real-time teal `2FA` badges across both table rows and responsive cards.
+
+### 9. Session Timeout Interceptor, 401 Recovery & Cloudflare R2 Asset Lifecycle
+
+- **Automatic 15-Minute Session Timeout & 401 Interception**:
+  - Access JWT tokens expire after 15 minutes of inactivity (`exp` timestamp verification).
+  - Global API interceptors across `api-client.ts`, `auth.service.ts`, and `service-notes.service.ts` catch HTTP 401 Unauthorized responses and broadcast a central `admin:session-expired` event.
+  - Replaces raw technical API error messages with an executive luxury security modal (`AdminSessionExpiredModal.tsx`).
+- **Background Scroll Locking & Zero-Disruption Recovery**:
+  - When the Session Expired modal opens, background page scrolling is locked (`document.body.style.overflow = "hidden"`), preventing disorientation while viewing administrative data.
+  - Clicking **"Sign In Again"** automatically preserves the administrator's exact active pathname via query parameter (`/login?expired=true&redirect=<target>`).
+  - Re-authenticating with email, password, and 2FA Authenticator code restores the session and seamlessly returns the administrator directly to their in-progress workspace.
+- **Automatic Cloudflare R2 Orphaned Asset Cleanup**:
+  - When a customer or admin replaces their profile avatar or deletes their account, the backend automatically resolves `targetToDelete` and asynchronously issues an S3/R2 `DeleteObjectCommand`.
+  - External social avatars (Google `lh3.googleusercontent.com` and Facebook `graph.facebook.com`) are automatically identified and protected from deletion.
+  - Keeps Cloudflare R2 bucket storage clean and eliminates orphan image storage costs without blocking HTTP responses.
 
 ---
 

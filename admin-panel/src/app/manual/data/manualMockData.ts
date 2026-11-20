@@ -1188,8 +1188,29 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
   {
     question: "How do the new dynamic toast notifications and sidebar auto-centering work?",
     module: "UI/UX Resilience",
-    cause: "Long toast messages previously caused text truncation, and clicking bottom sidebar items previously scrolled the entire browser window.",
+    cause: "Toast messages previously forced artificial fixed widths or line wraps, and bottom sidebar items were restricted by the scroll boundary.",
     solution:
-      "AdminToast now dynamically adjusts its width to fit the content size (w-fit max-w-md sm:max-w-lg) without forced fixed minimums, keeping height compact (py-2) and text crisp (text-[11px] sm:text-xs) with clean word-wrapping. The sidebar strictly confines scrolling to its internal navigation container (navRef.scrollTo) with zero parent window jump, elevating bottom items (Staff, Settings, Legal Docs) smoothly into the comfortable upper viewport.",
+      "AdminToast now dynamically adapts its width to the exact content size (w-auto max-w-[min(52rem,calc(100vw-3rem))]) and guarantees standard sentences under 95 characters remain on a single line (whitespace-nowrap) with compact height (py-2) and crisp text (text-[11px] sm:text-xs). The sidebar features an extended 256px bottom scroll runway (pb-64), smoothly gliding bottom-most items (like Admin Manual Guide) into the comfortable upper 15% viewport on click, route changes, or hover expand.",
+  },
+  {
+    question: "What happens when an admin session times out after 15 minutes of inactivity?",
+    module: "Security & Session Management",
+    cause: "Administrative JWT tokens are issued with a strict 15-minute expiration timestamp to comply with Zero-Trust security standards and prevent unattended terminal exploitation.",
+    solution:
+      "When an admin session times out, global API interceptors catch the HTTP 401 response and open the executive Session Expired modal. Background page scrolling is locked to maintain your screen position. Clicking 'Sign In Again' preserves your active workspace URL (/login?expired=true&redirect=<target>). Once you re-enter your credentials and 6-digit 2FA Authenticator code, you are instantly returned directly to your in-progress workspace.",
+  },
+  {
+    question: "How does Customer Two-Factor Authentication (2FA) work and where is it monitored in the Admin Panel?",
+    module: "Customer Security & 2FA",
+    cause: "Registered travelers can activate RFC 6238 TOTP two-factor security using Google Authenticator or Authy to protect their bookings and profile data.",
+    solution:
+      "Customers activate 2FA via their Profile Security settings by scanning an otpauth:// QR code. Once enabled, their login requires both password and a live 6-digit TOTP code. Administrators can monitor 2FA adoption directly in the /users module, where active customer accounts display a real-time teal '2FA' shield badge across both table and card views.",
+  },
+  {
+    question: "How does the Cloudflare R2 automatic asset cleanup engine work for customer and admin profile avatars?",
+    module: "Media & Cloud Storage",
+    cause: "Frequent profile avatar replacements could leave thousands of orphaned image files accumulating in Cloudflare R2 bucket storage over time.",
+    solution:
+      "The automatic cleanup engine resolves targetToDelete whenever an admin or customer updates or removes their avatar. The backend immediately purges the old image from Cloudflare R2 via an asynchronous DeleteObjectCommand without blocking the user response. External social OAuth avatars (Google lh3.googleusercontent.com and Facebook graph.facebook.com) are automatically recognized and protected from deletion.",
   },
 ];
