@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { AdminAccessRestricted } from "@/components/AdminAccessRestricted";
+import { AdminSessionExpiredModal } from "@/components/AdminSessionExpiredModal";
 import { isRoutePermitted } from "@/app/staff/data/staffRoles";
 import { authService, type AdminUser } from "@/services/auth.service";
 import { Loader2 } from "lucide-react";
@@ -18,6 +19,16 @@ export function AdminShell({ children }: AdminShellProps) {
 
   const [mounted, setMounted] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+
+  // Listen for global session expiry events from API interceptors
+  useEffect(() => {
+    const handleExpired = () => {
+      setIsSessionExpired(true);
+    };
+    window.addEventListener("admin:session-expired", handleExpired);
+    return () => window.removeEventListener("admin:session-expired", handleExpired);
+  }, []);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -87,6 +98,9 @@ export function AdminShell({ children }: AdminShellProps) {
           <AdminAccessRestricted pathname={pathname} user={adminUser} />
         )}
       </main>
+
+      {/* Global Session Timeout Re-Authentication Modal */}
+      <AdminSessionExpiredModal isOpen={isSessionExpired} />
     </div>
   );
 }

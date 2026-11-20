@@ -22,6 +22,12 @@ export async function fetcher<T>(endpoint: string, options: RequestInit = {}): P
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    if (response.status === 401) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('admin:session-expired'));
+      }
+      throw new Error('Your administrative session has timed out. Please sign in again.');
+    }
     throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
   }
 

@@ -34,11 +34,13 @@ export function AdminToast({ toast, onDismiss }: AdminToastProps) {
     info: "bg-slate-900 text-slate-50 border-slate-700 shadow-slate-950/30",
   };
 
+  const isLongMessage = toast.message.length > 95;
+
   return (
     <div className="fixed bottom-5 right-5 z-120 pointer-events-none animate-in fade-in slide-in-from-bottom-3 duration-200 max-w-[calc(100vw-2.5rem)] flex justify-end">
       <div
         role="status"
-        className={`pointer-events-auto inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2 shadow-xl backdrop-blur-md w-fit max-w-md sm:max-w-lg transition-all duration-200 ${styles[toast.variant]}`}
+        className={`pointer-events-auto inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2 shadow-xl backdrop-blur-md w-auto max-w-[min(52rem,calc(100vw-3rem))] transition-all duration-200 ${styles[toast.variant]}`}
       >
         <div className="shrink-0">
           {toast.variant === "success" && (
@@ -54,7 +56,11 @@ export function AdminToast({ toast, onDismiss }: AdminToastProps) {
             <Info className="h-4 w-4 text-sky-400" />
           )}
         </div>
-        <p className="text-[11px] sm:text-xs font-semibold leading-snug break-words text-left select-text">
+        <p
+          className={`text-[11px] sm:text-xs font-semibold leading-tight text-left select-text ${
+            isLongMessage ? "whitespace-normal break-words leading-snug" : "whitespace-nowrap max-sm:whitespace-normal"
+          }`}
+        >
           {toast.message}
         </p>
         <button

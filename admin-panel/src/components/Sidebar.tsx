@@ -141,8 +141,8 @@ export default function Sidebar() {
     const currentScrollTop = nav.scrollTop;
     const itemRelativeTop = itemRect.top - navRect.top + currentScrollTop;
 
-    // Bring it comfortably up higher (place item at ~22% from top of sidebar nav)
-    const targetScrollTop = Math.max(0, itemRelativeTop - nav.clientHeight * 0.22);
+    // Bring it comfortably up higher (place item at ~15% from top of sidebar nav)
+    const targetScrollTop = Math.max(0, itemRelativeTop - nav.clientHeight * 0.15);
 
     nav.scrollTo({
       top: targetScrollTop,
@@ -185,7 +185,7 @@ export default function Sidebar() {
   useEffect(() => {
     const timer = setTimeout(() => {
       scrollToActiveItem();
-    }, 140);
+    }, 180);
     return () => clearTimeout(timer);
   }, [pathname, isExpanded, scrollToActiveItem]);
 
@@ -303,7 +303,7 @@ export default function Sidebar() {
         <nav
           ref={navRef}
           aria-label="Main navigation"
-          className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="flex-1 overflow-y-auto overflow-x-hidden px-3 pt-3 pb-64 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {visibleNavGroups.map((group, groupIndex) => (
             <div key={group.title} className={groupIndex > 0 ? "mt-3" : ""}>

@@ -192,6 +192,12 @@ export function UsersTable({
                               />
                             </span>
                           )}
+                          {Boolean(user.isTwoFactorEnabled || (user as any).is_two_factor_enabled) && (
+                            <span title="Two-Factor Authentication (2FA) Protected" className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-black bg-teal-50 text-teal-700 border border-teal-200">
+                              <ShieldCheck className="w-2.5 h-2.5 text-teal-600 shrink-0" />
+                              <span>2FA</span>
+                            </span>
+                          )}
                         </div>
                         <p className="text-[10px] text-slate-400 mt-0.5">
                           Joined:{" "}

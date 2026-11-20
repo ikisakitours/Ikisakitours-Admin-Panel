@@ -275,6 +275,8 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Container-scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll animations to the sidebar navigation rail, preventing undesirable main document/window jumps.
   - Bottom navigation items (such as Staff Directory, Settings, and Legal Documents) smoothly elevate into the optimal upper-third viewport (~22% from the top) upon selection.
   - Hover auto-scroll (`onMouseEnter`) gently guides the sidebar to the currently active page when expanding the collapsed navigation.
+- **Customer Two-Factor Authentication (2FA) Monitoring**:
+  - The `/users` module monitors customer-side RFC 6238 TOTP adoption with real-time teal `2FA` badges across both table rows and responsive cards.
 
 ---
 

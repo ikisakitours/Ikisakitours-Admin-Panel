@@ -27,6 +27,15 @@ class ServiceNotesService {
     return headers;
   }
 
+  private async handleError(res: Response, defaultMsg: string): Promise<never> {
+    const error = await res.json().catch(() => ({}));
+    if (res.status === 401 && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("admin:session-expired"));
+      throw new Error("Your administrative session has timed out. Please sign in again.");
+    }
+    throw new Error(error.message || defaultMsg);
+  }
+
   // Create a new service note
   async createServiceNote(payload: ServiceNotePayload) {
     const res = await fetch(`${this.getBaseUrl()}/services/notes`, {
@@ -36,8 +45,7 @@ class ServiceNotesService {
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to create service note");
+      await this.handleError(res, "Failed to create service note");
     }
 
     return res.json();
@@ -55,8 +63,7 @@ class ServiceNotesService {
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to fetch service notes");
+      await this.handleError(res, "Failed to fetch service notes");
     }
 
     return res.json();
@@ -71,8 +78,7 @@ class ServiceNotesService {
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to update service note");
+      await this.handleError(res, "Failed to update service note");
     }
 
     return res.json();
@@ -86,8 +92,7 @@ class ServiceNotesService {
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to delete service note");
+      await this.handleError(res, "Failed to delete service note");
     }
 
     return res.json().catch(() => ({ success: true }));
