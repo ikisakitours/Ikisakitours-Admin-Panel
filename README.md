@@ -221,7 +221,7 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Tracks consecutive failed login attempts in the database (`failed_login_attempts`, `locked_until`).
   - On **5 consecutive incorrect attempts**, the account and IP are locked for **30 minutes** (returning `HTTP 429 Too Many Requests`).
 - **Session Security & Dual-Token Rotation**:
-  - Issues a 15-minute Access JWT and a 7-day cryptographically secure UUID Refresh Token.
+  - Issues a 3-hour Access JWT and a 7-day cryptographically secure UUID Refresh Token.
   - Stored inside an `HttpOnly`, `Secure`, `SameSite=Strict` cookie (`admin_session`) — inaccessible to browser JavaScript, completely eliminating XSS token theft.
   - Automatic refresh token rotation: if a revoked refresh token is reused, all active sessions for that admin user are instantly invalidated.
 - **Database Audit Logs (`admin_audit_logs`)**:
@@ -275,15 +275,25 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Maintains compact single-line height (`py-2`), standard crisp font scaling (`text-[11px] sm:text-xs font-semibold`), and dynamic display duration scaled to message length (4.5s to 10s).
 - **Sidebar Isolated Smooth Navigation & Auto-Centering (`Sidebar.tsx`)**:
   - Container-scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll animations to the sidebar navigation rail, preventing undesirable main document/window jumps.
-  - Built-in `pb-64` bottom scroll runway (256px) ensures bottom-most navigation items (such as `Admin Manual Guide` and `Audit Logs`) smoothly elevate into the optimal upper viewport (~15% from top) upon route changes or clicks.
+  - **Bounded Nearest-Edge Auto-Scroll**: `scrollToActiveItem` uses smart nearest-edge scrolling (~16px margin) so bottom items like `Admin Manual Guide` rest naturally right at the visible guideline above the user card, avoiding aggressive overshooting to the upper 15%.
+  - **Clean Bottom Spacing**: Streamlined bottom padding from an excessive 256px void (`pb-64`) down to a clean `pb-6` (24px) margin, ensuring the navigation seamlessly meets the profile card without empty dead space.
+  - **Brand Header Direct Dashboard Link**: Clicking the brand icon badge (`IT`) or `IKISAKI TOURS Admin Panel` in the sidebar header instantly navigates to `/dashboard` across both collapsed and expanded states.
   - Hover auto-scroll (`onMouseEnter` with 180ms timing) automatically and gently glides the sidebar to the currently active page when expanding the collapsed navigation.
+- **Admin Profile & Security Modal Ergonomics (`AdminSecurityModal.tsx`)**:
+  - **Centered Content-Adaptive Toasts**: Profile, password, and 2FA feedback toasts dynamically scale to message length (`w-fit max-w-md mx-auto`), horizontally centered with backdrop blur, dismiss (`X`) button, and auto-dismiss after 4.5 seconds.
+  - **Centered Manual Setup Key**: 2FA TOTP setup key is neatly centered with responsive horizontal scrolling (`w-fit max-w-full mx-auto`) and 1-click clipboard copy.
+  - **Optimized Field Constraints**: All form inputs (`max-w-sm sm:max-w-[340px]`) prevent over-stretched text boxes on large monitors.
+  - **High-Assurance 2FA Deactivation**: Turning off two-factor authentication strictly requires entering the administrator's current account password.
+- **Login UX Resilience & 3-Hour Expiry Indicator (`login/page.tsx`)**:
+  - Single-line concise session timeout banner (`"Session expired. Please sign in again."`) preventing awkward word wraps, truncation, or ellipses on smaller screens.
+  - Footer indicator clearly displays `Session: 3-Hour Expiry` matching the NestJS backend JWT session duration.
 - **Customer Two-Factor Authentication (2FA) Monitoring**:
   - The `/users` module monitors customer-side RFC 6238 TOTP adoption with real-time teal `2FA` badges across both table rows and responsive cards.
 
 ### 9. Session Timeout Interceptor, 401 Recovery & Cloudflare R2 Asset Lifecycle
 
-- **Automatic 15-Minute Session Timeout & 401 Interception**:
-  - Access JWT tokens expire after 15 minutes of inactivity (`exp` timestamp verification).
+- **Automatic 3-Hour Session Timeout & 401 Interception**:
+  - Access JWT tokens remain valid for 3 hours of active administrative operations (`exp` timestamp verification).
   - Global API interceptors across `api-client.ts`, `auth.service.ts`, and `service-notes.service.ts` catch HTTP 401 Unauthorized responses and broadcast a central `admin:session-expired` event.
   - Replaces raw technical API error messages with an executive luxury security modal (`AdminSessionExpiredModal.tsx`).
 - **Background Scroll Locking & Zero-Disruption Recovery**:
