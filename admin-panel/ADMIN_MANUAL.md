@@ -434,12 +434,13 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 
 ### 13.13 UI/UX Resilience: Content-Adaptive Toast Engine & Sidebar Navigation Auto-Centering
 - **Content-Adaptive Dynamic Toast Notifications (`AdminToast.tsx`):**
-  - Toast width smoothly adjusts according to the content size (`w-fit max-w-md sm:max-w-lg`) instead of imposing an artificial fixed minimum width.
-  - Maintains compact height (`py-2`), standard crisp font sizing (`text-[11px] sm:text-xs`), and responsive `break-words` text wrapping.
+  - Toast width smoothly adjusts according to message content (`w-auto max-w-[min(52rem,calc(100vw-3rem))]`) without forced fixed minimums or artificial width caps.
+  - Standard messages under 95 characters remain strictly on a single line (`whitespace-nowrap max-sm:whitespace-normal`), preventing awkward single-word wrapping onto line 2 (e.g. `code.`).
+  - Maintains compact height (`py-2`), standard crisp font sizing (`text-[11px] sm:text-xs font-semibold`), and length-scaled display duration (4.5s to 10s).
 - **Sidebar Isolated Smooth Navigation (`Sidebar.tsx`):**
   - Scoped scrolling via `navRef.current.scrollTo(...)` strictly confines scroll movement to the sidebar navigation container, preventing accidental main page/window scrolling.
-  - Bottom navigation items (such as Staff, Settings, and Legal Docs) are elevated into the comfortable upper viewport (positioned at ~22% from top) upon click or route transition.
-  - Hover auto-scroll (`onMouseEnter`) automatically and smoothly glides to the currently active page when expanding the sidebar.
+  - Built-in `pb-64` bottom scroll runway (256px) provides sufficient scroll margin so bottom-most items (such as `Admin Manual Guide` and `Audit Logs`) smoothly glide into the comfortable upper viewport (~15% from top) upon click or route transition.
+  - Hover auto-scroll (`onMouseEnter` with 180ms delay) automatically and smoothly glides the sidebar to the currently active page when expanding the navigation.
 
 ### 13.14 Customer Two-Factor Authentication (2FA / RFC 6238 TOTP) Architecture
 - **Customer Account Protection:**
@@ -450,6 +451,22 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - The customer frontend seamlessly transitions to the 2FA Challenge screen, prompting for the 6-digit TOTP code before granting authentication.
 - **Admin Panel Visibility:**
   - Customer 2FA status is surfaced directly in the `/users` table and card views with a teal `2FA` shield badge for operational awareness.
+
+### 13.15 Session Timeout Interceptor, 401 Recovery Modal & Return URL Navigation
+- **15-Minute Token Expiration & Global 401 Interception:**
+  - Administrative JWT tokens expire after 15 minutes of inactivity (`exp` timestamp check).
+  - API interceptors in `api-client.ts`, `auth.service.ts`, and `service-notes.service.ts` catch HTTP 401 responses and dispatch a centralized `admin:session-expired` event.
+- **Background Scroll Locking & Executive Recovery Modal:**
+  - When the Session Expired modal is open, background page scrolling is locked (`document.body.style.overflow = "hidden"`), preserving user position and context.
+  - Sized comfortably with an executive width (`max-w-lg`) and centered action button.
+  - Clicking **"Sign In Again"** purges expired tokens and preserves the active route (`/login?expired=true&redirect=<target>`).
+  - Upon successful credentials and 2FA authentication, the system immediately returns the administrator directly to their in-progress workspace without getting stuck.
+
+### 13.16 Cloudflare R2 Automatic Orphaned Asset Cleanup
+- **Automatic Image Pruning:**
+  - When a customer or admin replaces their profile avatar or deletes their account, the backend automatically issues an asynchronous S3/R2 `DeleteObjectCommand` to Cloudflare R2.
+  - External OAuth avatars (Google `lh3.googleusercontent.com` and Facebook `graph.facebook.com`) are automatically preserved and never targeted for deletion.
+  - Prevents orphaned image accumulation, keeping Cloudflare R2 storage clutter-free.
 
 ---
 

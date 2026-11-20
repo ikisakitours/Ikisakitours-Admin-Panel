@@ -67,9 +67,8 @@ function LoginForm() {
             variant: "success",
           });
           setTimeout(() => {
-            router.push(redirectPath);
-            router.refresh();
-          }, 600);
+            window.location.href = redirectPath;
+          }, 500);
         } else {
           setToast({
             id: Date.now(),
@@ -108,9 +107,8 @@ function LoginForm() {
             variant: "success",
           });
           setTimeout(() => {
-            router.push(redirectPath);
-            router.refresh();
-          }, 600);
+            window.location.href = redirectPath;
+          }, 500);
         } else {
           setToast({
             id: Date.now(),
@@ -203,7 +201,7 @@ function LoginForm() {
 
         {/* RIGHT PANEL: Compact Credential Portal (col-span-7) */}
         <div className="md:col-span-7 p-7 sm:p-9 bg-white flex flex-col justify-center">
-          <div className="max-w-md w-full mx-auto space-y-5">
+          <div className="max-w-[370px] sm:max-w-[390px] w-full mx-auto space-y-4">
             {/* Header */}
             <div>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">
@@ -216,11 +214,13 @@ function LoginForm() {
               </p>
             </div>
 
-            {/* Session Expired Banner */}
+            {/* Session Expired Banner (Strict single line, no text wrapping) */}
             {isExpired && (
-              <div className="p-3 bg-amber-50 border border-amber-200/90 rounded-2xl flex items-center gap-2.5 text-amber-900 text-xs shadow-2xs animate-in fade-in duration-200">
+              <div className="py-2.5 px-3.5 bg-amber-50 border border-amber-200/90 rounded-2xl flex items-center gap-2.5 text-amber-900 shadow-2xs animate-in fade-in duration-200 overflow-hidden">
                 <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
-                <span className="font-medium">Your administrative session has timed out. Please sign in again.</span>
+                <span className="font-semibold whitespace-nowrap text-[11px] sm:text-xs">
+                  Your administrative session has timed out. Please sign in again.
+                </span>
               </div>
             )}
 
@@ -234,7 +234,7 @@ function LoginForm() {
                       Staff Administrator Email
                     </label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
                         type="email"
                         required
@@ -242,7 +242,7 @@ function LoginForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="admin@ikisakitours.com"
-                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 focus:ring-1 focus:ring-emerald-500/20 transition-all"
                       />
                     </div>
                   </div>
@@ -263,7 +263,7 @@ function LoginForm() {
                       </button>
                     </div>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
                         type={showPassword ? "text" : "password"}
                         required
@@ -271,12 +271,12 @@ function LoginForm() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono"
+                        className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs font-medium outline-none focus:bg-white focus:border-emerald-600 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                         title={showPassword ? "Hide key" : "Show key"}
                       >
                         {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}

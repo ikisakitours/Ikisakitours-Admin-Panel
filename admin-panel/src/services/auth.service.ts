@@ -76,7 +76,7 @@ export const authService = {
         }
         // Set fallback client-side session cookie if backend doesn't set HTTP-only cookie in dev
         if (typeof document !== 'undefined') {
-          document.cookie = `admin_session=active_${Date.now()}; path=/; max-age=86400; SameSite=Strict`;
+          document.cookie = `admin_session=active_${Date.now()}; path=/; max-age=86400; SameSite=Lax`;
         }
         return { success: true, user: data.user, requiresTwoFactor: data.requiresTwoFactor };
       }

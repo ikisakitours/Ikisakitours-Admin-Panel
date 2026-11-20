@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Lock, LogIn, ShieldAlert } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface AdminSessionExpiredModalProps {
   isOpen: boolean;
@@ -10,7 +9,16 @@ interface AdminSessionExpiredModalProps {
 }
 
 export function AdminSessionExpiredModal({ isOpen }: AdminSessionExpiredModalProps) {
-  const router = useRouter();
+  // Prevent background page from scrolling while session modal is displayed
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -21,11 +29,14 @@ export function AdminSessionExpiredModal({ isOpen }: AdminSessionExpiredModalPro
       localStorage.removeItem("admin_user");
     }
     if (typeof document !== "undefined") {
-      document.cookie = "admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict";
-      document.cookie = "admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict";
+      document.cookie = "admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+      document.cookie = "admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
     }
-    // Redirect to login with expiration query flag
-    router.push("/login?expired=true");
+
+    // Preserve the current pathname so re-authentication redirects straight back
+    const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+    const redirectQuery = currentPath && currentPath !== "/login" ? `&redirect=${encodeURIComponent(currentPath)}` : "";
+    window.location.href = `/login?expired=true${redirectQuery}`;
   };
 
   return (
@@ -33,9 +44,9 @@ export function AdminSessionExpiredModal({ isOpen }: AdminSessionExpiredModalPro
       role="dialog"
       aria-modal="true"
       aria-labelledby="session-expired-title"
-      className="fixed inset-0 z-150 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-150 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 overscroll-contain"
     >
-      <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 text-center space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="w-full max-w-lg sm:max-w-[31rem] bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 text-center space-y-5 animate-in zoom-in-95 duration-200">
         {/* Security Shield Icon */}
         <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
           <Lock className="w-8 h-8" />
@@ -55,12 +66,12 @@ export function AdminSessionExpiredModal({ isOpen }: AdminSessionExpiredModalPro
           </p>
         </div>
 
-        {/* Action Button */}
-        <div className="pt-2">
+        {/* Action Button (Centered, balanced width) */}
+        <div className="pt-2 flex justify-center">
           <button
             type="button"
             onClick={handleSignInAgain}
-            className="w-full py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-auto min-w-[190px] max-w-xs py-2.5 px-7 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <LogIn className="w-4 h-4" />
             <span>Sign In Again</span>
