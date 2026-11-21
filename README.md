@@ -538,7 +538,7 @@ When executing the SQL table schema migrations in Supabase SQL Editor for Sectio
 | :--- | :--- |
 | **Client & Owner** | **Ikisaki Tours (Pvt) Ltd** — [www.ikisakitours.com](https://www.ikisakitours.com) |
 | **Powered By** | **Aetheria Labs** |
-| **Engineered By** | **Shehan_W** & **Pramod_Siriwardhana** |
+| **Engineered By** | **Pramod_Siriwardhana** & **Shehan_W** |
 | **License** | All rights reserved © 2026 Ikisaki Tours (Pvt) Ltd |
 
 > [!IMPORTANT]
