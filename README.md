@@ -551,6 +551,6 @@ When executing the SQL table schema migrations in Supabase SQL Editor for Sectio
 
 <div align="center">
 
-**© 2026 Ikisaki Tours (Pvt) Ltd** · Powered by **Aetheria Labs** · Engineered by **Shehan_W** & **Pramod_Siriwardhana**
+**© 2026 Ikisaki Tours (Pvt) Ltd** · Powered by **Aetheria Labs** · Engineered by **Pramod_Siriwardhana** & **Shehan_W**
 
 </div>
