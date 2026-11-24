@@ -66,6 +66,7 @@ export default function ContactPage() {
       const data = await contactService.getContacts();
       const formatted: ContactInquiry[] = (data || []).map((item: ContactItem) => ({
         id: item.id,
+        referenceId: item.referenceId || (item as any).reference_id,
         inquiryType: item.inquiryType || "General Inquiry",
         fullName: item.fullName || "Guest",
         email: item.email || "—",

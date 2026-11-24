@@ -21,6 +21,7 @@ import {
   PackageOptionItem,
   PassengerCategoryPricing,
 } from "../../types/package.types";
+import { calculateLivePackagePrice } from "../../utils/pricingCalculator";
 
 interface Props {
   formData: PackageFormData;
@@ -76,7 +77,7 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
 
   // Interactive Live Preview Simulation State (matching user booking widget: Adult, Couple, Child, Infant)
   const [testAdults, setTestAdults] = useState<number>(0);
-  const [testCouples, setTestCouples] = useState<number>(1); // 1 Couple = 2 Adults
+  const [testCouples, setTestCouples] = useState<number>(0); // Default to 0 (matching Adult, Child, Infant)
   const [testChildren, setTestChildren] = useState<number>(0);
   const [testInfants, setTestInfants] = useState<number>(0);
   const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
@@ -192,51 +193,31 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
     updatePricingConfig({ options: updated });
   };
 
-  // ── Live Calculation Logic for Preview ──
-  // 1 Couple represents 2 Adults
-  const effectiveAdults = testAdults + testCouples * 2;
-  const totalTravelers = effectiveAdults + testChildren + testInfants;
-
-  const matchedTier =
-    tiers.find((t) => totalTravelers >= t.minPax && totalTravelers <= t.maxPax) ||
-    tiers[tiers.length - 1] || { pricePerPerson: Number(formData.price) || 0 };
-
-  const adultRate = matchedTier.pricePerPerson;
-
-  // 2-Person Tier Rate helper for dynamic couple calculation & note
-  const twoPaxTier = tiers.find((t) => t.minPax <= 2 && t.maxPax >= 2) || tiers[1] || tiers[0];
-  const twoPaxRate = twoPaxTier ? twoPaxTier.pricePerPerson : 65;
-  const twoPaxTotal = twoPaxRate * 2;
-
-  // Couple calculation: custom fixed couple rate OR 2 x adultRate
-  const coupleRate =
-    passengerPricing.couplePricingType === "fixed" && passengerPricing.coupleFixedPrice
-      ? passengerPricing.coupleFixedPrice
-      : 2 * adultRate;
-
-  const coupleTotal = testCouples * coupleRate;
-  const singleAdultTotal = testAdults * adultRate;
-  const baseAdultTotal = singleAdultTotal + coupleTotal;
-
-  const childRate =
-    passengerPricing.childRateType === "percentage"
-      ? (adultRate * passengerPricing.childRateValue) / 100
-      : passengerPricing.childRateValue;
-
-  const baseChildTotal = testChildren * childRate;
-  const baseInfantTotal = testInfants * (passengerPricing.infantPrice || 0);
-  const baseTotal = baseAdultTotal + baseChildTotal + baseInfantTotal;
-
-  const optionsTotal = options
-    .filter((opt) => selectedOptionIds.includes(opt.id))
-    .reduce((sum, opt) => {
-      if (opt.calculationType === "per_person") {
-        return sum + opt.price * (effectiveAdults + testChildren);
-      }
-      return sum + opt.price; // per_room or per_booking flat rate
-    }, 0);
-
-  const grandTotal = baseTotal + optionsTotal;
+  // ── Live Calculation Logic for Preview (Modularized) ──
+  const {
+    effectiveAdults,
+    totalTravelers,
+    matchedTier,
+    adultRate,
+    twoPaxRate,
+    twoPaxTotal,
+    coupleRate,
+    childRate,
+    baseTotal,
+    optionsTotal,
+    grandTotal,
+    breakdownSummary,
+  } = calculateLivePackagePrice({
+    tiers,
+    passengerPricing,
+    options,
+    fallbackBasePrice: Number(formData.price) || 0,
+    testAdults,
+    testCouples,
+    testChildren,
+    testInfants,
+    selectedOptionIds,
+  });
 
   return (
     <div className="space-y-8 pt-6 border-t border-slate-200">
@@ -824,8 +805,9 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
             </h4>
           </div>
           <span className="text-[11px] font-bold text-indigo-700 bg-white px-2.5 py-1 rounded-full border border-indigo-200">
-            Active Tier: {matchedTier.label || `${matchedTier.minPax}-${matchedTier.maxPax} Pax`} ($
-            {matchedTier.pricePerPerson}/adult)
+            {effectiveAdults === 0
+              ? `Starting Tier: ${matchedTier.label || `${matchedTier.minPax}-${matchedTier.maxPax} Pax`} ($${matchedTier.pricePerPerson}/adult)`
+              : `Active Tier: ${matchedTier.label || `${matchedTier.minPax}-${matchedTier.maxPax} Pax`} ($${matchedTier.pricePerPerson}/adult)`}
           </span>
         </div>
 
@@ -973,14 +955,7 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
         <div className="p-3.5 bg-white rounded-xl border border-indigo-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
           <div className="text-xs text-slate-600 space-y-0.5">
             <div>
-              <strong>
-                Base (
-                {testCouples > 0 && `${testCouples} Couple @ $${coupleRate} `}
-                {testAdults > 0 && `${testAdults} Adult @ $${adultRate} `}
-                {testChildren > 0 && `, ${testChildren} Child @ $${childRate.toFixed(2)} `}
-                {testInfants > 0 && `, ${testInfants} Infant @ $${passengerPricing.infantPrice}`}
-                {") = "}
-              </strong>
+              <strong>Base ({breakdownSummary}) = </strong>
               <span className="font-mono font-bold text-slate-900">${baseTotal.toFixed(2)}</span>
             </div>
             {optionsTotal > 0 && (

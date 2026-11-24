@@ -30,6 +30,7 @@ import {
   getTotalServicePax,
   isNewServiceRequest,
 } from "../utils/tourserviceFormatters";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface TourServicesTableProps {
   services: TourServiceRequest[];
@@ -203,14 +204,13 @@ export function TourServicesTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3">Ref &amp; Journey</th>
-              <th className="py-3 px-3">Service &amp; Vehicle</th>
-              <th className="py-3 px-3">Customer</th>
-              <th className="py-3 px-3">Route / Location</th>
-              <th className="py-3 px-3">Travelers</th>
-              <th className="py-3 px-3">Pricing / Quote</th>
-              <th className="py-3 px-3">Status</th>
-              <th className="py-3 pl-3 pr-4 text-right">Actions</th>
+              <th className="py-3 pl-4 pr-3 w-[190px]">Ref &amp; Journey</th>
+              <th className="py-3 px-3 w-[180px]">Service &amp; Vehicle</th>
+              <th className="py-3 px-3 min-w-[220px]">Route / Location</th>
+              <th className="py-3 px-3 w-[130px]">Travelers</th>
+              <th className="py-3 px-3 w-[150px]">Pricing / Quote</th>
+              <th className="py-3 px-3 w-[150px]">Status</th>
+              <th className="py-3 pl-3 pr-4 text-right w-[140px]">Actions</th>
             </tr>
           </thead>
 
@@ -286,43 +286,22 @@ export function TourServicesTable({
                       {service.category === "transfer" && <Plane className="w-3 h-3" />}
                       <span>{catCfg.label}</span>
                     </span>
-                    <p className="text-xs font-black text-slate-900 uppercase tracking-wide mt-1 truncate">
-                      {service.vehicleType || "Standard Vehicle"}
-                    </p>
+                    <HoverScrollText
+                      text={service.vehicleType || "Standard Vehicle"}
+                      className="text-xs font-black text-slate-900 uppercase tracking-wide mt-1"
+                    />
                   </td>
 
-                  {/* 3. Customer (Clean Name + Email Subtitle) */}
-                  <td className="py-3.5 px-3 align-middle max-w-[170px] whitespace-nowrap">
-                    <p className="font-extrabold text-slate-900 text-xs truncate">
-                      {service.fullName || "—"}
-                    </p>
-                    <p className="text-[11px] text-slate-400 truncate mt-0.5" title={service.email}>
-                      {service.email || "—"}
-                    </p>
-                  </td>
-
-                  {/* 4. Route / Location (Safely Truncated with Tooltips & MapPin) */}
-                  <td className="py-3.5 px-3 align-middle max-w-[200px]">
-                    <div
-                      className="flex items-center gap-1.5 text-xs font-semibold text-slate-800 max-w-[195px]"
-                      title={`${service.pickupLocation || "Pickup"}${
-                        service.dropOffLocation ? ` → ${service.dropOffLocation}` : ""
-                      }`}
-                    >
+                  {/* 4. Route / Location (with Vercel-style hover auto-scroll) */}
+                  <td className="py-3.5 px-3 align-middle max-w-[240px]">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
                       <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <div className="flex items-center gap-1 min-w-0 truncate">
-                        <span className="truncate font-bold text-slate-900" title={service.pickupLocation}>
-                          {service.pickupLocation || "Pickup"}
-                        </span>
-                        {service.dropOffLocation && (
-                          <>
-                            <span className="text-slate-400 shrink-0 text-[11px]">→</span>
-                            <span className="truncate text-slate-600 font-medium" title={service.dropOffLocation}>
-                              {service.dropOffLocation}
-                            </span>
-                          </>
-                        )}
-                      </div>
+                      <HoverScrollText
+                        text={`${service.pickupLocation || "Pickup"}${
+                          service.dropOffLocation ? ` → ${service.dropOffLocation}` : ""
+                        }`}
+                        className="font-bold text-slate-900 text-xs"
+                      />
                     </div>
                     {service.pickupTime && (
                       <p className="text-[10px] text-slate-400 mt-0.5 font-medium flex items-center gap-1 pl-5">

@@ -1,6 +1,7 @@
 import type { FeedbackItem } from "../types/comment.types";
 
 export function getDisplayCommentReference(item: FeedbackItem): string {
+  if (item.referenceId && item.referenceId.trim()) return item.referenceId.trim();
   if (!item.id) return "REV-IK";
   const prefix = item.itemType === "package-review" ? "REV" : "FDB";
   return `${prefix}-${item.id.slice(0, 8).toUpperCase()}`;

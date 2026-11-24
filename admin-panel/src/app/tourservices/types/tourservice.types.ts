@@ -10,6 +10,7 @@ export interface TourServiceTravelers {
 
 export interface TourServiceRequest {
   id: string;
+  referenceId?: string;
   category: TourServiceCategory;
   status: TourServiceStatus | string;
   fullName: string;

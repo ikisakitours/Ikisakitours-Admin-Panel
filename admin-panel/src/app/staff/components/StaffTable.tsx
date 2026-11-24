@@ -13,6 +13,7 @@ import {
 import type { AdminStaffUser, AdminRole } from "@/services/staff.service";
 import { STAFF_ROLES, getRoleMeta } from "../data/staffRoles";
 import { StaffRoleDropdown } from "./StaffRoleDropdown";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface StaffTableProps {
   staffList: AdminStaffUser[];
@@ -94,14 +95,20 @@ export function StaffTable({
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <p className="font-bold text-slate-900 truncate leading-snug">{staff.fullName}</p>
+                            <HoverScrollText
+                              text={staff.fullName}
+                              className="font-bold text-slate-900 leading-snug max-w-[150px]"
+                            />
                             {isSelf && (
                               <span className="inline-flex items-center px-1.5 py-0.2 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
                                 You
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-slate-400 font-mono truncate">{staff.email}</p>
+                          <HoverScrollText
+                            text={staff.email}
+                            className="text-[11px] text-slate-400 font-mono max-w-[180px]"
+                          />
                         </div>
                       </div>
                     </td>

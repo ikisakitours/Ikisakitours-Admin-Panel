@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Calendar,
@@ -10,6 +11,7 @@ import {
   Copy,
   CreditCard,
   ExternalLink,
+  FileText,
   Globe,
   Loader2,
   Mail,
@@ -29,6 +31,8 @@ import type {
   PaymentStatus,
 } from "@/app/tours/types/package-booking.types";
 import { packageBookingService } from "@/services/package-booking.service";
+import { packageService } from "@/services/package.service";
+import { generateItineraryFromBooking } from "@/app/itinerary-editor/utils/itineraryGenerator";
 import {
   BOOKING_STATUS_CONFIG,
   PAYMENT_STATUS_CONFIG,
@@ -69,8 +73,56 @@ export function BookingDetailsModal({
     booking?.paymentTransactionId || ""
   );
   const [saving, setSaving] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
   const modalScrollRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+
+  const handleGenerateItinerary = async () => {
+    if (!detail) return;
+    try {
+      setGeneratingPdf(true);
+      let pkgDetails = null;
+
+      // 1. Try by packageSlug directly
+      if (detail.packageSlug) {
+        pkgDetails = await packageService.getPackageBySlug(detail.packageSlug).catch(() => null);
+      }
+
+      // 2. Fallback: Search all packages by packageId or title to find slug
+      if (!pkgDetails && (detail.packageId || detail.packageName)) {
+        try {
+          const allPkgs = await packageService.getAllPackages();
+          const match = allPkgs.find(
+            (p) =>
+              p.id === detail.packageId ||
+              (typeof p.title === "string"
+                ? p.title === detail.packageName
+                : (p.title as any)?.en === detail.packageName)
+          );
+          if (match?.slug) {
+            pkgDetails = await packageService.getPackageBySlug(match.slug).catch(() => null);
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      const itineraryDoc = generateItineraryFromBooking(detail, pkgDetails);
+      localStorage.setItem("ikisaki_active_itinerary_draft", JSON.stringify(itineraryDoc));
+      const collectionRaw = localStorage.getItem("ikisaki_itinerary_drafts");
+      const list = collectionRaw ? JSON.parse(collectionRaw) : [];
+      const updatedList = [itineraryDoc, ...list.filter((d: any) => d.id !== itineraryDoc.id)];
+      localStorage.setItem("ikisaki_itinerary_drafts", JSON.stringify(updatedList));
+
+      onNotify("Tour itinerary generated! Opening PDF Studio...", "success");
+      router.push("/itinerary-editor?fromBooking=true");
+    } catch {
+      onNotify("Failed to generate itinerary document", "error");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
 
   // Lock background page scroll without touching html overflow (prevents sticky Sidebar from shifting up)
   useEffect(() => {
@@ -845,6 +897,26 @@ export function BookingDetailsModal({
                       <>
                         <Save className="w-3.5 h-3.5" />
                         Save Changes
+                      </>
+                    )}
+                  </button>
+                  {/* Generate PDF Itinerary Button placed exactly in the marked yellow box right next to Save Changes */}
+                  <button
+                    type="button"
+                    onClick={handleGenerateItinerary}
+                    disabled={generatingPdf}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-900 bg-slate-900 px-4 py-2 text-xs font-extrabold text-white hover:bg-emerald-600 hover:border-emerald-600 disabled:bg-slate-700 transition-colors shadow-xs cursor-pointer"
+                    title="Generate client itinerary PDF document"
+                  >
+                    {generatingPdf ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Generate PDF</span>
                       </>
                     )}
                   </button>

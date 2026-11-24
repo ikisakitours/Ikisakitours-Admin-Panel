@@ -16,6 +16,7 @@ import {
   Sun,
 } from "lucide-react";
 import type { PackageListItem } from "@/services/package.service";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface PackagesTableProps {
   packages: PackageListItem[];
@@ -247,7 +248,7 @@ export function PackagesTable({
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
               <th className="py-3 pl-4 pr-3 w-[70px]">Ref</th>
-              <th className="py-3 px-3">Package Title &amp; Japanese</th>
+              <th className="py-3 px-3 min-w-[240px] max-w-[300px]">Package Title &amp; Japanese</th>
               <th className="py-3 px-3 w-[170px]">Tour Type</th>
               <th className="py-3 px-3 w-[180px]">Slug Reference</th>
               <th className="py-3 px-3 w-[130px]">Visibility</th>
@@ -285,15 +286,17 @@ export function PackagesTable({
                     </span>
                   </td>
 
-                  {/* 2. Package Title */}
-                  <td className="py-3.5 px-3 align-middle max-w-[280px]">
-                    <p className="font-extrabold text-slate-900 text-xs line-clamp-1" title={enTitle}>
-                      {enTitle}
-                    </p>
+                  {/* 2. Package Title (with Vercel-style hover auto-scroll) */}
+                  <td className="py-3.5 px-3 align-middle min-w-[240px] max-w-[300px]">
+                    <HoverScrollText
+                      text={enTitle}
+                      className="font-extrabold text-slate-900 text-xs"
+                    />
                     {jaTitle && jaTitle !== enTitle && (
-                      <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5" title={jaTitle}>
-                        🇯🇵 {jaTitle}
-                      </p>
+                      <HoverScrollText
+                        text={`🇯🇵 ${jaTitle}`}
+                        className="text-[11px] text-slate-500 font-medium mt-0.5"
+                      />
                     )}
                   </td>
 

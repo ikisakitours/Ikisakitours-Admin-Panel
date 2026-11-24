@@ -18,6 +18,7 @@ import {
   User,
 } from "lucide-react";
 import type { BlogPayload } from "@/services/blog.service";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface BlogTableProps {
   blogs: BlogPayload[];
@@ -125,7 +126,7 @@ export function BlogTable({
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
               <th className="py-3 pl-4 pr-3 w-[80px]">Ref</th>
               <th className="py-3 px-3 w-[70px]">Cover</th>
-              <th className="py-3 px-3">Title &amp; Author</th>
+              <th className="py-3 px-3 min-w-[240px]">Title &amp; Author</th>
               <th className="py-3 px-3 w-[200px]">Category &amp; Slug</th>
               <th className="py-3 px-3 w-[130px]">Visibility</th>
               <th className="py-3 pl-3 pr-4 text-right w-[180px]">Actions</th>
@@ -182,15 +183,17 @@ export function BlogTable({
                     )}
                   </td>
 
-                  {/* 3. Title & Author */}
+                  {/* 3. Title & Author (with Vercel-style hover auto-scroll for long titles) */}
                   <td className="py-3.5 px-3 align-middle max-w-[280px]">
-                    <p className="font-extrabold text-slate-900 text-xs line-clamp-1" title={enTitle}>
-                      {enTitle}
-                    </p>
+                    <HoverScrollText
+                      text={enTitle}
+                      className="font-extrabold text-slate-900 text-xs"
+                    />
                     {jaTitle && jaTitle !== enTitle && (
-                      <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5" title={jaTitle}>
-                        🇯🇵 {jaTitle}
-                      </p>
+                      <HoverScrollText
+                        text={`🇯🇵 ${jaTitle}`}
+                        className="text-[11px] text-slate-500 font-medium mt-0.5"
+                      />
                     )}
                     <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-400 font-medium">
                       <span className="inline-flex items-center gap-1">

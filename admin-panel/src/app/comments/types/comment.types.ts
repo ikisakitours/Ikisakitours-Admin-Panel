@@ -2,6 +2,7 @@ export type CommentItemType = "website" | "package-review";
 
 export interface FeedbackItem {
   id: string;
+  referenceId?: string;
   itemType: CommentItemType;
   source?: string; // Package Name or Website origin
   authorName: string;

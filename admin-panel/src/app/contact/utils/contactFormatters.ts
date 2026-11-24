@@ -1,6 +1,7 @@
 import type { ContactInquiry } from "../types/contact.types";
 
 export function getDisplayContactReference(item: ContactInquiry): string {
+  if (item.referenceId && item.referenceId.trim()) return item.referenceId.trim();
   if (!item.id) return "INQ-IK";
   return `INQ-${item.id.slice(0, 8).toUpperCase()}`;
 }

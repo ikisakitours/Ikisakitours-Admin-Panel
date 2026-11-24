@@ -7,6 +7,7 @@ export interface FaqPayload {
 
 export interface FaqItem extends FaqPayload {
   id: string;
+  referenceId?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -2,6 +2,7 @@ export type ContactStatus = "pending" | "contacted" | "completed" | string;
 
 export interface ContactInquiry {
   id: string;
+  referenceId?: string;
   inquiryType: string;
   fullName: string;
   email: string;
