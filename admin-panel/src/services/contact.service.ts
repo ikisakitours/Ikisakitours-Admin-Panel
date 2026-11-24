@@ -1,5 +1,6 @@
 export interface ContactItem {
   id: string;
+  referenceId?: string;
   inquiryType: string;
   date: string;
   status: string;

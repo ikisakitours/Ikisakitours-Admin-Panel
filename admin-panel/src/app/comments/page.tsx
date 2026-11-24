@@ -72,6 +72,7 @@ export default function CommentsPage() {
 
       const formattedComments: FeedbackItem[] = (commentsRes.comments || []).map((c: any) => ({
         id: c.id,
+        referenceId: c.referenceId || c.reference_id,
         itemType: "website",
         source: c.source || "Website Feedback",
         authorName: c.authorName || `${c.firstName || ""} ${c.lastName || ""}`.trim() || "Guest",
@@ -91,6 +92,7 @@ export default function CommentsPage() {
 
       const formattedReviews: FeedbackItem[] = (reviewsRes || []).map((r: PackageReview) => ({
         id: r.id,
+        referenceId: (r as any).referenceId || (r as any).reference_id,
         itemType: "package-review",
         source: r.packageName || "Tour Package",
         authorName: r.fullName || "Guest Traveler",

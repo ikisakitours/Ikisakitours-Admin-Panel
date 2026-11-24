@@ -18,6 +18,7 @@ import {
   getDisplayContactReference,
   isNewContact,
 } from "../utils/contactFormatters";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface ContactTableProps {
   inquiries: ContactInquiry[];
@@ -121,11 +122,11 @@ export function ContactTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3 w-50">Ref &amp; Date</th>
-              <th className="py-3 px-3 w-62.5">Inquiry Type</th>
-              <th className="py-3 px-3">Customer</th>
-              <th className="py-3 px-3 w-42.5">Status</th>
-              <th className="py-3 pl-3 pr-4 text-right w-35">Actions</th>
+              <th className="py-3 pl-4 pr-3 w-[180px]">Ref &amp; Date</th>
+              <th className="py-3 px-3 min-w-[200px]">Inquiry Type</th>
+              <th className="py-3 px-3 w-[200px]">Customer</th>
+              <th className="py-3 px-3 w-[150px]">Status</th>
+              <th className="py-3 pl-3 pr-4 text-right w-[140px]">Actions</th>
             </tr>
           </thead>
 
@@ -181,33 +182,42 @@ export function ContactTable({
                   </td>
 
                   {/* 2. Inquiry Classification (Snapped tight to the left) */}
-                  <td className="py-3.5 px-3 align-middle w-62.5">
+                  <td className="py-3.5 px-3 align-middle min-w-[200px]">
                     <span className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold border bg-indigo-50/70 text-indigo-700 border-indigo-200">
                       <MessageSquare className="w-3 h-3 text-indigo-500" />
                       <span className="truncate">{inquiry.inquiryType || "General Inquiry"}</span>
                     </span>
+                    {inquiry.subject && inquiry.subject !== "No Subject" && (
+                      <HoverScrollText
+                        text={inquiry.subject}
+                        className="text-[11px] text-slate-700 font-medium mt-1"
+                      />
+                    )}
                     {inquiry.tourInterest && (
-                      <p className="text-[10px] text-purple-700 font-bold truncate mt-1 flex items-center gap-1">
+                      <div className="flex items-center gap-1 mt-0.5 text-[10px] text-purple-700 font-bold">
                         <Compass className="w-3 h-3 text-purple-500 shrink-0" />
-                        <span className="truncate" title={inquiry.tourInterest}>
-                          {inquiry.tourInterest}
-                        </span>
-                      </p>
+                        <HoverScrollText
+                          text={inquiry.tourInterest}
+                          className="font-bold text-purple-700"
+                        />
+                      </div>
                     )}
                   </td>
 
                   {/* 3. Customer */}
-                  <td className="py-3.5 px-3 align-middle whitespace-nowrap">
-                    <p className="font-extrabold text-slate-900 text-xs truncate">
-                      {inquiry.fullName || "Guest"}
-                    </p>
-                    <p className="text-[11px] text-slate-400 truncate mt-0.5" title={inquiry.email}>
-                      {inquiry.email || "—"}
-                    </p>
+                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[200px]">
+                    <HoverScrollText
+                      text={inquiry.fullName || "Guest"}
+                      className="font-extrabold text-slate-900 text-xs"
+                    />
+                    <HoverScrollText
+                      text={inquiry.email || "—"}
+                      className="text-[11px] text-slate-400 mt-0.5"
+                    />
                   </td>
 
                   {/* 4. Status Selector */}
-                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-42.5">
+                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[150px]">
                     <div className="flex items-center gap-1">
                       <select
                         aria-label={`Status for ${refCode}`}
@@ -227,7 +237,7 @@ export function ContactTable({
                   </td>
 
                   {/* 5. Actions */}
-                  <td className="py-3.5 pl-3 pr-4 align-middle text-right whitespace-nowrap w-35">
+                  <td className="py-3.5 pl-3 pr-4 align-middle text-right whitespace-nowrap w-[140px]">
                     <div className="inline-flex items-center justify-end gap-1.5">
                       <button
                         type="button"

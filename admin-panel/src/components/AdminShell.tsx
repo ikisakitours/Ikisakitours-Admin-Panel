@@ -86,12 +86,14 @@ export function AdminShell({ children }: AdminShellProps) {
   const permitted = isRoutePermitted(pathname, adminUser?.role);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen print:block print:min-h-0">
       {/* Static Sidebar: locked in place, dynamically filters permitted menus */}
-      <Sidebar />
+      <div className="print:hidden">
+        <Sidebar />
+      </div>
 
       {/* Dynamic Content Area: Enforces zero-millisecond unauthorized flash prevention */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 print:p-0 print:m-0 print:w-full print:block">
         {permitted ? (
           children
         ) : (

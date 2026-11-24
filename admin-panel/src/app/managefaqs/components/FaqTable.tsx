@@ -16,6 +16,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import type { FaqItem } from "@/services/faq.service";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface FaqTableProps {
   faqs: FaqItem[];
@@ -107,12 +108,12 @@ export function FaqTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3">Ref &amp; Order</th>
-              <th className="py-3 px-3">Category</th>
-              <th className="py-3 px-3">Question (EN / JA)</th>
-              <th className="py-3 px-3">Answer Summary</th>
-              <th className="py-3 px-3 w-[130px]">Visibility</th>
-              <th className="py-3 pl-3 pr-4 text-right">Actions</th>
+              <th className="py-3 pl-4 pr-3 w-[150px]">Ref &amp; Order</th>
+              <th className="py-3 px-3 w-[150px]">Category</th>
+              <th className="py-3 px-3 min-w-[240px] max-w-[320px]">Question (EN / JA)</th>
+              <th className="py-3 px-3 min-w-[260px] max-w-[360px]">Answer Summary</th>
+              <th className="py-3 px-3 w-[120px]">Visibility</th>
+              <th className="py-3 pl-3 pr-4 text-right w-[140px]">Actions</th>
             </tr>
           </thead>
 
@@ -143,7 +144,9 @@ export function FaqTable({
                         {String(rowIndex + 1).padStart(2, "0")}
                       </span>
                       <span className="inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-700">
-                        FAQ-{faq.id.substring(0, 6)}
+                        {faq.referenceId && faq.referenceId.trim()
+                          ? faq.referenceId.trim()
+                          : `FAQ-${faq.id.substring(0, 6).toUpperCase()}`}
                       </span>
                       <button
                         type="button"
@@ -178,27 +181,30 @@ export function FaqTable({
                     </div>
                   </td>
 
-                  {/* 3. Question (EN / JA) */}
-                  <td className="py-3.5 px-3 align-middle max-w-[280px]">
-                    <p className="font-extrabold text-slate-900 text-xs line-clamp-2" title={faq.question?.en}>
-                      {faq.question?.en || "—"}
-                    </p>
+                  {/* 3. Question (with Vercel-style hover auto-scroll) */}
+                  <td className="py-3.5 px-3 align-middle min-w-[240px] max-w-[320px]">
+                    <HoverScrollText
+                      text={faq.question?.en || "—"}
+                      className="font-extrabold text-slate-900 text-xs"
+                    />
                     {faq.question?.ja && (
-                      <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5" title={faq.question?.ja}>
-                        🇯🇵 {faq.question.ja}
-                      </p>
+                      <HoverScrollText
+                        text={`🇯🇵 ${faq.question.ja}`}
+                        className="text-[11px] text-slate-500 font-medium mt-0.5"
+                      />
                     )}
                   </td>
 
-                  {/* 4. Answer Preview */}
-                  <td className="py-3.5 px-3 align-middle max-w-[320px]">
-                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed" title={faq.answer?.en || faq.answer?.ja}>
-                      {faq.answer?.en || faq.answer?.ja || "—"}
-                    </p>
+                  {/* 4. Answer Preview (with Vercel-style hover auto-scroll) */}
+                  <td className="py-3.5 px-3 align-middle min-w-[260px] max-w-[360px]">
+                    <HoverScrollText
+                      text={faq.answer?.en || faq.answer?.ja || "—"}
+                      className="text-xs text-slate-600 font-normal leading-relaxed"
+                    />
                   </td>
 
                   {/* 5. Live Visibility Toggle */}
-                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[130px]">
+                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[120px]">
                     <button
                       type="button"
                       disabled={isUpdating}

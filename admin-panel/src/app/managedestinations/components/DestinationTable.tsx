@@ -18,6 +18,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import type { DestinationPayload } from "@/services/destination.service";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface DestinationTableProps {
   destinations: DestinationPayload[];
@@ -117,12 +118,13 @@ export function DestinationTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3 w-[80px]">Ref</th>
+              <th className="py-3 pl-4 pr-3 w-[65px]">Ref</th>
               <th className="py-3 px-3 w-[70px]">Photo</th>
-              <th className="py-3 px-3">Destination &amp; Region</th>
-              <th className="py-3 px-3 w-[200px]">Province &amp; Slug</th>
-              <th className="py-3 px-3 w-[130px]">Visibility</th>
-              <th className="py-3 pl-3 pr-4 text-right w-[180px]">Actions</th>
+              <th className="py-3 px-3 min-w-[200px]">Destination &amp; Region</th>
+              <th className="py-3 px-3 w-[180px]">Province</th>
+              <th className="py-3 px-3 w-[160px]">Slug</th>
+              <th className="py-3 px-3 w-[110px]">Visibility</th>
+              <th className="py-3 pl-3 pr-4 text-right w-[160px]">Actions</th>
             </tr>
           </thead>
 
@@ -176,15 +178,17 @@ export function DestinationTable({
                     )}
                   </td>
 
-                  {/* 3. Destination Title */}
-                  <td className="py-3.5 px-3 align-middle max-w-[280px]">
-                    <p className="font-extrabold text-slate-900 text-xs line-clamp-1" title={enTitle}>
-                      {enTitle}
-                    </p>
+                  {/* 3. Destination Title (with Vercel-style hover auto-scroll) */}
+                  <td className="py-3.5 px-3 align-middle min-w-[200px]">
+                    <HoverScrollText
+                      text={enTitle}
+                      className="font-extrabold text-slate-900 text-xs"
+                    />
                     {jaTitle && jaTitle !== enTitle && (
-                      <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5" title={jaTitle}>
-                        🇯🇵 {jaTitle}
-                      </p>
+                      <HoverScrollText
+                        text={`🇯🇵 ${jaTitle}`}
+                        className="text-[11px] text-slate-500 font-medium mt-0.5"
+                      />
                     )}
                     {dest.coordinates?.lat && dest.coordinates?.lng && (
                       <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400 font-mono">
@@ -196,13 +200,17 @@ export function DestinationTable({
                     )}
                   </td>
 
-                  {/* 4. Province & Slug */}
-                  <td className="py-3.5 px-3 align-middle w-[200px]">
+                  {/* 4. Province */}
+                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[180px]">
                     <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold border bg-indigo-50/80 text-indigo-700 border-indigo-200 w-fit">
                       <MapPin className="w-3 h-3 text-indigo-500" />
                       <span>{provinceStr}</span>
                     </span>
-                    <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400 font-mono">
+                  </td>
+
+                  {/* 5. Slug */}
+                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[160px]">
+                    <div className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
                       <span className="truncate max-w-[140px]" title={`/${dest.slug}`}>
                         /{dest.slug}
                       </span>
@@ -221,8 +229,8 @@ export function DestinationTable({
                     </div>
                   </td>
 
-                  {/* 5. Live Visibility Toggle */}
-                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[130px]">
+                  {/* 6. Live Visibility Toggle */}
+                  <td className="py-3.5 px-3 align-middle whitespace-nowrap w-[120px]">
                     <button
                       type="button"
                       disabled={isUpdating}
@@ -244,8 +252,8 @@ export function DestinationTable({
                     </button>
                   </td>
 
-                  {/* 6. Actions */}
-                  <td className="py-3.5 pl-3 pr-4 align-middle text-right whitespace-nowrap w-[180px]">
+                  {/* 7. Actions */}
+                  <td className="py-3.5 pl-3 pr-4 align-middle text-right whitespace-nowrap w-[170px]">
                     <div className="inline-flex items-center justify-end gap-1.5">
                       <a
                         href={`https://www.ikisakitours.com/en/destination/${dest.slug}`}

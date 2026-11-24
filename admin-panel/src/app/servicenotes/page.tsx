@@ -28,6 +28,7 @@ import {
 import ServiceNoteFormWrapper from "./ServiceNoteFormWrapper";
 import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
 import { AdminDeleteModal } from "@/components/AdminDeleteModal";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface ServiceNoteItem extends ServiceNotePayload {
   id: string | number;
@@ -444,13 +445,13 @@ export default function ServiceNotesPage() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-                  <th className="py-3 pl-5 pr-3">Vehicle Model</th>
-                  <th className="py-3 px-3">Service Line</th>
-                  <th className="py-3 px-3">Starting Rate</th>
-                  <th className="py-3 px-3">Capacity &amp; Luggage</th>
-                  <th className="py-3 px-3">Driver / Guide Tiers</th>
-                  <th className="py-3 px-3 text-center">Booking Guidelines</th>
-                  <th className="py-3 pl-3 pr-5 text-right">Actions</th>
+                  <th className="py-3 pl-5 pr-3 w-[220px]">Vehicle Model</th>
+                  <th className="py-3 px-3 w-[150px]">Service Line</th>
+                  <th className="py-3 px-3 w-[140px]">Starting Rate</th>
+                  <th className="py-3 px-3 w-[180px]">Capacity &amp; Luggage</th>
+                  <th className="py-3 px-3 w-[220px]">Driver / Guide Tiers</th>
+                  <th className="py-3 px-3 text-center w-[160px]">Booking Guidelines</th>
+                  <th className="py-3 pl-3 pr-5 text-right w-[140px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200/80">
@@ -466,14 +467,17 @@ export default function ServiceNotesPage() {
                       key={item.id}
                       className="odd:bg-white even:bg-slate-50/50 hover:bg-emerald-50/40 transition-colors"
                     >
-                      {/* 1. Vehicle Model */}
-                      <td className="py-3 pl-5 pr-3 align-middle whitespace-nowrap">
+                      {/* 1. Vehicle Model (with Vercel-style hover auto-scroll) */}
+                      <td className="py-3 pl-5 pr-3 align-middle whitespace-nowrap max-w-[220px]">
                         <div className="flex items-center gap-2">
-                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/70 font-bold">
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/70 font-bold shrink-0">
                             <Car className="w-3.5 h-3.5" />
                           </span>
-                          <div>
-                            <p className="font-extrabold text-slate-900">{item.vehicleType}</p>
+                          <div className="min-w-0 flex-1">
+                            <HoverScrollText
+                              text={item.vehicleType}
+                              className="font-extrabold text-slate-900"
+                            />
                             <span className="text-[10px] text-slate-400 font-mono">ID: #{String(item.id).slice(0, 6)}</span>
                           </div>
                         </div>

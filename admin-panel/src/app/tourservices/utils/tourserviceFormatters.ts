@@ -69,6 +69,7 @@ export function formatServicePricingLabel(item: TourServiceRequest): { primary: 
 }
 
 export function getDisplayServiceReference(item: TourServiceRequest): string {
+  if (item.referenceId && item.referenceId.trim()) return item.referenceId.trim();
   if (!item.id) return "REQ-IK";
   return `SRV-${item.id.slice(0, 8).toUpperCase()}`;
 }

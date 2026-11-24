@@ -17,6 +17,7 @@ import {
   Users as UsersIcon,
 } from "lucide-react";
 import type { User } from "@/services/users.service";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface UsersTableProps {
   users: User[];
@@ -117,13 +118,13 @@ export function UsersTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3">Ref &amp; Customer</th>
-              <th className="py-3 px-3">Email &amp; ID</th>
-              <th className="py-3 px-3">Country</th>
-              <th className="py-3 px-3">Access</th>
-              <th className="py-3 px-3">Tier</th>
-              <th className="py-3 px-3">Verified</th>
-              <th className="py-3 pl-3 pr-4 text-right">Actions</th>
+              <th className="py-3 pl-4 pr-3 w-[240px]">Ref &amp; Customer</th>
+              <th className="py-3 px-3 min-w-[220px]">Email &amp; ID</th>
+              <th className="py-3 px-3 w-[130px]">Country</th>
+              <th className="py-3 px-3 w-[130px]">Access</th>
+              <th className="py-3 px-3 w-[130px]">Tier</th>
+              <th className="py-3 px-3 w-[120px]">Verified</th>
+              <th className="py-3 pl-3 pr-4 text-right w-[140px]">Actions</th>
             </tr>
           </thead>
 
@@ -182,9 +183,10 @@ export function UsersTable({
                       {/* Name & Joined */}
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-extrabold text-slate-900 text-xs truncate max-w-[150px]">
-                            {fullName}
-                          </p>
+                          <HoverScrollText
+                            text={fullName}
+                            className="font-extrabold text-slate-900 text-xs max-w-[150px]"
+                          />
                           {user.isVerified && (
                             <span title="Verified Profile">
                               <CheckCircle2
@@ -215,9 +217,10 @@ export function UsersTable({
 
                   {/* 2. Email & ID */}
                   <td className="py-3.5 px-3 align-middle max-w-[200px] whitespace-nowrap">
-                    <p className="font-semibold text-slate-800 text-xs truncate" title={user.email}>
-                      {user.email || "—"}
-                    </p>
+                    <HoverScrollText
+                      text={user.email || "—"}
+                      className="font-semibold text-slate-800 text-xs max-w-[200px]"
+                    />
                     {/* 2. Email & ID */}
                     <div className="flex items-center gap-1.5 mt-0.5">
                       {(user.referenceId || user.customerReferenceId) && (

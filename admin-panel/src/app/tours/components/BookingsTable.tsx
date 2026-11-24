@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Copy,
   Eye,
-  Globe,
   Loader2,
   Package,
   Trash2,
@@ -26,6 +25,7 @@ import {
   isNewBooking,
   toNumber,
 } from "../utils/bookingFormatters";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface BookingsTableProps {
   bookings: PackageBooking[];
@@ -206,13 +206,12 @@ export function BookingsTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3">Ref &amp; Journey</th>
-              <th className="py-3 px-3">Tour Package</th>
-              <th className="py-3 px-3">Customer</th>
-              <th className="py-3 px-3">Travelers</th>
-              <th className="py-3 px-3">Amount</th>
-              <th className="py-3 px-3">Status</th>
-              <th className="py-3 pl-3 pr-4 text-right">Actions</th>
+              <th className="py-3 pl-4 pr-3 w-[200px]">Ref &amp; Journey</th>
+              <th className="py-3 px-3 min-w-[240px]">Tour Package</th>
+              <th className="py-3 px-3 w-[150px]">Travelers</th>
+              <th className="py-3 px-3 w-[150px]">Amount</th>
+              <th className="py-3 px-3 w-[160px]">Status</th>
+              <th className="py-3 pl-3 pr-4 text-right w-[140px]">Actions</th>
             </tr>
           </thead>
 
@@ -294,16 +293,13 @@ export function BookingsTable({
                     </div>
                   </td>
 
-                  {/* 2. Tour Package (Clean Dedicated Column) */}
-                  <td className="py-3.5 px-3 align-middle max-w-[230px]">
-                    <button
-                      type="button"
+                  {/* 2. Tour Package (Clean Dedicated Column with HoverScrollText) */}
+                  <td className="py-3.5 px-3 align-middle max-w-[260px]">
+                    <HoverScrollText
+                      text={booking.packageName}
                       onClick={() => onViewDetails(booking)}
-                      className="text-left text-xs font-extrabold text-slate-900 hover:text-emerald-700 transition-colors line-clamp-1 cursor-pointer block w-full"
-                      title={booking.packageName}
-                    >
-                      {booking.packageName}
-                    </button>
+                      className="text-left text-xs font-extrabold text-slate-900 hover:text-emerald-700 transition-colors"
+                    />
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <span
                         className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold border ${
@@ -322,19 +318,7 @@ export function BookingsTable({
                     </div>
                   </td>
 
-                  {/* 3. Customer (Clean Dedicated Column) */}
-                  <td className="py-3.5 px-3 align-middle max-w-[200px]">
-                    <p className="font-bold text-slate-900 truncate">
-                      {booking.firstname} {booking.lastname}
-                    </p>
-                    <p className="text-[11px] text-slate-500 truncate mt-0.5" title={booking.email}>
-                      {booking.email}
-                    </p>
-                    <p className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400 mt-0.5">
-                      <Globe className="w-3 h-3 text-slate-400 shrink-0" />
-                      <span className="truncate">{booking.country || "—"}</span>
-                    </p>
-                  </td>
+
 
                   {/* 4. Travelers (Click-to-reveal breakdown popover) */}
                   <td className="py-3.5 px-3 align-middle whitespace-nowrap">

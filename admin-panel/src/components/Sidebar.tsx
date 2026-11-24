@@ -49,6 +49,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/tours", label: "Tour Bookings", icon: CalendarDays },
       { href: "/tourservices", label: "Tour Services", icon: Compass },
+      { href: "/itinerary-editor", label: "PDF Itinerary Studio", icon: FileText },
     ],
   },
   {
@@ -90,8 +91,8 @@ const navGroups: NavGroup[] = [
     title: "Availability & Rates",
     items: [
       { href: "/newupdates", label: "Date Availability", icon: CalendarOff },
-      { href: "/servicepricing", label: "Service Pricing", icon: BadgeDollarSign },
-      { href: "/servicenotes", label: "Service Guidelines", icon: ClipboardList },
+      { href: "/servicepricing", label: "Services Price Note", icon: BadgeDollarSign },
+      { href: "/servicenotes", label: "Add Services price ", icon: ClipboardList },
     ],
   },
   {

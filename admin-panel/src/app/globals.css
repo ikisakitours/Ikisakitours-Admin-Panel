@@ -134,3 +134,101 @@
     @apply font-sans;
     }
 }
+
+/* ── Universal Print Stylesheet for Official Itinerary Documents ── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Force hide all sidebar, navigation, toasts, studio toolbars */
+  aside,
+  nav,
+  header,
+  footer,
+  .sidebar,
+  [data-sidebar],
+  .print-hidden,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Force all outer layout containers to pure white and remove constraints */
+  main,
+  .itinerary-studio-root,
+  .itinerary-studio-screen,
+  .itinerary-studio-main,
+  .itinerary-studio-container,
+  .itinerary-preview-center,
+  div:has(> #itinerary-preview-wrapper),
+  div:has(#itinerary-printable) {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  #itinerary-preview-wrapper {
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    box-shadow: none !important;
+  }
+
+  #itinerary-printable {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    transform: none !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Ensure crisp rendering of colors and borders */
+  #itinerary-printable * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Prevent awkward page breaking inside table rows and remarks */
+  tr,
+  .break-inside-avoid,
+  .page-break-inside-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+}

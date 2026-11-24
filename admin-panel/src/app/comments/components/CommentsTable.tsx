@@ -21,6 +21,7 @@ import {
   getDisplayCommentReference,
   isNewComment,
 } from "../utils/commentFormatters";
+import { HoverScrollText } from "@/components/HoverScrollText";
 
 interface CommentsTableProps {
   items: FeedbackItem[];
@@ -127,13 +128,13 @@ export function CommentsTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="py-3 pl-4 pr-3">Ref &amp; Date</th>
-              <th className="py-3 px-3">Type &amp; Tour</th>
-              <th className="py-3 px-3">Author / Guest</th>
-              <th className="py-3 px-3">Rating &amp; Feedback</th>
-              <th className="py-3 px-3 text-center">Visibility</th>
-              <th className="py-3 px-3">Staff Reply</th>
-              <th className="py-3 pl-3 pr-4 text-right">Actions</th>
+              <th className="py-3 pl-4 pr-3 w-[180px]">Ref &amp; Date</th>
+              <th className="py-3 px-3 w-[200px]">Type &amp; Tour</th>
+              <th className="py-3 px-3 w-[180px]">Author / Guest</th>
+              <th className="py-3 px-3 min-w-[240px]">Rating &amp; Feedback</th>
+              <th className="py-3 px-3 text-center w-[120px]">Visibility</th>
+              <th className="py-3 px-3 w-[140px]">Staff Reply</th>
+              <th className="py-3 pl-3 pr-4 text-right w-[140px]">Actions</th>
             </tr>
           </thead>
 
@@ -209,31 +210,30 @@ export function CommentsTable({
                     </span>
 
                     {item.source ? (
-                      <p
-                        className="text-xs font-bold text-slate-900 truncate mt-1"
-                        title={item.source}
-                      >
-                        {item.source}
-                      </p>
+                      <HoverScrollText
+                        text={item.source}
+                        className="text-xs font-bold text-slate-900 mt-1"
+                      />
                     ) : (
                       <p className="text-[11px] text-slate-400 mt-1">General Feedback</p>
                     )}
                   </td>
 
                   {/* 3. Author / Guest (Overview Only) */}
-                  <td className="py-3 px-3 align-middle max-w-[170px] whitespace-nowrap">
+                  <td className="py-3 px-3 align-middle max-w-[180px] whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-teal-500 font-bold text-slate-950 text-[10px] shadow-2xs">
                         {item.authorName?.charAt(0).toUpperCase() || "G"}
                       </div>
-                      <p className="font-extrabold text-slate-900 truncate text-xs" title={`${item.authorName || "Guest"} ${item.country ? `(${item.country})` : ""}`}>
-                        {item.authorName || "Guest"}
-                      </p>
+                      <HoverScrollText
+                        text={`${item.authorName || "Guest"}${item.country ? ` (${item.country})` : ""}`}
+                        className="font-extrabold text-slate-900 text-xs"
+                      />
                     </div>
                   </td>
 
-                  {/* 4. Rating & Feedback (Overview Only) */}
-                  <td className="py-3 px-3 align-middle max-w-[240px]">
+                  {/* 4. Rating & Feedback (with Vercel-style hover auto-scroll) */}
+                  <td className="py-3 px-3 align-middle min-w-[240px] max-w-[320px]">
                     <div className="flex items-center gap-1.5">
                       {typeof item.rating === "number" && item.rating > 0 ? (
                         <div className="inline-flex items-center gap-1 text-amber-500 font-extrabold text-xs">
@@ -252,9 +252,10 @@ export function CommentsTable({
                       )}
                     </div>
 
-                    <p className="text-[11px] text-slate-500 truncate italic mt-0.5" title={item.content}>
-                      &quot;{item.content}&quot;
-                    </p>
+                    <HoverScrollText
+                      text={`"${item.content || ""}"`}
+                      className="text-[11px] text-slate-500 italic mt-0.5"
+                    />
                   </td>
 
                   {/* 5. Visibility Toggle */}
