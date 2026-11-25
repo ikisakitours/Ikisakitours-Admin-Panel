@@ -41,8 +41,9 @@
   - [5. Enterprise Zero-Trust Admin Authentication, 10-Role RBAC & 2FA Engine](#5-enterprise-zero-trust-admin-authentication-10-role-rbac--2fa-engine)
   - [6. Dual-Lock Route Guard, Zero-Flash Protection & Cloudflare R2 WebP Profile Engine](#6-dual-lock-route-guard-zero-flash-protection--cloudflare-r2-webp-profile-engine)
   - [7. Customer Account Suspension & Zero-Trust Access Guard](#7-customer-account-suspension--zero-trust-access-guard)
-  - [8. Branded Customer Reference ID Engine & UI/UX Resilience](#8-branded-customer-reference-id-engine--uiux-resilience)
+  - [8. Branded Entity Reference ID Engine, HoverScrollText Component & UI/UX Resilience](#8-branded-entity-reference-id-engine-hoverscrolltext-component--uiux-resilience)
   - [9. Session Timeout Interceptor, 401 Recovery & Cloudflare R2 Asset Lifecycle](#9-session-timeout-interceptor-401-recovery--cloudflare-r2-asset-lifecycle)
+  - [10. PDF Itinerary Studio & Word Hub (`/itinerary-editor`)](#10-pdf-itinerary-studio--word-hub-itinerary-editor)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -92,7 +93,7 @@ flowchart LR
 | **Authentication & Access** | `/login` | Zero Trust executive login portal with 256-bit encrypted session handling, Edge Middleware route protection, and instant sidebar Sign Out |
 | **Staff & Team (RBAC)** | `/staff` | 10-role internal staff directory, role provisioning, status toggles (Active/Suspended) with immediate session invalidation, temporary password resets, and 2FA compliance tracking |
 | **Overview** | `/dashboard` | Monthly KPI cards (Visitors, Feed Impressions, Total Clicks, Avg. SEO Rank) + interactive Recharts `GrowthChart` |
-| **Bookings & Operations** | `/tours`, `/tourservices` | One-Day / Multi-Day package booking statuses (`Pending`, `Confirmed`, `Completed`, `Cancelled`); tabbed service inquiries (`Custom Made Tours`, `Private Chauffeur`, `Transfers`) with status filters (`Pending`, `Approved`, `Active`, `Rejected`) |
+| **Bookings & Operations** | `/tours`, `/tourservices`, `/itinerary-editor` | One-Day / Multi-Day package booking statuses (`Pending`, `Confirmed`, `Completed`, `Cancelled`); tabbed service inquiries (`Custom Made Tours`, `Private Chauffeur`, `Transfers`); plus **PDF Itinerary Studio** for A4 print-ready Word vouchers & Japanese agency (HIS) standard travel itineraries with EN/JA dual-language engine and local draft storage |
 | **User Management** | `/users` | Customer directory with total count badge and live **VIP**, **Active Access**, and **Verified** status toggles |
 | **Tour Packages** | `/addpackage`, `/managepackages` | EN/JA/+ tour builder, 1-click JSON prefill, 18 conversion badges, Title + Gold Highlight rules, dynamic group pricing tiers, passenger rules, add-ons, dynamic meals/accommodation lists, Live Pricing Simulator, text-only `PATCH` inline editing, and 1-click Live Visibility toggle |
 | **Destinations** | `/destinations`, `/managedestinations`, `/managedestinations/[id]/edit` | Reusable Sri Lanka destination hubs with JSON uploader, quick facts, multilingual content, 1-click Live Visibility, and isolated edit mode (`hideImageUpload`) |
@@ -262,13 +263,22 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Suspended customers cannot view any protected pages (even for a millisecond); they are immediately locked onto the luxury `<AccessRestricted />` screen.
   - The **"SIGN OUT"** action purges auth cookies and local state, instantly restoring public guest browsing capabilities.
 
-### 8. Branded Customer Reference ID Engine & UI/UX Resilience
+### 8. Branded Entity Reference ID Engine, HoverScrollText Component & UI/UX Resilience
 
-- **Branded Customer Reference ID System (`IKISAKI-XXXXXX`)**:
-  - High-readability 6-character alphanumeric codes excluding confusing characters (`0`, `O`, `1`, `I`), e.g., `IKISAKI-8F42M9`.
-  - Automatically generated upon email registration and Social OAuth (Google, Facebook, Instagram), with automatic on-the-fly backfill for legacy accounts.
-  - Displayed across customer profile screens and the `<AccessRestricted />` screen with a pre-filled support `mailto:` link for immediate issue resolution.
-  - Fully integrated into the Admin Panel `/users` table with 1-click clipboard copy and real-time omni-search filtering by Reference ID, Name, or Email.
+- **Unified Entity Reference ID Architecture**:
+  - Implements standardized, high-readability branded alphanumeric identifiers across all operational workflows:
+    - **Customer Accounts (`/users`)**: `IKISAKI-XXXXXX` (e.g. `IKISAKI-8F42M9`, excluding confusing chars `0`, `O`, `1`, `I`).
+    - **Package Tour Bookings (`/tours`)**: `IK-XXXXXXXX` (uses `bookingReference`).
+    - **Tour Service Requests (`/tourservices`)**: `SRV-XXXXXXXX` (Custom tours, Chauffeur hire, Transfers).
+    - **Contact Inquiries (`/contact`)**: `INQ-XXXXXXXX` (Direct customer inquiries).
+    - **Reviews & Feedback (`/comments`)**: `REV-XXXXXXXX` (Package Reviews) / `FDB-XXXXXXXX` (Website Feedback).
+    - **Support FAQs (`/managefaqs`)**: `FAQ-XXXXXX` (Categorized Q&A entries).
+  - Enables instant 1-click clipboard copying, omni-search filtering by Reference ID, and rapid customer support issue tracking across email, WhatsApp, and phone channels.
+- **Reusable Vercel-Style Hover Scroll Component (`HoverScrollText.tsx`)**:
+  - **Default State**: Long multi-word table columns (Tour Package Names, Questions, Answers, Routes, Titles) are strictly clamped to a single line (`whitespace-nowrap overflow-hidden`). Eliminates awkward table column widening, layout warping, or messy multi-line breaks.
+  - **On Hover ("Vercel Magic")**: When the user hovers their cursor over the text cell, an intelligent `useCallback` measures `scrollWidth - clientWidth`. If the text overflows its container, it smoothly pans horizontally (`translateX(-${overflowDistance}px)`) at a natural reading velocity (~45px/second, minimum 1.8s duration), revealing the entire content effortlessly.
+  - **Mouse Leave Reset**: On mouse leave, the text smoothly glides back to its initial position (`0.3s transition`).
+  - **Adaptive Guard**: If the text is short and fits within its container (`overflowDistance <= 0`), zero translation occurs and the cursor remains standard, incurring zero layout or animation overhead. Automatically recalculates on window resize events.
 - **Dynamic Content-Adaptive Toast Engine (`AdminToast.tsx`)**:
   - Toast width adjusts dynamically according to message content (`w-auto max-w-[min(52rem,calc(100vw-3rem))]`) without forced fixed minimums or artificial width caps.
   - Standard messages under 95 characters remain strictly on a single line (`whitespace-nowrap max-sm:whitespace-normal`), preventing single-word line breaks (e.g. `code.`).
@@ -304,6 +314,32 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - When a customer or admin replaces their profile avatar or deletes their account, the backend automatically resolves `targetToDelete` and asynchronously issues an S3/R2 `DeleteObjectCommand`.
   - External social avatars (Google `lh3.googleusercontent.com` and Facebook `graph.facebook.com`) are automatically identified and protected from deletion.
   - Keeps Cloudflare R2 bucket storage clean and eliminates orphan image storage costs without blocking HTTP responses.
+
+### 10. PDF Itinerary Studio & Word Hub (`/itinerary-editor`)
+
+- **Microsoft Word-Style Document Hub**:
+  - Centralized document manager providing two streamlined entry pathways:
+    - **Blank Document**: Clean-slate document creator with zero mock data, default remarks, and official Ikisaki branding.
+    - **From Tour Booking**: 1-click import from confirmed client bookings (`/tours`) that auto-populates guest party names, room configurations (`1TWN`, `1DBL`, `1SGL`, `FAMILY`), flight schedules, tour dates, and destinations.
+- **Two-Pane Live Studio Architecture**:
+  - **Left Form Editor**: Manages Tour Metadata, dynamic Guest Party lists, Inbound/Outbound Flight tables, Day-by-Day schedule contents, Hotel check-ins, Meal indicators (`HOTEL`, `CLIENT`, `NONE`, `BOX MEAL`, `RESTAURANT`, `AIRPORT`), and Legal remarks.
+  - **Right Live A4 Preview**: Built to exacting Japanese agency (HIS style) standards. Features bold table headers (`Date`, `Tour Content`, `Meals`), `font-normal` body typography, and strictly vertically aligned Meal indicators (`B - HOTEL`, `L - CLIENT`, `D - HOTEL`).
+- **Activities & Scenic Stops Control with Trash Deletion & Restore**:
+  - Each of **Activities**, **Scenic Stops & Viewpoints**, and **Tour Highlights & Notes** has an individual **Trash (`🗑️`)** icon on its label row to delete the section from any day.
+  - Convenient restore buttons (`+ Add Activities`, `+ Add Scenic Stops`, `+ Add Tour Highlights`) appear at the bottom of the day card to bring any deleted section back in one click.
+- **Dynamic Custom Sections Engine (`+ Add Custom Section`)**:
+  - Administrators can add unlimited custom blocks per day with a **Section Title** and multi-line **Description/Notes** field, each equipped with its own Trash icon.
+  - Every new line (`Enter` key or click) in the description automatically formats as a crisp, aligned bullet point (`• `) in the preview, matching Tour Highlights.
+- **Dual-Language Engine (`EN` & `JA`) & Brand Protection**:
+  - 1-click language switcher between **(EN)** English and **(JA)** Japanese. Form Editor labels remain in English for ease of admin operation.
+  - Legal corporate entity name `Ikisaki Tours (Private) Limited` is strictly preserved in English even in Japanese vouchers.
+  - Standardized official corporate contact info: `492/14, Halbarawa Road, Thalahena, Malabe, Sri Lanka`, direct operations phone `+94 75 797 2582`, and official email `info@ikisakitours.com`.
+- **Offline-First Local Draft Storage**:
+  - All drafts are auto-saved to browser `localStorage` (`ikisaki_itinerary_drafts`, `ikisaki_active_itinerary_draft`).
+  - Drafts persist across browser closures and computer reboots, with zero backend API latency.
+- **Architectural Distinction**:
+  - *Package Itinerary Builder (`/addpackage` & `/managepackages`, Section 4.6)*: Configures public multilingual tour package listings stored in PostgreSQL.
+  - *PDF Itinerary Studio (`/itinerary-editor`, Section 10)*: Produces customized, printable A4 guest travel vouchers stored in browser `localStorage`.
 
 ---
 

@@ -332,9 +332,9 @@ export const MANUAL_TOC_ITEMS: TocItemData[] = [
     id: "bookings",
     number: "03",
     title: "Bookings & Tour Services",
-    shortDesc: "Package bookings, custom, chauffeur & transfers",
+    shortDesc: "Package bookings, custom services & PDF itinerary studio",
     icon: "calendar",
-    keywords: ["bookings", "tours", "oneday", "multiday", "custom", "chauffeur", "transfer", "status", "pending", "confirmed", "approved", "rejected"],
+    keywords: ["bookings", "tours", "oneday", "multiday", "custom", "chauffeur", "transfer", "status", "pending", "confirmed", "approved", "rejected", "itinerary-editor", "pdf studio", "word hub", "voucher", "a4 print", "his standard", "drafts", "localstorage"],
   },
   {
     id: "packages",
@@ -459,6 +459,7 @@ export const QUICK_DIRECTORY_MODULES: QuickModuleCardData[] = [
   { label: "Staff & RBAC", href: "/staff", desc: "10 Roles, 2FA & team permissions", icon: "shieldCheck", colorClass: "text-emerald-700 bg-emerald-50 border-emerald-200" },
   { label: "Tour Bookings", href: "/tours", desc: "One-Day & Multi-Day bookings", icon: "calendar", colorClass: "text-blue-600 bg-blue-50 border-blue-200" },
   { label: "Tour Services", href: "/tourservices", desc: "Custom, Chauffeur & Transfers", icon: "compass", colorClass: "text-indigo-600 bg-indigo-50 border-indigo-200" },
+  { label: "PDF Itinerary Studio", href: "/itinerary-editor", desc: "A4 Word vouchers & EN/JA drafts", icon: "sparkles", colorClass: "text-emerald-700 bg-emerald-50 border-emerald-200" },
   { label: "Registered Users", href: "/users", desc: "Customer accounts & emails", icon: "users", colorClass: "text-sky-600 bg-sky-50 border-sky-200" },
   { label: "Add Tour Package", href: "/addpackage", desc: "Create EN/JA tour package", icon: "packagePlus", colorClass: "text-violet-600 bg-violet-50 border-violet-200" },
   { label: "Manage Packages", href: "/managepackages", desc: "Inline edit live packages", icon: "package", colorClass: "text-purple-600 bg-purple-50 border-purple-200" },
@@ -532,6 +533,7 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         badges: ["Pending", "Confirmed", "Completed", "Cancelled"],
         bullets: [
           "Use the top Filter By dropdown to isolate All Fixed Packages, One-Day Tours, or Multi-Day Tours.",
+          "Branded Reference IDs (IK-XXXXXXXX): Each card displays a unique booking reference for rapid search and financial cross-referencing.",
           "Each card shows Client Name, Email, Country, Selected Package Name, Journey Date, and full traveler count breakdown (Adults, Couples, Children, Infants).",
           "Change status directly from the color-coded dropdown (Pending → Confirmed → Completed / Cancelled) — updates save instantly to the backend.",
           "Use the Delete button (with confirmation prompt) only to remove test or spam bookings.",
@@ -543,17 +545,41 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         icon: "compass",
         iconColorClass: "text-indigo-600",
         summary: "Tabbed inbox managing non-package custom travel requests with category & status filtering.",
-        badges: ["Pending", "Approved", "Active", "Rejected"],
+        badges: ["SRV-XXXXXXXX ID", "Pending", "Approved", "Active", "Rejected"],
         bullets: [
           "Tab 1 — Custom Made Tours: Tailor-made multi-day Sri Lanka itineraries requested by travelers.",
           "Tab 2 — Private Chauffeur: Dedicated vehicle + English/Japanese chauffeur hire requests.",
           "Tab 3 — Transfers: Point-to-point airport pickups (BIA) and intercity hotel transfers.",
+          "Branded Service Reference ID (SRV-XXXXXXXX): Every request is assigned a unique tracking ID for driver allocation and client communication.",
+          "Vercel-Style Hover Scroll: Long routes, client notes, and package titles remain cleanly single-line and automatically scroll smoothly on mouse hover (45px/sec).",
           "Use the Status Filter dropdown (All / Pending / Approved / Active / Rejected) to focus on open leads.",
+        ],
+      },
+      {
+        title: "PDF Itinerary Studio & Word Hub",
+        route: "/itinerary-editor",
+        icon: "sparkles",
+        iconColorClass: "text-emerald-600",
+        summary: "Microsoft Word-style itinerary document studio generating pixel-perfect Japanese agency (HIS) standard A4 vouchers & travel itineraries with dual-language EN/JA support and local draft storage.",
+        badges: ["Blank Document", "1-Click Booking Import", "HIS Standard A4", "Dual Language EN/JA", "Local Drafts"],
+        bullets: [
+          "Launch from Sidebar → Bookings & Operations → PDF Itinerary Studio (/itinerary-editor).",
+          "Word Hub Options: Choose 'Blank Document' to start completely from scratch, or 'From Tour Booking' to 1-click import guest names, flight schedules, dates, and destinations directly from active client reservations.",
+          "Live Two-Pane Studio: Edit structured metadata, guests, room allocations (1TWN, 1DBL, 1SGL, FAMILY), and flight tables on the left; view pixel-perfect print-ready A4 preview on the right.",
+          "Day Schedule Builder: Enter Day titles, Activities, Scenic Stops, Tour Highlights, and Hotel Check-in names.",
+          "Trash (Delete) & Restore: Each of Activities, Scenic Stops, and Tour Highlights features an individual Trash icon to delete that section for any day, with instant restore buttons (+ Add Activities, + Add Scenic Stops, + Add Tour Highlights) to bring them back anytime.",
+          "Custom Sections (+ Add Custom Section): Add unlimited custom sections with a Section Title and multi-line Description field. Every new line (Enter key) automatically formats as an aligned bullet point (• ) in the PDF.",
+          "HIS Japanese Agency Typography: Built with bold table headers (Date, Tour Content, Meals), font-normal body text, and strictly vertically aligned Meal indicators (B - HOTEL, L - CLIENT, D - HOTEL).",
+          "Dual Language (EN / JA): 1-click language switcher. Company legal entity 'Ikisaki Tours (Private) Limited' is strictly preserved in English even in Japanese documents.",
+          "Official Contact Information: Automatically embeds company headquarters address (492/14, Halbarawa Road, Thalahena, Malabe, Sri Lanka), direct operations phone (+94 75 797 2582), and official email (info@ikisakitours.com).",
+          "Offline-First Local Drafts: All drafts auto-save to browser LocalStorage (ikisaki_itinerary_drafts) for zero-delay reopening and resilience against browser closure or PC restart.",
         ],
       },
     ],
     proTip:
       "After confirming a high-season booking on /tours or /tourservices, check /newupdates to block out that date if your fleet is fully allocated, and note the assigned chauffeur inside /adminlogs.",
+    warning:
+      "IMPORTANT DISTINCTION: Do not confuse the PDF Itinerary Studio (/itinerary-editor) with the Tour Package Itinerary Builder (/addpackage, Section 06). The Package Builder stores JSONB itineraries in the database for public website packages; the PDF Itinerary Studio creates customized, printable A4 travel vouchers for confirmed guests stored in browser LocalStorage.",
   },
 
   itinerary: {
@@ -693,6 +719,8 @@ export const GENERIC_GUIDE_SECTIONS: Record<
           "To edit or delete an existing FAQ, go to /managefaqs → click Edit (/managefaqs/[id]/edit) or Delete.",
         ],
         bullets: [
+          "Branded Reference IDs (FAQ-XXXXXX): Each FAQ card and table row displays a unique ID for precise support team referencing.",
+          "Vercel-Style Hover Scroll: Long questions and multi-line answers stay clamped to a neat single line and smoothly scroll horizontally on mouse hover (45px/sec).",
           "Keep FAQs updated on ETA visas, Japanese-speaking guides, payment rules, and child seats.",
         ],
       },
@@ -817,6 +845,8 @@ export const GENERIC_GUIDE_SECTIONS: Record<
           "Type your official response in the Admin Reply box and submit to display your reply beneath the customer's review.",
         ],
         bullets: [
+          "Branded Reference IDs: Uses REV-XXXXXXXX for verified Package Reviews and FDB-XXXXXXXX for General Website Feedback to streamline moderation and support tracking.",
+          "Vercel-Style Hover Scroll: Long traveler comments and admin reply previews smoothly scroll on mouse hover without breaking card dimensions.",
           "Fast, polite Admin Replies build strong social proof for Japanese and European travelers.",
         ],
       },
@@ -828,10 +858,12 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         summary: "Inbox for all general messages submitted through the public Contact Us page.",
         steps: [
           "Open /contact to view all incoming messages sorted with sender email, subject, message body, and date.",
+          "Branded Inquiry Reference IDs: Every message generates an INQ-XXXXXXXX code to quote in email or WhatsApp customer replies.",
           "Reply to the customer via email/WhatsApp, then click Delete (with confirmation) to clear resolved or spam inquiries.",
         ],
         bullets: [
           "Header displays the live total count of open Contact Form Inquiries.",
+          "Hover-to-read enables instant preview of lengthy message bodies and subject lines.",
         ],
       },
     ],
@@ -1152,6 +1184,20 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "Your assigned operational role does not have administrative authorization to view or edit that module (e.g. Destination Specialist cannot access Staff or Fleet).",
     solution:
       "Click 'Return to Permitted Dashboard' to return to your authorized workspace. If your daily duties require access to this section, request your Super Administrator to upgrade your role via the Staff Directory (/staff).",
+  },
+  {
+    question: "What is the difference between the Package Itinerary in /addpackage and the PDF Itinerary Studio (/itinerary-editor)?",
+    module: "Itineraries & Vouchers",
+    cause: "The Admin Panel contains two distinct itinerary engines serving different operational needs.",
+    solution:
+      "1) Package Itinerary Builder (/addpackage & /managepackages): Manages multilingual JSONB itineraries for public tour packages published on www.ikisakitours.com (stored in PostgreSQL database). 2) PDF Itinerary Studio (/itinerary-editor): A desktop Word-style document studio that creates high-precision, printable A4 travel vouchers and customized itineraries for confirmed travelers (stored in browser LocalStorage). Do not mix up or confuse these two tools.",
+  },
+  {
+    question: "Where are PDF Itinerary Studio drafts stored, and will they be lost when I close the browser?",
+    module: "Itineraries & Vouchers",
+    cause: "Itinerary drafts are automatically stored in the browser's local client storage (localStorage) under 'ikisaki_itinerary_drafts'.",
+    solution:
+      "Closing the browser tab, exiting the application, or restarting your computer will NOT delete your saved drafts. However, clearing your browser's site cookies/data will erase them. When an itinerary is finalized, always use the Print / Save as PDF button to produce the final client A4 PDF document.",
   },
   {
     question: "Google Authenticator 2FA code is rejected or login is blocked",

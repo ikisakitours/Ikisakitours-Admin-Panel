@@ -10,7 +10,10 @@
 
 - [1. System Requirements & Navigation](#1-system-requirements--navigation)
 - [2. Dashboard & Platform Analytics (`/dashboard`)](#2-dashboard--platform-analytics-dashboard)
-- [3. Bookings & Tour Services (`/tours`, `/tourservices`)](#3-bookings--tour-services-tours-tourservices)
+- [3. Bookings, Services & PDF Itinerary Studio (`/tours`, `/tourservices`, `/itinerary-editor`)](#3-bookings-services--pdf-itinerary-studio-tours-tourservices-itinerary-editor)
+  - [3.1 Fixed Tour Bookings (`/tours`)](#fixed-tour-bookings-tours)
+  - [3.2 Tour Services Inquiries (`/tourservices`)](#tour-services-tourservices)
+  - [3.3 PDF Itinerary Studio & Word Hub (`/itinerary-editor`)](#33-pdf-itinerary-studio--word-hub-itinerary-editor)
 - [4. Creating & Managing Tour Packages (`/addpackage`, `/managepackages`)](#4-creating--managing-tour-packages-addpackage-managepackages)
   - [4.1 Multilingual Switcher (`EN` / `JA` / `+`)](#41-multilingual-switcher-en--ja--)
   - [4.2 Fast Creation with JSON Import](#42-fast-creation-with-json-import)
@@ -36,6 +39,23 @@
 
 - **Hover Sidebar:** The dark left navigation rail stays compact (`IT` logo) and smoothly expands on mouse hover, revealing all **11 module groups**.
 - **Recommended Browsers:** Latest Google Chrome, Microsoft Edge, Safari, or Firefox.
+- **Vercel-Style Hover Scroll Text (`HoverScrollText`):**
+  - Columns with long titles, questions, customer answers, or route highlights (e.g. Package Names, FAQs, Service Inquiries) are constrained to a clean, single line to keep tables strictly aligned.
+  - **Hover to Read:** Hovering over any long text cell automatically scrolls the text smoothly to the left at a comfortable reading pace (~45px/second). Moving your mouse away immediately resets the text back to the beginning.
+  - Text that naturally fits inside the cell does not scroll.
+
+### Operational Reference ID Schema
+
+Every customer interaction, booking, inquiry, and review generates a standardized branded Reference ID for instant search, support, and accounting:
+
+| Module | Entity Type | Prefix Format | Example | Purpose & Operational Use |
+| :--- | :--- | :--- | :--- | :--- |
+| **Users (`/users`)** | Customer Accounts | `IKISAKI-XXXXXX` | `IKISAKI-8F42M9` | Customer support lookups, VIP tracking, and verified status verification. |
+| **Tour Bookings (`/tours`)** | Fixed Package Bookings | `IK-XXXXXXXX` | `IK-91428301` | Customer booking vouchers, invoicing, and reservation confirmations. |
+| **Tour Services (`/tourservices`)** | Custom, Chauffeur & Transfers | `SRV-XXXXXXXX` | `SRV-5E8A1D3C` | Fleet coordination, chauffeur allocations, and tailor-made pricing. |
+| **Contact Inquiries (`/contact`)** | Contact Us Inquiries | `INQ-XXXXXXXX` | `INQ-2F7B0A94` | Direct customer support, email ticketing, and WhatsApp inquiries. |
+| **Reviews & Feedback (`/comments`)** | Package Reviews / Feedback | `REV-XXXXXXXX` / `FDB-XXXXXXXX` | `REV-3A9F1B2C` / `FDB-7E0D4C8A` | Review moderation, verification, and direct administrative replies. |
+| **FAQs & Help (`/managefaqs`)** | Support Questions & Answers | `FAQ-XXXXXX` | `FAQ-8A1D3E` | Support ticket categorization and multilingual Help Center mapping. |
 
 ---
 
@@ -47,7 +67,7 @@
 
 ---
 
-## 3. Bookings & Tour Services (`/tours`, `/tourservices`)
+## 3. Bookings, Services & PDF Itinerary Studio (`/tours`, `/tourservices`, `/itinerary-editor`)
 
 ### Fixed Tour Bookings (`/tours`)
 - Lists direct reservations submitted from published **One-Day** and **Multi-Day** tour pages.
@@ -61,6 +81,45 @@
 
 > [!TIP]
 > After confirming a peak-season booking, block unavailable fleet dates in **`/newupdates`** and record chauffeur/guide allocations inside **`/adminlogs`**.
+
+### 3.3 PDF Itinerary Studio & Word Hub (`/itinerary-editor`)
+
+The **PDF Itinerary Studio** is a Microsoft Word-style desktop workspace engineered to draft, customize, and generate high-precision, Japanese travel agency-standard (HIS style) A4 printable itineraries and guest travel vouchers.
+
+> [!IMPORTANT]
+> **CRITICAL DISTINCTION — TWO SEPARATE ITINERARY SYSTEMS:**
+> - **Website Package Itinerary Builder (`/addpackage` & `/managepackages`, Section 4.6):** Builds the standard daily itinerary schedules and meal inclusions displayed publicly on `www.ikisakitours.com`. Stored in PostgreSQL via backend APIs.
+> - **PDF Itinerary Studio (`/itinerary-editor`, Section 3.3):** Generates customized, print-ready A4 PDF travel vouchers for confirmed travelers. Stored locally in browser `localStorage` (`ikisaki_itinerary_drafts`). Do not confuse or mix up these two distinct tools!
+
+#### 1. Document Hub Entry Modes
+- **Blank Document:** Start from scratch with a clean slate, default remarks, and official Ikisaki branding.
+- **From Tour Booking:** 1-click import from confirmed tour bookings (`/tours`). Automatically populates:
+  - Lead Guest Name and Party size breakdown (e.g. `PRAMOD PREMUDU PARTY (PAX: 2)`).
+  - Room Configurations (`1TWN`, `1DBL`, `1SGL`, `FAMILY`).
+  - Airline Flight Schedules (airline number, route, dates, and times).
+  - Tour Dates, Destinations, and Day-by-Day schedule contents.
+
+#### 2. Live Form Editor Features (Left Pane)
+- **Tour Info (Metadata):** Tour Package Title, Date Range (`26-NOV to 3-DEC`), and Reference Code (`IK-XXXX`).
+- **Guests & Rooms:** Manage traveler names and room type drop-downs.
+- **Flight Schedules:** Add inbound/outbound flights with routes (e.g. `NRT - CMB`), flight numbers, and dates.
+- **Day-by-Day Content:**
+  - Day heading and date strings.
+  - **Activities:** Multi-line text field with a dedicated **Trash (`🗑️`)** icon to delete the section for any day.
+  - **Scenic Stops & Viewpoints:** Multi-line text field with a dedicated **Trash (`🗑️`)** icon to delete the section for any day.
+  - **Tour Highlights & Day Notes:** Multi-line text field with a dedicated **Trash (`🗑️`)** icon to delete the section for any day.
+  - **Instant Section Restore:** If an admin deletes Activities, Scenic Stops, or Highlights, convenient restore buttons (`+ Add Activities`, `+ Add Scenic Stops`, `+ Add Tour Highlights`) appear at the bottom of the day card to bring them back anytime.
+  - **Custom Sections (`+ Add Custom Section`):** Add unlimited custom sections with a **Section Title** and **Description/Notes** field. Each newline (`Enter` key or click) automatically formats as an aligned bullet point (`• `) in the preview. Includes individual Trash icon to delete anytime.
+  - **Hotel Check-In:** Dedicated property name field formatted to standard voucher specifications.
+  - **Meal Indicators:** Breakfast, Lunch, and Dinner drop-downs (`HOTEL`, `CLIENT`, `NONE`, `BOX MEAL`, `RESTAURANT`, `AIRPORT`).
+- **Important Remarks & Tour Conditions:** Multi-line conditions with automatic bullet point sanitization (prevents double-bullet glitches).
+- **Official Branding & Company Details:** Embedded legal entity name (`Ikisaki Tours (Private) Limited`), registration numbers (`PV 79171`, `SLTDA/SQA/PRO/01234`), Malabe headquarters address, phone (`+94 75 797 2582`), and email (`info@ikisakitours.com`).
+
+#### 3. Japanese Agency-Standard (HIS Style) A4 Print & PDF Preview (Right Pane)
+- **High-Precision Layout:** Clean borders, bold table headers (`Date`, `Tour Content`, `Meals`), light semibold day headings, `font-normal` body typography, and strictly vertically aligned Meal indicators (`B - HOTEL`, `L - CLIENT`, `D - HOTEL`).
+- **Dual-Language Switching:** 1-click switch between **(EN)** English and **(JA)** Japanese. Company legal name `Ikisaki Tours (Private) Limited` is strictly kept in English in both modes.
+- **A4 Zoom & PDF Export:** Responsive zoom (`75%`, `90%`, `100%`, `110%`) and 1-click print-ready PDF export via browser print stylesheet (`@media print`).
+- **Local Draft Resilience:** All drafts auto-save to browser `localStorage` (`ikisaki_itinerary_drafts`). Open, edit, or delete saved drafts from the Document Hub at any time. Survives browser restarts and computer reboots.
 
 ---
 

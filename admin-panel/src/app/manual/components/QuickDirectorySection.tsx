@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowUpRight, Monitor, Sparkles } from "lucide-react";
+import { ArrowUpRight, Hash, Monitor, MoveHorizontal, Sparkles } from "lucide-react";
 import { QUICK_DIRECTORY_MODULES } from "../data/manualMockData";
 import { SectionCard } from "./SectionCard";
 import { ManualIcon } from "./ManualIcon";
@@ -32,7 +32,25 @@ export function QuickDirectorySection() {
             <Sparkles className="w-4 h-4 text-emerald-600" /> Hover-to-Expand Sidebar
           </p>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Move your cursor over the left navigation rail to expand all 10 module groups. Clicking any link loads the page cleanly while keeping the sidebar locked in place.
+            Move your cursor over the left navigation rail to expand all 11 module groups. Clicking any link loads the page cleanly while keeping the sidebar locked in place.
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-1.5">
+          <p className="text-xs font-extrabold text-slate-800 flex items-center gap-2">
+            <MoveHorizontal className="w-4 h-4 text-blue-600" /> Vercel-Style Hover Scroll (HoverScrollText)
+          </p>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Long table cells (Package Names, FAQs, Answers, Routes) remain cleanly clamped to a single line. Simply <strong>hover your cursor</strong> over any text to smoothly scroll at <strong>45px/sec</strong> and read the full content. Resets automatically on mouse leave.
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-1.5">
+          <p className="text-xs font-extrabold text-slate-800 flex items-center gap-2">
+            <Hash className="w-4 h-4 text-amber-600" /> Operational Reference ID Standards
+          </p>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Every record generates a branded ID for instant search and support: <code>SRV-XXXXXXXX</code> (Services), <code>INQ-XXXXXXXX</code> (Inquiries), <code>REV-</code> / <code>FDB-</code> (Reviews/Feedback), <code>FAQ-XXXXXX</code> (FAQs), and <code>IK-XXXXXXXX</code> (Bookings).
           </p>
         </div>
       </div>
