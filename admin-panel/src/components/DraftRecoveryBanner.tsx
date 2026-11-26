@@ -95,7 +95,7 @@ export function DraftRecoveryBanner({
       {/* 02 & 03) BOTTOM-RIGHT FLOATING DRAFT CONTROLS                        */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <div
-        className={`fixed bottom-7 right-7 z-50 flex flex-col items-end gap-3 pointer-events-none select-none ${className}`}
+        className={`fixed bottom-3 right-5 sm:bottom-3 sm:right-6 z-50 flex flex-col items-end gap-2 pointer-events-none select-none ${className}`}
       >
         {/* 02) Compact Floating Recovery Card (Inline Sparkle Icon & Red Hover Close) */}
         {hasDraft && (
@@ -151,7 +151,7 @@ export function DraftRecoveryBanner({
         {/* 03) PROMINENT, CLEAR & LARGE LIVE AUTO-SAVE PILL WITH REAL BUTTON (NO WRAPPING) */}
         <div
           style={{ whiteSpace: "nowrap", flexShrink: 0, width: "max-content" }}
-          className="pointer-events-auto inline-flex flex-nowrap items-center gap-3 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-black/10 text-xs text-slate-700 dark:text-slate-200 transition-all whitespace-nowrap shrink-0 max-w-none"
+          className="pointer-events-auto inline-flex flex-nowrap items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg shadow-black/10 text-xs text-slate-700 dark:text-slate-200 transition-all whitespace-nowrap shrink-0 max-w-none"
         >
           {isSaving ? (
             <span
@@ -204,7 +204,7 @@ export function DraftRecoveryBanner({
               onClick={onSaveNow}
               title="Force save draft to browser storage"
               style={{ whiteSpace: "nowrap", flexShrink: 0 }}
-              className="inline-flex flex-nowrap items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold cursor-pointer transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap shrink-0"
+              className="inline-flex flex-nowrap items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold cursor-pointer transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap shrink-0"
             >
               <Save className="w-3.5 h-3.5 text-white shrink-0" />
               <span style={{ whiteSpace: "nowrap", flexShrink: 0 }} className="whitespace-nowrap inline-block">
