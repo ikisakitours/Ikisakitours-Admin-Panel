@@ -214,9 +214,9 @@ function LoginForm() {
               </p>
             </div>
 
-            {/* Session Expired Banner (Concise, single line, zero truncation) */}
+            {/* Session Expired Banner (Centered pill badge fitting content size) */}
             {isExpired && (
-              <div className="py-2 px-3 bg-amber-50 border border-amber-200/90 rounded-xl flex items-center gap-2 text-amber-900 shadow-2xs animate-in fade-in duration-200">
+              <div className="w-fit mx-auto py-1.5 px-3.5 bg-amber-50 border border-amber-200/90 rounded-xl flex items-center justify-center gap-2 text-amber-900 shadow-2xs animate-in fade-in duration-200">
                 <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
                 <span className="font-semibold whitespace-nowrap text-[11px] sm:text-xs">
                   Session expired. Please sign in again.
