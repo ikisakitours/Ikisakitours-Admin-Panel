@@ -579,9 +579,7 @@ When executing the SQL table schema migrations in Supabase SQL Editor for Sectio
 
 <div align="center">
 
-<a href="https://pramod-siriwardhana.vercel.app/" target="_blank" rel="noopener noreferrer">
-  <img src="admin-panel/public/Layout-Icons/two2flod-readme-logo.webp" alt="Two2Flod Logo" width="84" height="84" />
-</a>
+<img src="admin-panel/public/Layout-Icons/two2flod-readme-logo.webp" alt="Two2Flod Logo" width="84" height="84" />
 
 ### Luxury Travel Operations & Admin CMS Suite — Client & Engineering
 
@@ -590,9 +588,8 @@ When executing the SQL table schema migrations in Supabase SQL Editor for Sectio
 | Attribute | Entity / Specification | Details |
 | :--- | :--- | :--- |
 | **Client & Business Owner** | **Ikisaki Tours (Private) Limited** | Sri Lanka Luxury Inbound Tour Operator · [www.ikisakitours.com](https://www.ikisakitours.com) · [`info@ikisakitours.com`](mailto:info@ikisakitours.com) |
-| **Technology Partner** | **Two2Flod** | Web Architecture, Bespoke UI/UX Design & Next-Gen Engineering · [Portfolio](https://pramod-siriwardhana.vercel.app/) |
-| **Lead Software Engineer** | **Pramod Siriwardhana** | Full-Stack Architecture, React 19 Engine, Cloudflare R2 Pipeline & Bilingual i18n Suite · [Profile](https://pramod-siriwardhana.vercel.app/) |
-| **Software Engineer** | **Shehan Wijekoon** | Core Engineering, UI Implementation & Module Integration · Two2Flod |
+| **Technology Partner** | **Two2Flod** | Digital Architecture, Cloud Infrastructure & Next-Gen Systems Engineering |
+| **Software Engineers** | **Pramod Siriwardhana & Shehan Wijekoon** | Enterprise Admin Architecture, React 19 Engine, PDF Itinerary Studio, Dynamic Pricing Matrix & Cloudflare R2 Pipeline · Two2Flod |
 | **Platform Ecosystem** | **Ikisaki Enterprise Suite** | Customer Web Platform (Next.js 16) · Admin CMS Panel (Next.js 16) · Core API (NestJS + PostgreSQL) |
 | **Intellectual Property Rights** | **All Rights Reserved** | Copyright © 2026 Ikisaki Tours (Private) Limited & Two2Flod ([`LICENSE`](./LICENSE)) |
 
@@ -615,6 +612,6 @@ When executing the SQL table schema migrations in Supabase SQL Editor for Sectio
 <div align="center">
 
 **© 2026 Ikisaki Tours (Private) Limited & Two2Flod** · All Rights Reserved  
-Client: [**Ikisaki Tours (Private) Limited**](https://www.ikisakitours.com) · Engineered by [**Pramod Siriwardhana**](https://pramod-siriwardhana.vercel.app/) & **Shehan Wijekoon** ([**Two2Flod**](https://pramod-siriwardhana.vercel.app/))
+Client: [**Ikisaki Tours (Private) Limited**](https://www.ikisakitours.com) · Engineered by Pramod Siriwardhana & Shehan Wijekoon (Two2Flod)
 
 </div>
