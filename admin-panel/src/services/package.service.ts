@@ -77,8 +77,15 @@ export const packageService = {
         infantPrice: 0,
       },
       options: formData.options || [],
+      pricingNotes: formData.pricingNotes || [],
     };
+    if (formData.pricingNotes && !pricingConfig.pricingNotes) {
+      pricingConfig.pricingNotes = formData.pricingNotes;
+    }
     data.append("pricingConfig", JSON.stringify(pricingConfig));
+    if (pricingConfig.pricingNotes) {
+      data.append("pricingNotes", JSON.stringify(pricingConfig.pricingNotes));
+    }
 
     images.forEach((file) => {
       data.append("images", file);
@@ -128,13 +135,18 @@ export const packageService = {
       tiers: formData.pricingTiers || [],
       passengerPricing: formData.passengerPricing,
       options: formData.options || [],
+      pricingNotes: formData.pricingNotes || [],
     };
+    if (formData.pricingNotes && !pricingConfig.pricingNotes) {
+      pricingConfig.pricingNotes = formData.pricingNotes;
+    }
 
     const payload = {
       ...formData,
       price: Number(formData.price),
       discount: Number(formData.discount || 0),
       pricingConfig,
+      pricingNotes: pricingConfig.pricingNotes,
     };
 
     const response = await fetch(`${API_URL}/addpackages/${slug}`, {

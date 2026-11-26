@@ -24,6 +24,8 @@ import DocumentPreviewPanel from "./DocumentPreviewPanel";
 import DocumentMetaModal from "./DocumentMetaModal";
 import { LegalIcon } from "./LegalIcon";
 import { legalDocsService } from "@/services/legaldocs.service";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LegalDocEditor – the main per-document editing pane:
@@ -67,6 +69,25 @@ export default function LegalDocEditor({
   const [saving, setSaving]       = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Crash-resilient draft auto-save and recovery
+  const {
+    hasDraft,
+    draftSavedAt,
+    lastSaved,
+    isSaving,
+    restoreDraft,
+    discardDraft,
+    saveDraftNow,
+    clearDraft,
+    showLeaveConfirm,
+    cancelLeave,
+    confirmLeave,
+  } = useFormDraft<LegalDocument>({
+    storageKey: `ikisaki_draft_legaldoc_${doc.id}`,
+    formData: doc,
+    setFormData: (restored) => onUpdate(restored),
+  });
+
   const badgeClass = ACCENT_BADGE[doc.accent ?? "indigo"] ?? ACCENT_BADGE.indigo;
   const displayTitle = resolveLocalized(doc.title, locale, "Untitled Policy");
   const displayEyebrow = resolveLocalized(doc.eyebrow, locale);
@@ -104,6 +125,7 @@ export default function LegalDocEditor({
     setErrorMessage(null);
     try {
       await legalDocsService.saveDocument(doc);
+      clearDraft();
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err: any) {
@@ -251,6 +273,20 @@ export default function LegalDocEditor({
       {/* ── Tab Content ── */}
       {activeTab === "editor" ? (
         <div className="p-5 space-y-4 flex-1 overflow-y-auto">
+          <DraftRecoveryBanner
+            hasDraft={hasDraft}
+            draftSavedAt={draftSavedAt}
+            onRestore={restoreDraft}
+            onDiscard={discardDraft}
+            lastSaved={lastSaved}
+            isSaving={isSaving}
+            onSaveNow={saveDraftNow}
+            entityName={`"${displayTitle}" Legal Document`}
+            showLeaveConfirm={showLeaveConfirm}
+            onCancelLeave={cancelLeave}
+            onConfirmLeave={confirmLeave}
+          />
+
           {/* Add Section bar */}
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">

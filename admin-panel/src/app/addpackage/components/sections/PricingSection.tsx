@@ -20,6 +20,7 @@ import {
   GroupPricingTier,
   PackageOptionItem,
   PassengerCategoryPricing,
+  ImportantPricingNote,
 } from "../../types/package.types";
 import { calculateLivePackagePrice } from "../../utils/pricingCalculator";
 
@@ -35,6 +36,42 @@ const DEFAULT_STANDARD_TIERS: GroupPricingTier[] = [
   { minPax: 3, maxPax: 4, pricePerPerson: 45, label: "Small Group (3-4 Persons)" },
   { minPax: 5, maxPax: 7, pricePerPerson: 35, label: "Medium Group (5-7 Persons)" },
   { minPax: 8, maxPax: 15, pricePerPerson: 30, label: "Large Group (8+ Persons)" },
+];
+
+export const DEFAULT_STANDARD_PRICING_NOTES: ImportantPricingNote[] = [
+  {
+    id: "note-1",
+    title: {
+      en: "DYNAMIC GROUP PRICING",
+      ja: "ダイナミックグループ料金",
+    },
+    description: {
+      en: "Rates per person decrease automatically as your party size increases to match vehicle capacity tiers.",
+      ja: "参加人数が増えるにつれて、車両定員に合わせたグループ割引が自動的に適用され、1名あたりの料金がお得になります。",
+    },
+  },
+  {
+    id: "note-2",
+    title: {
+      en: "TRAVELER CATEGORIES",
+      ja: "旅行者区分と料金",
+    },
+    description: {
+      en: "Couple rates apply to 2 adults sharing a room. Child rates (with applicable discount) apply for ages 2–11. Infants under 2 travel free.",
+      ja: "カップル料金は同室2名様に適用されます。子供料金（割引適用）は2〜11歳が対象です。2歳未満の幼児は無料です。",
+    },
+  },
+  {
+    id: "note-3",
+    title: {
+      en: "COMPREHENSIVE INCLUSIONS",
+      ja: "充実のパッケージ内容",
+    },
+    description: {
+      en: "Includes private AC luxury vehicle, dedicated chauffeur-guide, fuel, highway tolls, accommodations, and itinerary-specified meal plans.",
+      ja: "専用エアコン完備の専用車、専属ドライバーガイド、燃料代、高速道路料金、宿泊費、日程表に記載されたお食事プランが含まれています。",
+    },
+  },
 ];
 
 export function PricingSection({ formData, setFormData, locale = "en" }: Props) {
@@ -53,6 +90,11 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
   const options: PackageOptionItem[] =
     formData.pricingConfig?.options || formData.options || [];
 
+  const pricingNotes: ImportantPricingNote[] =
+    formData.pricingConfig?.pricingNotes ||
+    formData.pricingNotes ||
+    DEFAULT_STANDARD_PRICING_NOTES;
+
   // Helper to update the unified pricingConfig object
   const updatePricingConfig = (newConfig: Partial<PricingConfig>) => {
     setFormData((prev) => {
@@ -60,6 +102,7 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
         tiers,
         passengerPricing,
         options,
+        pricingNotes,
       };
       const mergedConfig: PricingConfig = {
         ...currentConfig,
@@ -68,11 +111,61 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
       return {
         ...prev,
         pricingConfig: mergedConfig,
+        pricingNotes: mergedConfig.pricingNotes,
         pricingTiers: mergedConfig.tiers,
         passengerPricing: mergedConfig.passengerPricing,
         options: mergedConfig.options,
       };
     });
+  };
+
+  // ── Handlers for Important Pricing Notes (Traveler Modal) ──
+  const updatePricingNotes = (newNotes: ImportantPricingNote[]) => {
+    updatePricingConfig({ pricingNotes: newNotes });
+  };
+
+  const handleNoteTitleChange = (index: number, val: string) => {
+    const updated = [...pricingNotes];
+    updated[index] = {
+      ...updated[index],
+      title: {
+        ...(updated[index].title || {}),
+        [locale]: val,
+      },
+    };
+    updatePricingNotes(updated);
+  };
+
+  const handleNoteDescChange = (index: number, val: string) => {
+    const updated = [...pricingNotes];
+    updated[index] = {
+      ...updated[index],
+      description: {
+        ...(updated[index].description || {}),
+        [locale]: val,
+      },
+    };
+    updatePricingNotes(updated);
+  };
+
+  const addPricingNote = () => {
+    const newNote: ImportantPricingNote = {
+      id: `note-${Date.now()}`,
+      title: { [locale]: "" },
+      description: { [locale]: "" },
+    };
+    updatePricingNotes([...pricingNotes, newNote]);
+  };
+
+  const removePricingNote = (index: number) => {
+    const updated = pricingNotes.filter((_, i) => i !== index);
+    updatePricingNotes(updated);
+  };
+
+  const resetStandardNotes = () => {
+    if (confirm("Reset pricing notes back to Ikisaki standard defaults?")) {
+      updatePricingNotes(DEFAULT_STANDARD_PRICING_NOTES);
+    }
   };
 
   // Interactive Live Preview Simulation State (matching user booking widget: Adult, Couple, Child, Infant)
@@ -232,6 +325,122 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
           </h3>
           <p className="text-xs text-slate-500 mt-1">
             Configure dynamic group discounts, traveler categories, and customizable add-ons matching industry standards.
+          </p>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          BLOCK 0: IMPORTANT PRICING NOTES (POP-UP MODAL FOR TRAVELERS)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="p-1 rounded-md bg-amber-50 text-amber-600 border border-amber-200/60">
+              <Sparkles className="w-4 h-4" />
+            </span>
+            <div>
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                Important Pricing Notes
+                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 normal-case">
+                  Active Tab: {locale.toUpperCase()}
+                </span>
+              </h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                These notes display inside the &quot;Important Pricing Notes&quot; modal on the customer website to guide travelers on dynamic rates, group discounts, and booking policies.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={resetStandardNotes}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-medium transition-all cursor-pointer shadow-2xs"
+              title="Reset back to standard Ikisaki travel notes"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Defaults</span>
+            </button>
+            <button
+              type="button"
+              onClick={addPricingNote}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all cursor-pointer shadow-xs hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Note</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Notes Items List */}
+        <div className="space-y-3">
+          {pricingNotes.map((note, idx) => (
+            <div
+              key={note.id || idx}
+              className="p-3.5 sm:p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 hover:bg-slate-50 transition-colors space-y-3"
+            >
+              <div className="flex items-center justify-between gap-2 border-b border-slate-200/60 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-700 text-[10px] font-bold flex items-center justify-center font-mono">
+                    {idx + 1}
+                  </span>
+                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    {note.title?.[locale] || note.title?.en || `Note #${idx + 1}`}
+                  </span>
+                </div>
+                {pricingNotes.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removePricingNote(idx)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all cursor-pointer"
+                    title="Delete note"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Note Title ({locale.toUpperCase()}) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={note.title?.[locale] || ""}
+                    onChange={(e) => handleNoteTitleChange(idx, e.target.value)}
+                    placeholder={locale === "ja" ? "例: ダイナミックグループ料金" : "e.g. DYNAMIC GROUP PRICING"}
+                    className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-100 transition-all"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Note Description ({locale.toUpperCase()}) *
+                  </label>
+                  <textarea
+                    rows={2}
+                    required
+                    value={note.description?.[locale] || ""}
+                    onChange={(e) => handleNoteDescChange(idx, e.target.value)}
+                    placeholder={
+                      locale === "ja"
+                        ? "例: 参加人数が増えるにつれて、車両定員に合わせたグループ割引が自動的に適用されます。"
+                        : "e.g. Rates per person decrease automatically as your party size increases to match vehicle capacity tiers."
+                    }
+                    className="w-full text-xs font-normal px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-100 transition-all resize-y"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Admin Tip underneath (Requested by user: "ytin note ekk dann podi note ekak pode title description dann pluwn trm kiyl") */}
+        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs">
+          <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="leading-relaxed text-[11px]">
+            <strong>Admin Guidelines:</strong> Please keep note titles concise and descriptions limited to 1–2 short sentences. Short, clear guidelines ensure the modal on the customer booking page looks elegant and is comfortable for international guests to read on mobile and desktop devices. Remember to complete translations for both <strong>EN</strong> and <strong>JA</strong> tabs.
           </p>
         </div>
       </div>

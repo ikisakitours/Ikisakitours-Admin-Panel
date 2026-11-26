@@ -23,6 +23,8 @@ import {
   charterPricingService,
   ServicePricingAllData,
 } from "@/services/servicepricing.service";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 import CharterRatesForm from "./CharterServiceRatesForm";
 import CustomTourForm from "./CustomTourForm";
 import TransferRatesForm from "./TransferRatesForm";
@@ -46,6 +48,38 @@ export default function CharterPricingManager() {
 
   // Error alert state
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Crash-resilient draft auto-save and recovery
+  const currentPricingConfig =
+    activeTab === "charter"
+      ? charterData
+      : activeTab === "custom"
+        ? customData
+        : transferData;
+
+  const {
+    hasDraft,
+    draftSavedAt,
+    lastSaved,
+    isSaving,
+    restoreDraft,
+    discardDraft,
+    saveDraftNow,
+    clearDraft,
+    showLeaveConfirm,
+    cancelLeave,
+    confirmLeave,
+  } = useFormDraft<any>({
+    storageKey: `ikisaki_draft_pricing_${activeTab}`,
+    formData: currentPricingConfig,
+    setFormData: (restored) => {
+      if (!restored) return;
+      if (activeTab === "charter") setCharterData(restored);
+      else if (activeTab === "custom") setCustomData(restored);
+      else setTransferData(restored);
+    },
+    enabled: !loading,
+  });
 
   // Scan configurations to discover any newly added languages
   const discoverLanguages = (data: ServicePricingAllData) => {
@@ -114,7 +148,7 @@ export default function CharterPricingManager() {
             : transferData;
 
       await charterPricingService.savePricing(activeTab, currentConfig);
-
+      clearDraft();
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err: any) {
@@ -287,6 +321,20 @@ export default function CharterPricingManager() {
           onSubmit={handleSave}
           className="w-full space-y-6 p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 shadow-xs"
         >
+          <DraftRecoveryBanner
+            hasDraft={hasDraft}
+            draftSavedAt={draftSavedAt}
+            onRestore={restoreDraft}
+            onDiscard={discardDraft}
+            lastSaved={lastSaved}
+            isSaving={isSaving}
+            onSaveNow={saveDraftNow}
+            entityName={`${activeTab.toUpperCase()} Pricing Note`}
+            showLeaveConfirm={showLeaveConfirm}
+            onCancelLeave={cancelLeave}
+            onConfirmLeave={confirmLeave}
+          />
+
           {/* Card Top Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
             <div>

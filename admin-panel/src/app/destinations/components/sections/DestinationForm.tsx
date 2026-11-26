@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { destinationService, DestinationPayload } from "@/services/destination.service";
 import { Save, Plus } from "lucide-react";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 import DestinationBasicInfo from "./DestinationBasicInfo";
 import DestinationContent from "./DestinationContent";
 import DestinationMedia from "./DestinationMedia";
@@ -26,16 +28,29 @@ export default function DestinationForm({
 
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [isCustomSlug, setIsCustomSlug] = useState(false);
-  const [slug, setSlug] = useState("");
+  const [isCustomSlug, setIsCustomSlug] = useState<boolean>(() => Boolean(initialData?.slug));
+  const [slug, setSlug] = useState<string>(() => initialData?.slug || "");
 
   // Active language tab selected in admin form
   const [activeLang, setActiveLang] = useState<string>("en");
 
-  // Track languages detected from imported JSON or added manually
-  const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en", "ja"]);
+  // Track languages detected from initialData or imported JSON or added manually
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>(() => {
+    if (initialData) {
+      const langs = new Set<string>(["en", "ja"]);
+      const checkObj = (obj?: Record<string, any>) => {
+        if (obj) Object.keys(obj).forEach((k) => { if (k.length <= 5) langs.add(k); });
+      };
+      checkObj(initialData.title);
+      checkObj(initialData.summary);
+      checkObj(initialData.description);
+      checkObj(initialData.province);
+      return Array.from(langs);
+    }
+    return ["en", "ja"];
+  });
 
-  // Multilingual fields stored as Record<string, string>
+  // Multilingual fields stored as Record<string, string> - initialized synchronously from initialData
   const [formData, setFormData] = useState<{
     title: Record<string, string>;
     summary: Record<string, string>;
@@ -47,28 +62,80 @@ export default function DestinationForm({
     localCurrency: Record<string, string>;
     lat: number;
     lng: number;
-  }>({
-    title: { en: "", ja: "" },
-    summary: { en: "", ja: "" },
-    description: { en: "", ja: "" },
-    province: { en: "", ja: "" },
-    bestTimeToVisit: { en: "", ja: "" },
-    climate: { en: "", ja: "" },
-    primaryLanguage: { en: "", ja: "" },
-    localCurrency: { en: "", ja: "" },
-    lat: 35.6762,
-    lng: 139.6503,
+  }>(() => ({
+    title: { en: "", ja: "", ...(initialData?.title || {}) },
+    summary: { en: "", ja: "", ...(initialData?.summary || {}) },
+    description: { en: "", ja: "", ...(initialData?.description || {}) },
+    province: { en: "", ja: "", ...(initialData?.province || {}) },
+    bestTimeToVisit: { en: "", ja: "", ...(initialData?.bestTimeToVisit || {}) },
+    climate: { en: "", ja: "", ...(initialData?.climate || {}) },
+    primaryLanguage: { en: "", ja: "", ...(initialData?.primaryLanguage || {}) },
+    localCurrency: { en: "", ja: "", ...(initialData?.localCurrency || {}) },
+    lat: initialData?.coordinates?.lat ?? 35.6762,
+    lng: initialData?.coordinates?.lng ?? 139.6503,
+  }));
+
+  // Localized highlights map: Record<string, string[]> - initialized synchronously from initialData
+  const [highlights, setHighlights] = useState<Record<string, string[]>>(() => {
+    if (initialData?.highlights && Object.keys(initialData.highlights).length > 0) {
+      return { en: [""], ja: [""], ...initialData.highlights };
+    }
+    return { en: [""], ja: [""] };
   });
 
-  // Localized highlights map: Record<string, string[]>
-  const [highlights, setHighlights] = useState<Record<string, string[]>>({
-    en: [""],
-    ja: [""],
+  // Crash-resilient draft auto-save and recovery
+  const draftKey = isEditMode && initialData?.id
+    ? `ikisaki_draft_dest_edit_${initialData.id}`
+    : "ikisaki_draft_dest_new";
+
+  interface DestinationDraftState {
+    formData: typeof formData;
+    highlights: Record<string, string[]>;
+    slug: string;
+  }
+
+  const currentDraftState: DestinationDraftState = {
+    formData,
+    highlights,
+    slug,
+  };
+
+  const {
+    hasDraft,
+    draftSavedAt,
+    lastSaved,
+    isSaving,
+    restoreDraft,
+    discardDraft,
+    saveDraftNow,
+    clearDraft,
+    showLeaveConfirm,
+    cancelLeave,
+    confirmLeave,
+  } = useFormDraft<DestinationDraftState>({
+    storageKey: draftKey,
+    formData: currentDraftState,
+    setFormData: (restored) => {
+      if (restored.formData) {
+        const langs = new Set<string>(["en", "ja"]);
+        if (restored.formData.title && typeof restored.formData.title === "object") {
+          Object.keys(restored.formData.title).forEach((k) => {
+            if (k.length <= 5) langs.add(k);
+          });
+        }
+        setAvailableLanguages(Array.from(langs));
+        setFormData(restored.formData);
+      }
+      if (restored.highlights) setHighlights(restored.highlights);
+      if (restored.slug !== undefined) setSlug(restored.slug);
+    },
   });
 
-  // Pre-fill form when initialData is provided (Edit Mode)
+  // Only update state if initialData actually changes to a different record after mount
+  const prevInitialIdRef = useRef<string | undefined>(initialData?.id);
   useEffect(() => {
-    if (initialData) {
+    if (initialData && initialData.id !== prevInitialIdRef.current) {
+      prevInitialIdRef.current = initialData.id;
       const detectedLangs = Array.from(
         new Set([
           "en",
@@ -80,32 +147,30 @@ export default function DestinationForm({
         ])
       );
 
-      queueMicrotask(() => {
-        setAvailableLanguages(detectedLangs);
-        setSlug(initialData.slug || "");
-        setIsCustomSlug(true);
+      setAvailableLanguages(detectedLangs);
+      setSlug(initialData.slug || "");
+      setIsCustomSlug(Boolean(initialData.slug));
 
-        setFormData({
-          title: { en: "", ja: "", ...(initialData.title || {}) },
-          summary: { en: "", ja: "", ...(initialData.summary || {}) },
-          description: { en: "", ja: "", ...(initialData.description || {}) },
-          province: { en: "", ja: "", ...(initialData.province || {}) },
-          bestTimeToVisit: { en: "", ja: "", ...(initialData.bestTimeToVisit || {}) },
-          climate: { en: "", ja: "", ...(initialData.climate || {}) },
-          primaryLanguage: { en: "", ja: "", ...(initialData.primaryLanguage || {}) },
-          localCurrency: { en: "", ja: "", ...(initialData.localCurrency || {}) },
-          lat: initialData.coordinates?.lat ?? 35.6762,
-          lng: initialData.coordinates?.lng ?? 139.6503,
-        });
-
-        if (initialData.highlights) {
-          setHighlights({
-            en: [""],
-            ja: [""],
-            ...initialData.highlights,
-          });
-        }
+      setFormData({
+        title: { en: "", ja: "", ...(initialData.title || {}) },
+        summary: { en: "", ja: "", ...(initialData.summary || {}) },
+        description: { en: "", ja: "", ...(initialData.description || {}) },
+        province: { en: "", ja: "", ...(initialData.province || {}) },
+        bestTimeToVisit: { en: "", ja: "", ...(initialData.bestTimeToVisit || {}) },
+        climate: { en: "", ja: "", ...(initialData.climate || {}) },
+        primaryLanguage: { en: "", ja: "", ...(initialData.primaryLanguage || {}) },
+        localCurrency: { en: "", ja: "", ...(initialData.localCurrency || {}) },
+        lat: initialData.coordinates?.lat ?? 35.6762,
+        lng: initialData.coordinates?.lng ?? 139.6503,
       });
+
+      if (initialData.highlights) {
+        setHighlights({
+          en: [""],
+          ja: [""],
+          ...initialData.highlights,
+        });
+      }
     }
   }, [initialData]);
 
@@ -282,9 +347,11 @@ export default function DestinationForm({
 
       if (isEditMode && initialData?.id) {
         await destinationService.updateDestination(initialData.id, payload);
+        clearDraft();
         alert("Destination updated successfully!");
       } else {
         const newDest = await destinationService.createDestination(payload);
+        clearDraft();
         alert(`Destination created successfully! ID: ${newDest.id}`);
 
         // Reset Form
@@ -319,6 +386,20 @@ export default function DestinationForm({
 
   return (
     <form onSubmit={handleSubmit} className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 space-y-6">
+      <DraftRecoveryBanner
+        hasDraft={hasDraft}
+        draftSavedAt={draftSavedAt}
+        onRestore={restoreDraft}
+        onDiscard={discardDraft}
+        lastSaved={lastSaved}
+        isSaving={isSaving}
+        onSaveNow={saveDraftNow}
+        entityName={isEditMode ? "Destination Edit" : "New Destination"}
+        showLeaveConfirm={showLeaveConfirm}
+        onCancelLeave={cancelLeave}
+        onConfirmLeave={confirmLeave}
+      />
+
       <div className="flex justify-between items-center pb-4 border-b dark:border-gray-800 flex-wrap gap-4">
         <div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
