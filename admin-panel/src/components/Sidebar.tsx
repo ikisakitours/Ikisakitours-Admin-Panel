@@ -525,7 +525,6 @@ export default function Sidebar() {
                     </span> */}
                   </span>
                 </p>
-
                 {/* Line 2: Engineer credit */}
                 <p className="text-[10px] leading-none text-slate-600">
                   Engineered by <span className="text-slate-400">Shehan_W & Pramos_S</span>
