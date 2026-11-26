@@ -44,6 +44,7 @@
   - [8. Branded Entity Reference ID Engine, HoverScrollText Component & UI/UX Resilience](#8-branded-entity-reference-id-engine-hoverscrolltext-component--uiux-resilience)
   - [9. Session Timeout Interceptor, 401 Recovery & Cloudflare R2 Asset Lifecycle](#9-session-timeout-interceptor-401-recovery--cloudflare-r2-asset-lifecycle)
   - [10. PDF Itinerary Studio & Word Hub (`/itinerary-editor`)](#10-pdf-itinerary-studio--word-hub-itinerary-editor)
+  - [11. Offline-Resilient Multilingual Form Auto-Save, Crash Recovery & Unsaved Navigation Guard Engine (`useFormDraft` & `DraftRecoveryBanner`)](#11-offline-resilient-multilingual-form-auto-save-crash-recovery--unsaved-navigation-guard-engine-useformdraft--draftrecoverybanner)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -123,6 +124,7 @@ Tour pricing aligns with real Sri Lanka private vehicle capacities and room-shar
 
 - **Passenger Rules**: Couple (`auto_tier` or `fixed`), Child (`percentage` e.g. `50%` or `fixed`), Infant (default `$0`).
 - **Tour Add-Ons**: Multilingual optional extras supporting `per_person`, `per_room`, and `per_booking` (one-time flat fee) billing modes inside the customer Booking Review Modal.
+- **Important Pricing Notes (`pricingNotes`)**: Multilingual guidance guidelines configured directly on One-Day & Multi-Day tour packages, displaying inside the customer-facing "Important Pricing Notes" modal on the booking widget. Stored inside PostgreSQL `pricing_config JSONB` (and top-level `pricingNotes`) with schema `{ id, title: { en, ja }, description: { en, ja } }`. Includes 1-click Ikisaki standard presets (Dynamic Group Pricing, Traveler Categories, Comprehensive Inclusions) with full dynamic language tab support. *(Note: Strictly distinct from `/servicenotes`, which manages standalone chauffeur/transfer fleet guidelines)*.
 - **Built-in Simulator**: Interactive calculator embedded inside `/addpackage` and `/managepackages` to verify final totals before publishing.
 
 <details>
@@ -162,6 +164,23 @@ Tour pricing aligns with real Sri Lanka private vehicle capacities and room-shar
       "name": { "en": "VIP Luxury Vehicle Upgrade (Alphard / Mercedes)", "ja": "VIPラグジュアリー車両アップグレード" },
       "price": 150,
       "calculationType": "per_booking"
+    }
+  ],
+  "pricingNotes": [
+    {
+      "id": "note-1",
+      "title": { "en": "DYNAMIC GROUP PRICING", "ja": "ダイナミックグループ料金" },
+      "description": { "en": "Rates per person decrease automatically as your party size increases to match vehicle capacity tiers.", "ja": "参加人数が増えるにつれて、車両定員に合わせたグループ割引が自動的に適用され、1名あたりの料金がお得になります。" }
+    },
+    {
+      "id": "note-2",
+      "title": { "en": "TRAVELER CATEGORIES", "ja": "旅行者区分と料金" },
+      "description": { "en": "Couple rates apply to 2 adults sharing a room. Child rates (with applicable discount) apply for ages 2–11. Infants under 2 travel free.", "ja": "カップル料金は同室2名様に適用されます。子供料金（割引適用）は2〜11歳が対象です。2歳未満の幼児は無料です。" }
+    },
+    {
+      "id": "note-3",
+      "title": { "en": "COMPREHENSIVE INCLUSIONS", "ja": "充実のパッケージ内容" },
+      "description": { "en": "Includes private AC luxury vehicle, dedicated chauffeur-guide, fuel, highway tolls, accommodations, and itinerary-specified meal plans.", "ja": "専用エアコン完備の専用車、専属ドライバーガイド、燃料代、高速道路料金、宿泊費、日程表に記載されたお食事プランが含まれています。" }
     }
   ]
 }
@@ -341,6 +360,39 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
 - **Architectural Distinction**:
   - _Package Itinerary Builder (`/addpackage` & `/managepackages`, Section 4.6)_: Configures public multilingual tour package listings stored in PostgreSQL.
   - _PDF Itinerary Studio (`/itinerary-editor`, Section 10)_: Produces customized, printable A4 guest travel vouchers stored in browser `localStorage`.
+
+### 11. Offline-Resilient Multilingual Form Auto-Save, Crash Recovery & Unsaved Navigation Guard Engine (`useFormDraft` & `DraftRecoveryBanner`)
+
+- **Universal Multi-Entity Form Coverage (7 Core Modules)**:
+  - Full local draft auto-saving, dirty state tracking, and 1-click recovery across all primary authoring and edit forms:
+    1. **Tour Packages**: Add (`/addpackage`) and Edit (`/managepackages` modal/table edit)
+    2. **Destinations**: Add (`/destinations`) and Edit (`/managedestinations/[id]/edit`)
+    3. **Blog Articles**: Add (`/blogs`) and Edit (`/manageblogs/[id]/edit`)
+    4. **FAQs**: Add (`/faqs`) and Edit (`/managefaqs/[id]/edit`)
+    5. **Service Pricing**: Charter, Custom Tour & Transfer rate cards (`/servicepricing`)
+    6. **Service Guidelines & Specs**: Fleet specs and multilingual service notes (`/servicenotes`)
+    7. **Legal Compliance Documents**: Privacy, Terms & policy editor (`/legaldocs`)
+- **Synchronous Initial State Extraction & Zero-Race Condition Dirty Check**:
+  - In edit mode, forms initialize state synchronously from `initialData` props (`useState(() => buildInitialFormData(initialData))`), guaranteeing that `useFormDraft` captures the clean database record as baseline on render #1.
+  - Eliminates asynchronous `queueMicrotask` race conditions where initial database values previously triggered false dirty states or clobbered existing browser drafts.
+- **Silent 800ms Debounced Auto-Save & Unload Safety**:
+  - Automatically persists all multilingual fields (`EN`, `JA`, custom ISO codes), highlights, coordinates, and URL slugs to browser `localStorage` (`StorageKey: ikisaki_draft_<entity>_<id/new>`) 800ms after typing stops.
+  - Silent `pagehide` browser event handler flushes the latest edits instantly to `localStorage` on tab closure, battery exhaustion, or crash without intrusive native browser alert dialogs.
+- **Floating Live Status Pill (`DraftRecoveryBanner.tsx`)**:
+  - Anchored at bottom-right (`fixed bottom-7 right-7`) with `whiteSpace: "nowrap"`, `flexShrink: 0`, and `width: "max-content"` enforcing single-line rendering of timestamp badges and buttons across all viewport sizes.
+  - **Live Indicator**: Displays `Draft Auto-Save: Active` (ready), `Saving draft...` (spinner), or `Draft Protected (HH:MM:SS AM/PM)` (pulsing green indicator).
+  - **Instant Save**: Includes a dedicated emerald `Save Draft Now` button allowing admins to immediately force-persist their draft on demand.
+- **Top-Right Luxury Navigation Guard Modal**:
+  - When unsaved edits exist and an admin clicks a sidebar navigation link or back button, an in-app confirmation card smoothly slides in at the top-right corner.
+  - **"Leave & Keep Draft"**: Safely navigates away while guaranteeing the latest draft remains preserved in `localStorage`.
+  - **"Stay on Page"**: Dismisses the prompt and keeps focus in the form.
+  - Completely eliminates irritating browser-native `"Changes you made may not be saved"` dialogs and "Prevent additional dialogs" blocking.
+- **Bottom-Right Floating Recovery Card**:
+  - Upon reopening any form with an unsaved draft, an amber recovery card appears at the bottom-right with timestamp badge:
+    - **`🟢 Restore`**: 1-click recovery that populates all multilingual fields, reopens detected language tabs, and restores custom slugs.
+    - **`🗑️ No Need`**: Safely purges the draft from `localStorage` and resets the form to a clean slate.
+- **Clean State Lifecycle**:
+  - Successful form submission (`POST`) or update (`PATCH`/`PUT`) automatically invokes `clearDraft()`, removing temporary drafts from storage so the browser remains clean.
 
 ---
 

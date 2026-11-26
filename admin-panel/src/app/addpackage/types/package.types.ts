@@ -72,11 +72,18 @@ export interface PackageOptionItem {
   description?: Record<string, string>;
 }
 
+export interface ImportantPricingNote {
+  id?: string;
+  title: Record<string, string>;
+  description: Record<string, string>;
+}
+
 // ── Unified Dynamic Group Pricing & Custom Add-ons Configuration (Single JSONB Object) ──
 export interface PricingConfig {
   tiers: GroupPricingTier[];
   passengerPricing: PassengerCategoryPricing;
   options: PackageOptionItem[];
+  pricingNotes?: ImportantPricingNote[];
 }
 
 export interface PackageFormData {
@@ -97,6 +104,7 @@ export interface PackageFormData {
 
   // ── Unified Dynamic Pricing Configuration (Stored as single JSONB column) ──
   pricingConfig?: PricingConfig;
+  pricingNotes?: ImportantPricingNote[];
   // Backward compatibility aliases
   pricingTiers?: GroupPricingTier[];
   passengerPricing?: PassengerCategoryPricing;

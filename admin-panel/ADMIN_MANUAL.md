@@ -9,6 +9,8 @@
 ## Table of Contents
 
 - [1. System Requirements & Navigation](#1-system-requirements--navigation)
+  - [1.1 Operational Reference ID Schema](#operational-reference-id-schema)
+  - [1.2 Silent Auto-Save & Crash-Resilient Draft Recovery Guide (All Forms)](#12-silent-auto-save--crash-resilient-draft-recovery-guide-all-forms)
 - [2. Dashboard & Platform Analytics (`/dashboard`)](#2-dashboard--platform-analytics-dashboard)
 - [3. Bookings, Services & PDF Itinerary Studio (`/tours`, `/tourservices`, `/itinerary-editor`)](#3-bookings-services--pdf-itinerary-studio-tours-tourservices-itinerary-editor)
   - [3.1 Fixed Tour Bookings (`/tours`)](#fixed-tour-bookings-tours)
@@ -20,6 +22,7 @@
   - [4.3 Titles, Gold Highlighting & URL Slug Rules](#43-titles-gold-highlighting--url-slug-rules)
   - [4.4 Dynamic Group Discount Tiers & Vehicle Guide](#44-dynamic-group-discount-tiers--vehicle-guide)
   - [4.5 Passenger Category Rules & Tour Add-Ons](#45-passenger-category-rules--tour-add-ons)
+  - [4.5.1 Important Pricing Notes (Pop-up Modal for One-Day & Multi-Day Tour Packages)](#451-important-pricing-notes-pop-up-modal-for-one-day--multi-day-tour-packages)
   - [4.6 Day-by-Day Itinerary, Dynamic Meals, Hotels & Gallery](#46-day-by-day-itinerary-dynamic-meals-hotels--gallery)
   - [4.7 Editing Live Packages Safely (`/managepackages`)](#47-editing-live-packages-safely-managepackages)
 - [5. Destinations Management (`/destinations`, `/managedestinations`)](#5-destinations-management-destinations-managedestinations)
@@ -56,6 +59,48 @@ Every customer interaction, booking, inquiry, and review generates a standardize
 | **Contact Inquiries (`/contact`)**   | Contact Us Inquiries          | `INQ-XXXXXXXX`                  | `INQ-2F7B0A94`                  | Direct customer support, email ticketing, and WhatsApp inquiries.         |
 | **Reviews & Feedback (`/comments`)** | Package Reviews / Feedback    | `REV-XXXXXXXX` / `FDB-XXXXXXXX` | `REV-3A9F1B2C` / `FDB-7E0D4C8A` | Review moderation, verification, and direct administrative replies.       |
 | **FAQs & Help (`/managefaqs`)**      | Support Questions & Answers   | `FAQ-XXXXXX`                    | `FAQ-8A1D3E`                    | Support ticket categorization and multilingual Help Center mapping.       |
+
+---
+
+### 1.2 Silent Auto-Save & Crash-Resilient Draft Recovery Guide (All Forms)
+
+> [!TIP]
+> **Never lose typed work again:** The Admin Panel features an offline-resilient background auto-save system across all creation and update forms. Whether your power cuts, battery dies, browser crashes, or you accidentally close your tab, your typed text is preserved on your computer!
+
+#### 1. Supported Forms
+This auto-save protection runs across all 7 primary authoring and edit forms:
+- **Tour Packages:** Adding new packages (`/addpackage`) and editing existing packages (`/managepackages`).
+- **Destinations:** Adding new destinations (`/destinations`) and editing existing destinations (`/managedestinations/[id]/edit`).
+- **Blog Articles:** Creating new blogs (`/blogs`) and editing blogs (`/manageblogs/[id]/edit`).
+- **FAQs:** Adding new questions (`/faqs`) and editing questions (`/managefaqs/[id]/edit`).
+- **Service Pricing:** Charter, Custom Tour, and Transfer rate card managers (`/servicepricing`).
+- **Service Guidelines:** Vehicle specs and driver/guide notes (`/servicenotes`).
+- **Legal Documents:** Terms, Privacy & policy documents (`/legaldocs`).
+
+#### 2. Live Auto-Save Indicator (Bottom-Right Screen Corner)
+While typing in any form, look at the bottom-right corner of your screen:
+- 🟢 **`Draft Auto-Save: Active`**: The system is standing by and monitoring your inputs.
+- ⏳ **`Saving draft...`**: The system is quietly writing your changes to local storage.
+- 🛡️ **`Draft Protected (12:20:17 AM)`**: A green pulsing light confirms your latest work is securely saved with exact timestamp.
+- 💾 **`Save Draft Now` Button**: Want extra peace of mind before stepping away from your desk? Click this button to immediately force-save your draft on the spot.
+
+#### 3. Accidental Navigation Safety (Top-Right Confirmation)
+If you are typing in a form and accidentally click a sidebar link, the Back button, or another menu:
+- A clean, modern prompt appears in the **top-right corner**:
+  - **`Leave & Keep Draft` (Green)**: Takes you to the new page while guaranteeing that everything you typed stays safely saved in your browser.
+  - **`Stay on Page` (Grey)**: Closes the prompt and keeps you on the form so you can continue typing.
+- *Zero Browser Blocks*: You will never see annoying browser pop-ups saying *"Changes you made may not be saved"*, and your browser will never block dialogs.
+
+#### 4. Reopening Your Draft (Restore vs. No Need)
+When you return to any form that has unsaved work, a floating amber card appears in the bottom-right corner:
+- **`Draft Found (Timestamp)`**: Displays the exact time your previous work was saved.
+- **🟢 `Restore`**: Click to restore all your previous inputs in 1 click! This automatically restores:
+  - Multilingual translations across all language tabs (English, Japanese, and any custom languages).
+  - Highlights, itineraries, categories, and custom URL slugs.
+- **🗑️ `No Need`**: Click if you don't need the old draft anymore. It safely clears the draft and leaves the form at a clean state (or the original database version).
+
+#### 5. Automatic Clean-Up
+As soon as you click **"Publish Package"**, **"Update Destination"**, **"Save Blog"**, or **"Update FAQ"** and the form successfully saves to the server, the temporary local draft is **automatically cleared**. You don't have to manually delete anything!
 
 ---
 
@@ -202,6 +247,30 @@ flowchart LR
 
 > [!TIP]
 > Always verify every rate combination using the **Live Pricing Preview Simulator** at the bottom of the Pricing section before saving.
+
+### 4.5.1 Important Pricing Notes (Pop-up Modal for One-Day & Multi-Day Tour Packages)
+
+> [!IMPORTANT]
+> **CRITICAL DISTINCTION — TWO DIFFERENT "PRICE NOTES" IN THE SYSTEM:**
+> - **Package Important Pricing Notes (This Section — `/addpackage` & `/managepackages`):** Directly controls the "Important Pricing Notes" popup modal seen by travelers when viewing or booking any **One-Day or Multi-Day Tour Package** on the customer website (`www.ikisakitours.com/tours/[slug]`).
+> - **Service Guidelines & Fleet Specs (`/servicenotes`, Section 7):** Controls the fleet vehicle specifications, luggage capacities, and driver/guide notes for standalone **Private Chauffeur, Airport Transfer, and Custom Tours**.  
+> **Do not confuse or mix up these two distinct tools!**
+
+#### 1. What Are Important Pricing Notes?
+When international guests view a tour package on the website, they can click to open an **Important Pricing Notes** popup modal that explains how dynamic pricing, room sharing, child discounts, and vehicle inclusions work.
+
+#### 2. How to Manage Them in the Admin Panel
+Open **`/addpackage`** (when creating a tour) or **`/managepackages` → Edit** (for an existing tour) and locate the **Important Pricing Notes** block at the top of the Pricing Section:
+1. **Multilingual Editing:** Switch between the **EN** and **JA** tabs (or any custom language code) to enter localized **Note Titles** and **Note Descriptions**.
+2. **Add Custom Notes:** Click **`+ Add Note`** to add any package-specific booking rule or policy.
+3. **Delete Unwanted Notes:** Click the **Trash (`🗑️`)** icon on any note to remove it.
+4. **Reset Standard Defaults:** Click **`Reset Defaults`** to restore the 3 official Ikisaki guidelines:
+   - **Dynamic Group Pricing (ダイナミックグループ料金):** Explains how price per person decreases as group size increases.
+   - **Traveler Categories (旅行者区分と料金):** Explains couple rates, child age discounts (2–11 yrs), and free infant travel.
+   - **Comprehensive Inclusions (充実のパッケージ内容):** Lists private AC vehicle, dedicated chauffeur-guide, fuel, highway tolls, and hotels.
+
+> [!TIP]
+> **Admin Writing Tip:** Please keep each note's Title and Description short and concise (1–2 sentences). Short sentences keep the traveler's mobile and desktop popup modal clean, professional, and effortless to read.
 
 ### 4.6 Day-by-Day Itinerary, Dynamic Meals, Hotels & Gallery
 
@@ -590,6 +659,22 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Localized in English and Japanese with real-time validation and reactive updates to the customer booking forms.
 - **Standardized Administrative Management Tables:**
   - All operational tables (`/tours`, `/tourservices`, `/managepackages`, `/managefaqs`, `/users`) share standardized KPI summary bars (`BookingsSummaryBar`, `TourServicesSummaryBar`, `PackagesSummaryBar`, `FaqSummaryBar`, `UsersSummaryBar`) with real-time metrics, active filter pills, and unified `AdminDeleteModal` confirmation guards.
+
+### 13.20 Offline-Resilient Multilingual Form Auto-Save & Crash Recovery Engine
+
+- **Comprehensive 7-Form Integration:**
+  - Universal background protection across all authoring and edit forms: Tour Packages (`/addpackage`, `/managepackages`), Destinations (`/destinations`, `/managedestinations/[id]/edit`), Blogs (`/blogs`, `/manageblogs/[id]/edit`), FAQs (`/faqs`, `/managefaqs/[id]/edit`), Service Pricing (`/servicepricing`), Service Notes (`/servicenotes`), and Legal Documents (`/legaldocs`).
+- **Zero Data Loss on Crash or Sudden Power Cut:**
+  - Debounced 800ms auto-save safely writes every field into browser `localStorage`. Laptop battery dying, sudden power outage, or tab crashes will not cause loss of typed descriptions, pricing tiers, or multilingual translations.
+- **Synchronous Edit Baseline Protection:**
+  - Edit forms initialize directly from existing database records synchronously, preventing false dirty states or accidental overwriting of stored drafts on page mount.
+- **Unbreakable Live Status Pill (`Draft Protected`):**
+  - Anchored at bottom-right with inline non-wrapping styles (`whiteSpace: "nowrap"`, `flexShrink: 0`, `width: "max-content"`). Displays real-time save status and live timestamp without awkward word breaking, alongside a 1-click `Save Draft Now` button.
+- **Top-Right Navigation Guard Modal:**
+  - Accidental sidebar navigation or back button clicks trigger an in-app confirmation card ("Leave & Keep Draft" or "Stay on Page") instead of disruptive native browser dialogs.
+- **1-Click Draft Restoration & Automatic Cleanup:**
+  - Reopening any form with an unsaved draft displays a bottom-right amber card with **Restore** (reloads all languages, highlights, and custom URLs) and **No Need** (discards draft).
+  - Successful form publish or update automatically invokes `clearDraft()` to keep browser storage clean.
 
 ---
 

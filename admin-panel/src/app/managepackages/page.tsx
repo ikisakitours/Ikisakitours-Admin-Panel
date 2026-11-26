@@ -14,6 +14,8 @@ import { HighlightsAndExtras } from "@/app/addpackage/components/sections/Highli
 import { PackageDestinationPicker } from "../addpackage/components/sections/PackageDestinationPicker";
 import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 import {
   ArrowLeft,
   Save,
@@ -100,6 +102,18 @@ export default function ManagePackagesPage() {
       checkObj(data.title);
       checkObj(data.leadTitle);
       checkObj(data.description);
+      if (Array.isArray(data.pricingConfig?.pricingNotes)) {
+        data.pricingConfig.pricingNotes.forEach((n) => {
+          checkObj(n.title);
+          checkObj(n.description);
+        });
+      }
+      if (Array.isArray(data.pricingNotes)) {
+        data.pricingNotes.forEach((n) => {
+          checkObj(n.title);
+          checkObj(n.description);
+        });
+      }
 
       setAvailableLanguages(Array.from(discoveredLangs));
       setFormData(data);
@@ -119,6 +133,7 @@ export default function ManagePackagesPage() {
     setSubmitting(true);
     try {
       await packageService.updatePackageTextOnly(editingSlug, formData);
+      clearDraft();
       notify("Package updated successfully!", "success");
       setEditingSlug(null);
       setFormData(null);
@@ -229,6 +244,78 @@ export default function ManagePackagesPage() {
   // Helper type-safe setter for sub-components
   const safeSetFormData = setFormData as React.Dispatch<React.SetStateAction<PackageFormData>>;
 
+  // Human-readable package title for the edit header (instead of raw slug)
+  const displayEditingTitle = useMemo(() => {
+    if (!editingSlug) return "";
+    if (formData?.title) {
+      if (typeof formData.title === "string") return formData.title;
+      return (
+        formData.title[locale] ||
+        formData.title.en ||
+        Object.values(formData.title)[0] ||
+        editingSlug
+      );
+    }
+    const found = packages.find((p) => p.slug === editingSlug);
+    if (found?.title) {
+      if (typeof found.title === "string") return found.title;
+      return (
+        found.title[locale] ||
+        found.title.en ||
+        Object.values(found.title)[0] ||
+        editingSlug
+      );
+    }
+    return editingSlug;
+  }, [editingSlug, formData, locale, packages]);
+
+  // Draft auto-save and crash recovery for package editor
+  const draftKey = editingSlug ? `ikisaki_draft_package_edit_${editingSlug}` : "ikisaki_draft_package_edit";
+  const {
+    hasDraft,
+    draftSavedAt,
+    lastSaved,
+    isSaving,
+    restoreDraft,
+    discardDraft,
+    saveDraftNow,
+    clearDraft,
+    showLeaveConfirm,
+    cancelLeave,
+    confirmLeave,
+  } = useFormDraft<PackageFormData>({
+    storageKey: draftKey,
+    formData: formData || ({} as PackageFormData),
+    setFormData: (restored) => {
+      const langs = new Set<string>(["en", "ja"]);
+      const scan = (obj: any) => {
+        if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+          Object.keys(obj).forEach((k) => {
+            if (k.length <= 5) langs.add(k);
+          });
+        }
+      };
+      scan(restored.title);
+      scan(restored.leadTitle);
+      scan(restored.description);
+      if (Array.isArray(restored.pricingConfig?.pricingNotes)) {
+        restored.pricingConfig.pricingNotes.forEach((n) => {
+          scan(n.title);
+          scan(n.description);
+        });
+      }
+      if (Array.isArray(restored.pricingNotes)) {
+        restored.pricingNotes.forEach((n) => {
+          scan(n.title);
+          scan(n.description);
+        });
+      }
+      setAvailableLanguages(Array.from(langs));
+      setFormData(restored);
+    },
+    enabled: Boolean(editingSlug && formData),
+  });
+
   return (
     <div className="min-h-screen bg-slate-50/50 py-6 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -236,7 +323,7 @@ export default function ManagePackagesPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              {editingSlug ? `Edit Package: ${editingSlug}` : "Manage Tour Packages"}
+              {editingSlug ? `Edit Package: ${displayEditingTitle}` : "Manage Tour Packages"}
             </h1>
             <p className="text-xs text-slate-500 mt-1">
               {editingSlug
@@ -449,10 +536,25 @@ export default function ManagePackagesPage() {
                 <span className="font-mono text-emerald-600 font-bold">{editingSlug}</span>...
               </div>
             ) : (
-              <form
-                onSubmit={handleUpdate}
-                className="w-full space-y-8 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200 shadow-xs"
-              >
+              <div className="space-y-4">
+                <DraftRecoveryBanner
+                  hasDraft={hasDraft}
+                  draftSavedAt={draftSavedAt}
+                  onRestore={restoreDraft}
+                  onDiscard={discardDraft}
+                  lastSaved={lastSaved}
+                  isSaving={isSaving}
+                  onSaveNow={saveDraftNow}
+                  entityName={`"${editingSlug}" Tour Package`}
+                  showLeaveConfirm={showLeaveConfirm}
+                  onCancelLeave={cancelLeave}
+                  onConfirmLeave={confirmLeave}
+                />
+
+                <form
+                  onSubmit={handleUpdate}
+                  className="w-full space-y-8 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200 shadow-xs"
+                >
                 {/* Pass locale down to all sections */}
                 <BasicOverviewSection formData={formData} setFormData={safeSetFormData} locale={locale} />
                 <PricingSection formData={formData} setFormData={safeSetFormData} locale={locale} />
@@ -535,9 +637,10 @@ export default function ManagePackagesPage() {
                   </button>
                 </div>
               </form>
-            )}
-          </>
-        )}
+            </div>
+          )}
+        </>
+      )}
 
         {/* Unified Luxury AdminDeleteModal */}
         <AdminDeleteModal

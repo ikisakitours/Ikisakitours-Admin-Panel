@@ -5,13 +5,15 @@ import { packageService } from "@/services/package.service";
 import { PackageFormData } from "../types/package.types";
 import { JsonUploaderSection } from "./sections/JsonUploaderSection";
 import { BasicOverviewSection } from "./sections/BasicOverviewSection";
-import { PricingSection } from "./sections/PricingSection";
+import { PricingSection, DEFAULT_STANDARD_PRICING_NOTES } from "./sections/PricingSection";
 import { GallerySection } from "./sections/GallerySection";
 import { PackageDestinationPicker } from "./sections/PackageDestinationPicker";
 import { ActivitiesSection } from "./sections/ActivitiesSection";
 import { ItinerarySection } from "./sections/ItinerarySection";
 import { HighlightsAndExtras } from "./sections/HighlightsAndExtras";
 import { Save, Layers, Plus } from "lucide-react";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 
 const INITIAL_FORM_STATE: PackageFormData = {
   type: "multiday",
@@ -42,7 +44,9 @@ const INITIAL_FORM_STATE: PackageFormData = {
       infantPrice: 0,
     },
     options: [],
+    pricingNotes: DEFAULT_STANDARD_PRICING_NOTES,
   },
+  pricingNotes: DEFAULT_STANDARD_PRICING_NOTES,
 
   // Multilingual JSONB Text Fields (Records)
   title: { en: "", ja: "" },
@@ -90,6 +94,27 @@ export default function PackageFormWrapper() {
 
   const [formData, setFormData] = useState<PackageFormData>(INITIAL_FORM_STATE);
 
+  // Industry-Standard Auto-Save & Crash-Resilient Draft Engine
+  const draft = useFormDraft<PackageFormData>({
+    storageKey: "ikisaki_draft_package_new",
+    formData,
+    setFormData: (restored) => {
+      const langs = new Set<string>(["en", "ja"]);
+      const scan = (obj: any) => {
+        if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+          Object.keys(obj).forEach((k) => {
+            if (k.length <= 5) langs.add(k);
+          });
+        }
+      };
+      scan(restored.title);
+      scan(restored.description);
+      scan(restored.leadTitle);
+      setAvailableLanguages(Array.from(langs));
+      setFormData(restored);
+    },
+  });
+
   const handleRecordChange = (field: "leadTitle" | "leadDescription" | "description", value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -123,6 +148,7 @@ export default function PackageFormWrapper() {
       // Reset form data and uploaded files back to initial empty state
       setSelectedFiles([]);
       setFormData(INITIAL_FORM_STATE);
+      draft.clearDraft();
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -140,6 +166,21 @@ export default function PackageFormWrapper() {
         setActiveLang={setLocale}
         availableLanguages={availableLanguages}
         setAvailableLanguages={setAvailableLanguages}
+      />
+
+      {/* Draft Recovery & Auto-Save Notification */}
+      <DraftRecoveryBanner
+        hasDraft={draft.hasDraft}
+        draftSavedAt={draft.draftSavedAt}
+        onRestore={draft.restoreDraft}
+        onDiscard={draft.discardDraft}
+        lastSaved={draft.lastSaved}
+        isSaving={draft.isSaving}
+        onSaveNow={draft.saveDraftNow}
+        entityName="Tour Package"
+        showLeaveConfirm={draft.showLeaveConfirm}
+        onCancelLeave={draft.cancelLeave}
+        onConfirmLeave={draft.confirmLeave}
       />
 
       <form

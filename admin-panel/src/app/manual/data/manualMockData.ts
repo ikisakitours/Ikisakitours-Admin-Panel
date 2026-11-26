@@ -155,6 +155,9 @@ export const MANUAL_HERO_STATS: HeroStatData[] = [
 export const MANUAL_SEARCH_CHIPS: string[] = [
   "packages",
   "pricing",
+  "price notes",
+  "drafts",
+  "auto-save",
   "staff",
   "2fa",
   "rbac",
@@ -1289,5 +1292,26 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "Custom airport and intercity transfers require up-to-date vehicle capacity, luggage rules, baby seat requirements, and Colombo airport (BIA) meeting instructions.",
     solution:
       "Open /servicenotes to configure English and Japanese vehicle guidelines (Sedan, Mini Van, Van, Mini Coach) including max passenger counts, large/small suitcase limits, and baby seat availability. Changes save directly to the database and sync reactively with the customer website's transfer booking calculator.",
+  },
+  {
+    question: "What happens if my laptop turns off, power cuts, or browser crashes while typing in a form?",
+    module: "Auto-Save & Form Draft Recovery",
+    cause: "Admins frequently write extensive multilingual descriptions, itineraries, and pricing tiers that could be lost during sudden power outages or laptop battery drainage.",
+    solution:
+      "You will never lose your typed work! All 7 creation and edit forms (Packages, Destinations, Blogs, FAQs, Service Pricing, Service Notes, Legal Docs) feature a silent background auto-save engine. Every character you type is saved locally to your computer within 800ms. If your PC shuts down, simply reopen the form: an amber card will appear with 'Draft Found' and a green 'Restore' button to recover all your previous text, tabs, and custom URLs in 1 click.",
+  },
+  {
+    question: "How do the bottom-right Draft Protected pill, Save Draft Now button, and Top-Right navigation safety modal work?",
+    module: "UI/UX & Form Protection",
+    cause: "Admins need clear visual confirmation that their work is protected, plus a safe way to leave or stay without disruptive browser-native alerts.",
+    solution:
+      "1) Bottom-Right Pill: Displays 'Draft Protected' with a live time stamp (e.g. 12:20:17 AM) and a green 'Save Draft Now' button to force-save immediately. 2) Top-Right Navigation Guard: If you accidentally click a sidebar link or back button with unsaved edits, a clean card slides in asking 'Leave & Keep Draft' (guarantees your draft stays safely stored while navigating) or 'Stay on Page'. Once you successfully publish or update the form, the draft is automatically cleaned up.",
+  },
+  {
+    question: "What is the difference between Tour Package Important Pricing Notes and Service Guidelines (/servicenotes)?",
+    module: "Tour Packages vs. Transfer Services",
+    cause: "The Admin Panel manages guidelines in two separate sections for two different traveler touchpoints.",
+    solution:
+      "1) Package Important Pricing Notes (/addpackage & /managepackages): Strictly configured for One-Day and Multi-Day tour packages. They appear inside the 'Important Pricing Notes' popup modal on the package booking page (explaining dynamic group discounts, couple room rates, child discounts, and tour inclusions). 2) Service Guidelines & Fleet Specs (/servicenotes): Configured for standalone Private Chauffeur, Airport Transfer, and Custom Fleet bookings (explaining passenger capacity, luggage limits, and driver overtime). Do not confuse these two distinct tools.",
   },
 ];

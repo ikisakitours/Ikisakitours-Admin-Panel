@@ -1,8 +1,10 @@
 'use client';
 
 import { FaqItem, faqService } from '@/services/faq.service';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
+import { useFormDraft } from '@/hooks/useFormDraft';
+import { DraftRecoveryBanner } from '@/components/DraftRecoveryBanner';
 
 interface FaqFormProps {
   initialData?: FaqItem | null;
@@ -19,20 +21,70 @@ export default function FaqForm({
 
   // Dynamic language management state
   const [activeLang, setActiveLang] = useState<string>('en');
-  const [availableLanguages, setAvailableLanguages] = useState<string[]>(['en', 'ja']);
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>(() => {
+    if (initialData) {
+      const langs = new Set<string>(['en', 'ja']);
+      const checkObj = (obj?: Record<string, any>) => {
+        if (obj) Object.keys(obj).forEach((k) => { if (k.length <= 5) langs.add(k); });
+      };
+      checkObj(initialData.category);
+      checkObj(initialData.question);
+      checkObj(initialData.answer);
+      return Array.from(langs);
+    }
+    return ['en', 'ja'];
+  });
 
-  const [formData, setFormData] = useState({
-    category: { en: '', ja: '' } as Record<string, string>,
-    question: { en: '', ja: '' } as Record<string, string>,
-    answer: { en: '', ja: '' } as Record<string, string>,
+  const [formData, setFormData] = useState<{
+    category: Record<string, string>;
+    question: Record<string, string>;
+    answer: Record<string, string>;
+  }>(() => ({
+    category: { en: '', ja: '', ...(initialData?.category || {}) },
+    question: { en: '', ja: '', ...(initialData?.question || {}) },
+    answer: { en: '', ja: '', ...(initialData?.answer || {}) },
+  }));
+
+  // Crash-resilient draft auto-save and recovery
+  const draftKey = isEditMode && initialData?.id
+    ? `ikisaki_draft_faq_edit_${initialData.id}`
+    : 'ikisaki_draft_faq_new';
+
+  const {
+    hasDraft,
+    draftSavedAt,
+    lastSaved,
+    isSaving,
+    restoreDraft,
+    discardDraft,
+    saveDraftNow,
+    clearDraft,
+    showLeaveConfirm,
+    cancelLeave,
+    confirmLeave,
+  } = useFormDraft<typeof formData>({
+    storageKey: draftKey,
+    formData,
+    setFormData: (restored) => {
+      const langs = new Set<string>(["en", "ja"]);
+      if (restored.question && typeof restored.question === "object") {
+        Object.keys(restored.question).forEach((k) => {
+          if (k.length <= 5) langs.add(k);
+        });
+      }
+      setAvailableLanguages(Array.from(langs));
+      setFormData(restored);
+    },
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Pre-fill form & sync language tabs when initialData is provided (Edit Mode)
+  // Only sync if initialData changes to a DIFFERENT record after mount
+  const prevInitialIdRef = useRef<string | undefined>(initialData?.id);
   useEffect(() => {
-    if (initialData) {
+    if (initialData && initialData.id !== prevInitialIdRef.current) {
+      prevInitialIdRef.current = initialData.id;
       const detectedLangs = Array.from(
         new Set([
           'en',
@@ -43,13 +95,11 @@ export default function FaqForm({
         ])
       );
 
-      queueMicrotask(() => {
-        setAvailableLanguages(detectedLangs);
-        setFormData({
-          category: { en: '', ja: '', ...(initialData.category || {}) },
-          question: { en: '', ja: '', ...(initialData.question || {}) },
-          answer: { en: '', ja: '', ...(initialData.answer || {}) },
-        });
+      setAvailableLanguages(detectedLangs);
+      setFormData({
+        category: { en: '', ja: '', ...(initialData.category || {}) },
+        question: { en: '', ja: '', ...(initialData.question || {}) },
+        answer: { en: '', ja: '', ...(initialData.answer || {}) },
       });
     }
   }, [initialData]);
@@ -90,8 +140,10 @@ export default function FaqForm({
     try {
       if (isEditMode && initialData) {
         await faqService.updateFaq(initialData.id, formData);
+        clearDraft();
       } else {
         await faqService.createFaq(formData, '');
+        clearDraft();
         // Reset form only when creating a new FAQ
         setFormData({
           category: { en: '', ja: '' },
@@ -116,6 +168,21 @@ export default function FaqForm({
   return (
     <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-8">
       <form onSubmit={handleSubmit}>
+        <DraftRecoveryBanner
+          hasDraft={hasDraft}
+          draftSavedAt={draftSavedAt}
+          onRestore={restoreDraft}
+          onDiscard={discardDraft}
+          lastSaved={lastSaved}
+          isSaving={isSaving}
+          onSaveNow={saveDraftNow}
+          entityName={isEditMode ? 'FAQ Edit' : 'New FAQ'}
+          className="mb-6"
+          showLeaveConfirm={showLeaveConfirm}
+          onCancelLeave={cancelLeave}
+          onConfirmLeave={confirmLeave}
+        />
+
         {/* Header Section */}
         <div className="flex justify-between items-start mb-6 pb-6 border-b border-slate-100 flex-wrap gap-4">
           <div>
@@ -137,11 +204,10 @@ export default function FaqForm({
                   key={langKey}
                   type="button"
                   onClick={() => setActiveLang(langKey)}
-                  className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-all uppercase ${
-                    activeLang === langKey
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-600 hover:bg-slate-200'
-                  }`}
+                  className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-all uppercase ${activeLang === langKey
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-200'
+                    }`}
                 >
                   {langKey}
                 </button>

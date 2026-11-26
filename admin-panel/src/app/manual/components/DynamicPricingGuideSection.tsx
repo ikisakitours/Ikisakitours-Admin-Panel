@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertTriangle, Car, Lightbulb } from "lucide-react";
+import { AlertTriangle, Car, Lightbulb, Sparkles, Info } from "lucide-react";
 import {
   ADDON_TYPES_GUIDE,
   PASSENGER_RULES_GUIDE,
@@ -113,6 +113,44 @@ export function DynamicPricingGuideSection() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Important Pricing Notes (One-Day & Multi-Day Tour Packages) */}
+        <div className="rounded-2xl border border-amber-300/80 bg-amber-50/70 p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-amber-950 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0" /> Important Pricing Notes (Pop-Up Modal for Tour Packages)
+            </h4>
+            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-200/80 text-amber-900">
+              One-Day &amp; Multi-Day Packages Only
+            </span>
+          </div>
+
+          <p className="text-xs text-amber-900/90 leading-relaxed">
+            These notes populate the <strong>&quot;Important Pricing Notes&quot;</strong> modal that travelers open on any One-Day or Multi-Day tour page. They explain how dynamic group discounts, couple room rates, child discounts, and vehicle inclusions work.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs text-slate-800">
+            <div className="bg-white/90 rounded-xl p-3 border border-amber-200/80 space-y-1">
+              <strong className="block font-bold text-amber-950">1. Dynamic Group Pricing</strong>
+              <p className="text-[11px] text-slate-600">Explains that rates decrease automatically as group size matches larger vehicle capacity tiers.</p>
+            </div>
+            <div className="bg-white/90 rounded-xl p-3 border border-amber-200/80 space-y-1">
+              <strong className="block font-bold text-amber-950">2. Traveler Categories</strong>
+              <p className="text-[11px] text-slate-600">Explains room-sharing rules for couples, child discounts (ages 2–11), and free infant travel.</p>
+            </div>
+            <div className="bg-white/90 rounded-xl p-3 border border-amber-200/80 space-y-1">
+              <strong className="block font-bold text-amber-950">3. Comprehensive Inclusions</strong>
+              <p className="text-[11px] text-slate-600">Specifies private AC vehicle, dedicated chauffeur-guide, fuel, toll fees, and hotels.</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2 pt-1 text-[11px] text-amber-950 font-medium">
+            <Info className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
+            <span>
+              <strong>Crucial Distinction:</strong> This tool strictly manages <strong>Fixed Tour Packages</strong>. Do not confuse it with <code>/servicenotes</code>, which manages guidelines for standalone Private Chauffeur and Airport Transfer services.
+            </span>
           </div>
         </div>
 

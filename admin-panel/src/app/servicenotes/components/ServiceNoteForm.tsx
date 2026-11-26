@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Plus, Save, X, ClipboardList, Globe, Car, Plane, Compass, Sparkles, DollarSign, Users, Briefcase } from "lucide-react";
 import { ServiceNotePayload } from "@/services/service-notes.service";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 
 const ALLOWED_SERVICE_TYPES = [
     { value: "custom", label: "Custom Tour Itinerary", icon: Compass },
@@ -34,6 +36,29 @@ export default function ServiceNoteForm({
         Boolean(formData.vehicleType && !VEHICLE_PRESETS.includes(formData.vehicleType))
     );
     const isTransfer = formData.serviceType === "transfer";
+
+    // Crash-resilient draft auto-save and recovery
+    const draftKey = editingId
+        ? `ikisaki_draft_servicenote_edit_${editingId}`
+        : "ikisaki_draft_servicenote_new";
+
+    const {
+        hasDraft,
+        draftSavedAt,
+        lastSaved,
+        isSaving,
+        restoreDraft,
+        discardDraft,
+        saveDraftNow,
+        clearDraft,
+        showLeaveConfirm,
+        cancelLeave,
+        confirmLeave,
+    } = useFormDraft<ServiceNotePayload>({
+        storageKey: draftKey,
+        formData,
+        setFormData: (restored) => setFormData(restored),
+    });
 
     // Helper for record-based string fields or regular values
     const handleRecordChange = (field: keyof ServiceNotePayload, value: any) => {
@@ -97,6 +122,7 @@ export default function ServiceNoteForm({
                 setFormData(cleaned);
             }
             await onSubmit(e);
+            clearDraft();
         } finally {
             setSubmitting(false);
         }
@@ -132,6 +158,20 @@ export default function ServiceNoteForm({
             </div>
 
             <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
+                <DraftRecoveryBanner
+                    hasDraft={hasDraft}
+                    draftSavedAt={draftSavedAt}
+                    onRestore={restoreDraft}
+                    onDiscard={discardDraft}
+                    lastSaved={lastSaved}
+                    isSaving={isSaving}
+                    onSaveNow={saveDraftNow}
+                    entityName={editingId ? `Service Guideline #${editingId}` : "New Service Guideline"}
+                    showLeaveConfirm={showLeaveConfirm}
+                    onCancelLeave={cancelLeave}
+                    onConfirmLeave={confirmLeave}
+                />
+
                 {/* 1. Core Vehicle & Service Specs */}
                 <div>
                     <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">

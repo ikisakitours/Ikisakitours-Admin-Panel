@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { blogService, BlogPayload } from "@/services/blog.service";
 import { Save, Plus } from "lucide-react";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 import JsonImporter from "./JsonImporter";
 import MultilingualEditor from "./MultilingualEditor";
 import ImageUploader from "./ImageUploader";
@@ -24,25 +26,81 @@ export default function BlogForm({
 
     const [loading, setLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [isCustomSlug, setIsCustomSlug] = useState(false);
+    const [isCustomSlug, setIsCustomSlug] = useState<boolean>(() => Boolean(initialData?.slug));
 
     // Dynamic language management
     const [activeLang, setActiveLang] = useState<string>("en");
-    const [availableLanguages, setAvailableLanguages] = useState<string[]>(["en", "ja"]);
-
-    const [formData, setFormData] = useState({
-        title: { en: "", ja: "" } as Record<string, string>,
-        slug: "",
-        summary: { en: "", ja: "" } as Record<string, string>,
-        category: { en: "", ja: "" } as Record<string, string>,
-        readTime: { en: "", ja: "" } as Record<string, string>,
-        author: "",
-        blog: { en: "", ja: "" } as Record<string, string>,
+    const [availableLanguages, setAvailableLanguages] = useState<string[]>(() => {
+        if (initialData) {
+            const langs = new Set<string>(["en", "ja"]);
+            const checkObj = (obj?: Record<string, any>) => {
+                if (obj) Object.keys(obj).forEach((k) => { if (k.length <= 5) langs.add(k); });
+            };
+            checkObj(initialData.title);
+            checkObj(initialData.summary);
+            checkObj(initialData.category);
+            checkObj(initialData.readTime);
+            checkObj(initialData.blog);
+            return Array.from(langs);
+        }
+        return ["en", "ja"];
     });
 
-    // Pre-fill form & sync language tabs when initialData is provided (Edit Mode)
+    const [formData, setFormData] = useState<{
+        title: Record<string, string>;
+        slug: string;
+        summary: Record<string, string>;
+        category: Record<string, string>;
+        readTime: Record<string, string>;
+        author: string;
+        blog: Record<string, string>;
+    }>(() => ({
+        title: { en: "", ja: "", ...(initialData?.title || {}) },
+        slug: initialData?.slug || "",
+        summary: { en: "", ja: "", ...(initialData?.summary || {}) },
+        category: { en: "", ja: "", ...(initialData?.category || {}) },
+        readTime: { en: "", ja: "", ...(initialData?.readTime || {}) },
+        author: initialData?.author || "",
+        blog: { en: "", ja: "", ...(initialData?.blog || {}) },
+    }));
+
+    // Crash-resilient draft auto-save and recovery
+    const draftKey = isEditMode && initialData?.id
+        ? `ikisaki_draft_blog_edit_${initialData.id}`
+        : "ikisaki_draft_blog_new";
+
+    const {
+        hasDraft,
+        draftSavedAt,
+        lastSaved,
+        isSaving,
+        restoreDraft,
+        discardDraft,
+        saveDraftNow,
+        clearDraft,
+        showLeaveConfirm,
+        cancelLeave,
+        confirmLeave,
+    } = useFormDraft<typeof formData>({
+        storageKey: draftKey,
+        formData,
+        setFormData: (restored) => {
+            const langs = new Set<string>(["en", "ja"]);
+            if (restored.title && typeof restored.title === "object") {
+                Object.keys(restored.title).forEach((k) => {
+                    if (k.length <= 5) langs.add(k);
+                });
+            }
+            setAvailableLanguages(Array.from(langs));
+            setFormData(restored);
+        },
+    });
+
+    // Only sync if initialData changes to a DIFFERENT record after mount
+    const prevInitialIdRef = useRef<string | undefined>(initialData?.id);
     useEffect(() => {
-        if (initialData) {
+        if (initialData && initialData.id !== prevInitialIdRef.current) {
+            prevInitialIdRef.current = initialData.id;
             const detectedLangs = Array.from(
                 new Set([
                     "en",
@@ -55,18 +113,16 @@ export default function BlogForm({
                 ])
             );
 
-            queueMicrotask(() => {
-                setAvailableLanguages(detectedLangs);
-                setFormData({
-                    title: { en: "", ja: "", ...(initialData.title || {}) },
-                    slug: initialData.slug || "",
-                    summary: { en: "", ja: "", ...(initialData.summary || {}) },
-                    category: { en: "", ja: "", ...(initialData.category || {}) },
-                    readTime: { en: "", ja: "", ...(initialData.readTime || {}) },
-                    author: initialData.author || "",
-                    blog: { en: "", ja: "", ...(initialData.blog || {}) },
-                });
-                setIsCustomSlug(true);
+            setAvailableLanguages(detectedLangs);
+            setIsCustomSlug(Boolean(initialData.slug));
+            setFormData({
+                title: { en: "", ja: "", ...(initialData.title || {}) },
+                slug: initialData.slug || "",
+                summary: { en: "", ja: "", ...(initialData.summary || {}) },
+                category: { en: "", ja: "", ...(initialData.category || {}) },
+                readTime: { en: "", ja: "", ...(initialData.readTime || {}) },
+                author: initialData.author || "",
+                blog: { en: "", ja: "", ...(initialData.blog || {}) },
             });
         }
     }, [initialData]);
@@ -181,9 +237,11 @@ export default function BlogForm({
 
             if (isEditMode && initialData?.id) {
                 await blogService.updateBlog(initialData.id, blogPayload);
+                clearDraft();
                 alert("Blog updated successfully!");
             } else {
                 const newPost = await blogService.createBlog(blogPayload);
+                clearDraft();
                 alert(`Blog created successfully! ID: ${newPost.id}`);
 
                 setSelectedFiles([]);
@@ -212,6 +270,20 @@ export default function BlogForm({
 
     return (
         <form onSubmit={handleSubmit} className="p-6 bg-white rounded-xl border border-slate-200 space-y-6">
+            <DraftRecoveryBanner
+                hasDraft={hasDraft}
+                draftSavedAt={draftSavedAt}
+                onRestore={restoreDraft}
+                onDiscard={discardDraft}
+                lastSaved={lastSaved}
+                isSaving={isSaving}
+                onSaveNow={saveDraftNow}
+                entityName={isEditMode ? "Blog Edit" : "New Blog Post"}
+                showLeaveConfirm={showLeaveConfirm}
+                onCancelLeave={cancelLeave}
+                onConfirmLeave={confirmLeave}
+            />
+
             <div className="flex justify-between items-center pb-4 border-b flex-wrap gap-4">
                 <div>
                     <h2 className="text-lg font-bold">

@@ -8,6 +8,7 @@ import {
   FileJson,
   Globe,
   Package,
+  ShieldCheck,
   Sparkles,
   XCircle,
 } from "lucide-react";
@@ -48,6 +49,38 @@ export function PackagesTitleHighlightSection() {
               badges, pricing tiers, add-ons, and itineraries instantly. After uploading JSON, attach your{" "}
               <strong>Gallery Images</strong> manually and click Save Package.
             </p>
+          </div>
+        </div>
+
+        {/* Silent Auto-Save & Crash-Resilient Draft Recovery Banner Card */}
+        <div className="rounded-2xl border border-emerald-300/80 bg-emerald-50/70 p-4 sm:p-5 space-y-2.5">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h4 className="text-xs font-extrabold text-emerald-950 flex items-center gap-2 uppercase tracking-wider">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              Silent Background Auto-Save &amp; Zero Data Loss Draft Recovery
+            </h4>
+            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-200/70 text-emerald-800">
+              Active Across All Forms
+            </span>
+          </div>
+          <p className="text-xs text-emerald-900/90 leading-relaxed">
+            Never worry about power outages, laptop battery failure, or accidental tab closures. Every change you make in{" "}
+            <strong>Tour Packages</strong>, <strong>Destinations</strong>, <strong>Blogs</strong>, <strong>FAQs</strong>,{" "}
+            <strong>Service Pricing</strong>, <strong>Service Notes</strong>, or <strong>Legal Docs</strong> is silently auto-saved to your computer within 800ms.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-[11px] text-emerald-950">
+            <div className="bg-white/80 rounded-xl p-2.5 border border-emerald-200/80">
+              <strong className="block font-bold text-emerald-800 mb-0.5">🟢 Live Status Pill</strong>
+              Bottom-right screen corner shows live protected timestamp (e.g. <code>Draft Protected</code>) and an instant <code>Save Draft Now</code> button.
+            </div>
+            <div className="bg-white/80 rounded-xl p-2.5 border border-emerald-200/80">
+              <strong className="block font-bold text-emerald-800 mb-0.5">🛡️ Navigation Safety</strong>
+              Accidentally clicked a sidebar link? A top-right prompt lets you <code>Leave &amp; Keep Draft</code> or <code>Stay on Page</code> with zero annoying browser popups.
+            </div>
+            <div className="bg-white/80 rounded-xl p-2.5 border border-emerald-200/80">
+              <strong className="block font-bold text-emerald-800 mb-0.5">✨ 1-Click Restore</strong>
+              Returning to an unsaved form shows an amber card: click <code>Restore</code> to bring back all typed EN/JA text, or <code>No Need</code> to start fresh.
+            </div>
           </div>
         </div>
 
