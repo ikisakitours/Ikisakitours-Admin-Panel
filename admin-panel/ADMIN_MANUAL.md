@@ -10,7 +10,10 @@
 
 - [1. System Requirements & Navigation](#1-system-requirements--navigation)
 - [2. Dashboard & Platform Analytics (`/dashboard`)](#2-dashboard--platform-analytics-dashboard)
-- [3. Bookings & Tour Services (`/tours`, `/tourservices`)](#3-bookings--tour-services-tours-tourservices)
+- [3. Bookings, Services & PDF Itinerary Studio (`/tours`, `/tourservices`, `/itinerary-editor`)](#3-bookings-services--pdf-itinerary-studio-tours-tourservices-itinerary-editor)
+  - [3.1 Fixed Tour Bookings (`/tours`)](#fixed-tour-bookings-tours)
+  - [3.2 Tour Services Inquiries (`/tourservices`)](#tour-services-tourservices)
+  - [3.3 PDF Itinerary Studio & Word Hub (`/itinerary-editor`)](#33-pdf-itinerary-studio--word-hub-itinerary-editor)
 - [4. Creating & Managing Tour Packages (`/addpackage`, `/managepackages`)](#4-creating--managing-tour-packages-addpackage-managepackages)
   - [4.1 Multilingual Switcher (`EN` / `JA` / `+`)](#41-multilingual-switcher-en--ja--)
   - [4.2 Fast Creation with JSON Import](#42-fast-creation-with-json-import)
@@ -36,6 +39,23 @@
 
 - **Hover Sidebar:** The dark left navigation rail stays compact (`IT` logo) and smoothly expands on mouse hover, revealing all **11 module groups**.
 - **Recommended Browsers:** Latest Google Chrome, Microsoft Edge, Safari, or Firefox.
+- **Vercel-Style Hover Scroll Text (`HoverScrollText`):**
+  - Columns with long titles, questions, customer answers, or route highlights (e.g. Package Names, FAQs, Service Inquiries) are constrained to a clean, single line to keep tables strictly aligned.
+  - **Hover to Read:** Hovering over any long text cell automatically scrolls the text smoothly to the left at a comfortable reading pace (~45px/second). Moving your mouse away immediately resets the text back to the beginning.
+  - Text that naturally fits inside the cell does not scroll.
+
+### Operational Reference ID Schema
+
+Every customer interaction, booking, inquiry, and review generates a standardized branded Reference ID for instant search, support, and accounting:
+
+| Module                               | Entity Type                   | Prefix Format                   | Example                         | Purpose & Operational Use                                                 |
+| :----------------------------------- | :---------------------------- | :------------------------------ | :------------------------------ | :------------------------------------------------------------------------ |
+| **Users (`/users`)**                 | Customer Accounts             | `IKISAKI-XXXXXX`                | `IKISAKI-8F42M9`                | Customer support lookups, VIP tracking, and verified status verification. |
+| **Tour Bookings (`/tours`)**         | Fixed Package Bookings        | `IK-XXXXXXXX`                   | `IK-91428301`                   | Customer booking vouchers, invoicing, and reservation confirmations.      |
+| **Tour Services (`/tourservices`)**  | Custom, Chauffeur & Transfers | `SRV-XXXXXXXX`                  | `SRV-5E8A1D3C`                  | Fleet coordination, chauffeur allocations, and tailor-made pricing.       |
+| **Contact Inquiries (`/contact`)**   | Contact Us Inquiries          | `INQ-XXXXXXXX`                  | `INQ-2F7B0A94`                  | Direct customer support, email ticketing, and WhatsApp inquiries.         |
+| **Reviews & Feedback (`/comments`)** | Package Reviews / Feedback    | `REV-XXXXXXXX` / `FDB-XXXXXXXX` | `REV-3A9F1B2C` / `FDB-7E0D4C8A` | Review moderation, verification, and direct administrative replies.       |
+| **FAQs & Help (`/managefaqs`)**      | Support Questions & Answers   | `FAQ-XXXXXX`                    | `FAQ-8A1D3E`                    | Support ticket categorization and multilingual Help Center mapping.       |
 
 ---
 
@@ -47,20 +67,65 @@
 
 ---
 
-## 3. Bookings & Tour Services (`/tours`, `/tourservices`)
+## 3. Bookings, Services & PDF Itinerary Studio (`/tours`, `/tourservices`, `/itinerary-editor`)
 
 ### Fixed Tour Bookings (`/tours`)
+
 - Lists direct reservations submitted from published **One-Day** and **Multi-Day** tour pages.
 - Use **Filter By** (`All Fixed Packages`, `One-Day Tours`, `Multi-Day Tours`) to sort requests.
 - Inspect client details, journey date, and exact traveler breakdown (`Adults`, `Couples`, `Children`, `Infants`).
 - Update booking status live via the color-coded selector: `Pending` · `Confirmed` · `Completed` · `Cancelled`.
 
 ### Tour Services (`/tourservices`)
+
 - Organized into 3 tabs: **Custom Made Tours**, **Private Chauffeur**, and **Transfers**.
 - Filter leads by status: `All` · `Pending` · `Approved` · `Active` · `Rejected`.
 
 > [!TIP]
 > After confirming a peak-season booking, block unavailable fleet dates in **`/newupdates`** and record chauffeur/guide allocations inside **`/adminlogs`**.
+
+### 3.3 PDF Itinerary Studio & Word Hub (`/itinerary-editor`)
+
+The **PDF Itinerary Studio** is a Microsoft Word-style desktop workspace engineered to draft, customize, and generate high-precision, Japanese travel agency-standard (HIS style) A4 printable itineraries and guest travel vouchers.
+
+> [!IMPORTANT]
+> **CRITICAL DISTINCTION — TWO SEPARATE ITINERARY SYSTEMS:**
+>
+> - **Website Package Itinerary Builder (`/addpackage` & `/managepackages`, Section 4.6):** Builds the standard daily itinerary schedules and meal inclusions displayed publicly on `www.ikisakitours.com`. Stored in PostgreSQL via backend APIs.
+> - **PDF Itinerary Studio (`/itinerary-editor`, Section 3.3):** Generates customized, print-ready A4 PDF travel vouchers for confirmed travelers. Stored locally in browser `localStorage` (`ikisaki_itinerary_drafts`). Do not confuse or mix up these two distinct tools!
+
+#### 1. Document Hub Entry Modes
+
+- **Blank Document:** Start from scratch with a clean slate, default remarks, and official Ikisaki branding.
+- **From Tour Booking:** 1-click import from confirmed tour bookings (`/tours`). Automatically populates:
+  - Lead Guest Name and Party size breakdown (e.g. `PRAMOD PREMUDU PARTY (PAX: 2)`).
+  - Room Configurations (`1TWN`, `1DBL`, `1SGL`, `FAMILY`).
+  - Airline Flight Schedules (airline number, route, dates, and times).
+  - Tour Dates, Destinations, and Day-by-Day schedule contents.
+
+#### 2. Live Form Editor Features (Left Pane)
+
+- **Tour Info (Metadata):** Tour Package Title, Date Range (`26-NOV to 3-DEC`), and Reference Code (`IK-XXXX`).
+- **Guests & Rooms:** Manage traveler names and room type drop-downs.
+- **Flight Schedules:** Add inbound/outbound flights with routes (e.g. `NRT - CMB`), flight numbers, and dates.
+- **Day-by-Day Content:**
+  - Day heading and date strings.
+  - **Activities:** Multi-line text field with a dedicated **Trash (`🗑️`)** icon to delete the section for any day.
+  - **Scenic Stops & Viewpoints:** Multi-line text field with a dedicated **Trash (`🗑️`)** icon to delete the section for any day.
+  - **Tour Highlights & Day Notes:** Multi-line text field with a dedicated **Trash (`🗑️`)** icon to delete the section for any day.
+  - **Instant Section Restore:** If an admin deletes Activities, Scenic Stops, or Highlights, convenient restore buttons (`+ Add Activities`, `+ Add Scenic Stops`, `+ Add Tour Highlights`) appear at the bottom of the day card to bring them back anytime.
+  - **Custom Sections (`+ Add Custom Section`):** Add unlimited custom sections with a **Section Title** and **Description/Notes** field. Each newline (`Enter` key or click) automatically formats as an aligned bullet point (`• `) in the preview. Includes individual Trash icon to delete anytime.
+  - **Hotel Check-In:** Dedicated property name field formatted to standard voucher specifications.
+  - **Meal Indicators:** Breakfast, Lunch, and Dinner drop-downs (`HOTEL`, `CLIENT`, `NONE`, `BOX MEAL`, `RESTAURANT`, `AIRPORT`).
+- **Important Remarks & Tour Conditions:** Multi-line conditions with automatic bullet point sanitization (prevents double-bullet glitches).
+- **Official Branding & Company Details:** Embedded legal entity name (`Ikisaki Tours (Private) Limited`), registration numbers (`PV 79171`, `SLTDA/SQA/PRO/01234`), Malabe headquarters address, phone (`+94 75 797 2582`), and email (`info@ikisakitours.com`).
+
+#### 3. Japanese Agency-Standard (HIS Style) A4 Print & PDF Preview (Right Pane)
+
+- **High-Precision Layout:** Clean borders, bold table headers (`Date`, `Tour Content`, `Meals`), light semibold day headings, `font-normal` body typography, and strictly vertically aligned Meal indicators (`B - HOTEL`, `L - CLIENT`, `D - HOTEL`).
+- **Dual-Language Switching:** 1-click switch between **(EN)** English and **(JA)** Japanese. Company legal name `Ikisaki Tours (Private) Limited` is strictly kept in English in both modes.
+- **A4 Zoom & PDF Export:** Responsive zoom (`75%`, `90%`, `100%`, `110%`) and 1-click print-ready PDF export via browser print stylesheet (`@media print`).
+- **Local Draft Resilience:** All drafts auto-save to browser `localStorage` (`ikisaki_itinerary_drafts`). Open, edit, or delete saved drafts from the Document Hub at any time. Survives browser restarts and computer reboots.
 
 ---
 
@@ -79,11 +144,13 @@ flowchart LR
 ```
 
 ### 4.1 Multilingual Switcher (`EN` / `JA` / `+`)
+
 1. Fill in **English (`EN`)** first (required fields).
 2. Click **`JA`** in the top bar and translate all localized fields into Japanese.
 3. Click **`+`** to add any additional 2-letter ISO language code (`fr`, `de`, `es`, `zh`).
 
 ### 4.2 Fast Creation with JSON Import
+
 1. Download a template from [`public/sample-packages/`](./public/sample-packages) (or directly from the `/manual` sidebar):
    - `sample-oneday-tour.json`
    - `sample-multiday-tour.json`
@@ -92,29 +159,30 @@ flowchart LR
 
 ### 4.3 Titles, Gold Highlighting & URL Slug Rules
 
-| Field | Behavior & Best Practice |
-| :--- | :--- |
-| **Package Title (Title 1)** | Full tour name (e.g., `The Ultimate Sri Lanka Grand Explorer`). |
-| **Highlighted Words in Title (Title 2)** | Exact substring inside Title 1 to render in **Gold Italic** on the website (e.g., `Ultimate Sri Lanka`). |
-| **URL Slug (Auto)** | Auto-generated **strictly from English Title 1** (e.g., `the-ultimate-sri-lanka-grand-explorer`). Changing Title 2 never modifies the slug. |
-| **Badge** | Choose from 18 conversion badges (`Best Seller`, `Top Rated`, `All-Inclusive Package`, `Instant Confirmation`, `UNESCO Heritage Explorer`, etc.). |
+| Field                                    | Behavior & Best Practice                                                                                                                          |
+| :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Package Title (Title 1)**              | Full tour name (e.g., `The Ultimate Sri Lanka Grand Explorer`).                                                                                   |
+| **Highlighted Words in Title (Title 2)** | Exact substring inside Title 1 to render in **Gold Italic** on the website (e.g., `Ultimate Sri Lanka`).                                          |
+| **URL Slug (Auto)**                      | Auto-generated **strictly from English Title 1** (e.g., `the-ultimate-sri-lanka-grand-explorer`). Changing Title 2 never modifies the slug.       |
+| **Badge**                                | Choose from 18 conversion badges (`Best Seller`, `Top Rated`, `All-Inclusive Package`, `Instant Confirmation`, `UNESCO Heritage Explorer`, etc.). |
 
 > [!WARNING]
 > **Japanese Highlight Rule (Kanji vs Katakana):**  
-> Highlighting matches exact characters inside Title 1. Always copy the exact Japanese substring directly from Title 1!  
-> - **Correct:** Title = `究極のスリランカ・グランドエクスプローラー` → Highlight = `究極のスリランカ` (Highlights in Gold!)  
+> Highlighting matches exact characters inside Title 1. Always copy the exact Japanese substring directly from Title 1!
+>
+> - **Correct:** Title = `究極のスリランカ・グランドエクスプローラー` → Highlight = `究極のスリランカ` (Highlights in Gold!)
 > - **Incorrect:** Title = `究極のスリランカ...` → Highlight = `アルティメット・スリランカ` (Kanji ≠ Katakana → No highlight!)
 
 ### 4.4 Dynamic Group Discount Tiers & Vehicle Guide
 
-| Tier Label | Min Pax | Max Pax | Sri Lanka Vehicle Class | Cost Economics |
-| :--- | :---: | :---: | :--- | :--- |
-| **Solo (1 Person)** | `1` | `1` | Sedan Car (Prius / Axio) | 1 guest covers 100% of vehicle & guide cost |
-| **Couple (2 Persons)** | `2` | `2` | Sedan Car (1 Double Room) | Fixed vehicle/guide costs split by 2 (~35–40% drop) |
-| **Small Group (3–4 Persons)** | `3` | `4` | Flat-Roof Van (KDH / Noah) | Ideal for small groups with luggage |
-| **Medium Group (5–7 Persons)** | `5` | `7` | High-Roof Van (Toyota KDH) | 9-seater layout with suitcase space |
-| **Large Group (8–15 Persons)** | `8` | `15` | Mini Coach (Rosa / Coaster) | Covers 8–15 pax; next custom tier starts at `16` |
-| **Coach Group (16–30+)** *(Optional)* | `16` | `30` | Luxury Tour Coach (33–45 Seater) | Corporate & large family groups |
+| Tier Label                            | Min Pax | Max Pax | Sri Lanka Vehicle Class          | Cost Economics                                      |
+| :------------------------------------ | :-----: | :-----: | :------------------------------- | :-------------------------------------------------- |
+| **Solo (1 Person)**                   |   `1`   |   `1`   | Sedan Car (Prius / Axio)         | 1 guest covers 100% of vehicle & guide cost         |
+| **Couple (2 Persons)**                |   `2`   |   `2`   | Sedan Car (1 Double Room)        | Fixed vehicle/guide costs split by 2 (~35–40% drop) |
+| **Small Group (3–4 Persons)**         |   `3`   |   `4`   | Flat-Roof Van (KDH / Noah)       | Ideal for small groups with luggage                 |
+| **Medium Group (5–7 Persons)**        |   `5`   |   `7`   | High-Roof Van (Toyota KDH)       | 9-seater layout with suitcase space                 |
+| **Large Group (8–15 Persons)**        |   `8`   |  `15`   | Mini Coach (Rosa / Coaster)      | Covers 8–15 pax; next custom tier starts at `16`    |
+| **Coach Group (16–30+)** _(Optional)_ |  `16`   |  `30`   | Luxury Tour Coach (33–45 Seater) | Corporate & large family groups                     |
 
 > [!CAUTION]
 > **Zero Gaps & Zero Overlaps Rule:**  
@@ -126,11 +194,11 @@ flowchart LR
 - **Child (Age 2–12):** Default `50%` of the active adult tier rate (or set a `Fixed` USD fee).
 - **Infant (Under 2):** Keep at `$0` for free lap travel, or set a fee for baby car-seat rental.
 
-| Add-On Type | Code | How It Calculates | Examples |
-| :--- | :--- | :--- | :--- |
-| **Per Person** | `per_person` | `Price × Guest Quantity` (capped at total guests) | 1st Class Train Upgrade, Ayurveda Spa, Yala VIP Jeep |
-| **Per Room** | `per_room` | `Price × Selected Rooms` | Single Room Supplement, Extra Bed |
-| **Per Booking** | `per_booking` | **One-time flat fee** (single checkbox) | VIP Luxury Van Upgrade, Private Photographer & Drone |
+| Add-On Type     | Code          | How It Calculates                                 | Examples                                             |
+| :-------------- | :------------ | :------------------------------------------------ | :--------------------------------------------------- |
+| **Per Person**  | `per_person`  | `Price × Guest Quantity` (capped at total guests) | 1st Class Train Upgrade, Ayurveda Spa, Yala VIP Jeep |
+| **Per Room**    | `per_room`    | `Price × Selected Rooms`                          | Single Room Supplement, Extra Bed                    |
+| **Per Booking** | `per_booking` | **One-time flat fee** (single checkbox)           | VIP Luxury Van Upgrade, Private Photographer & Drone |
 
 > [!TIP]
 > Always verify every rate combination using the **Live Pricing Preview Simulator** at the bottom of the Pricing section before saving.
@@ -143,6 +211,7 @@ flowchart LR
 - **Gallery Images:** At least **1 high-resolution landscape photo** is mandatory for new packages (recommended `< 2MB`, WebP/JPG).
 
 ### 4.7 Editing Live Packages Safely (`/managepackages`)
+
 Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons, or itineraries via safe text-only **`PATCH`** updates without overwriting existing gallery images.
 
 ---
@@ -158,6 +227,7 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 ## 6. Blog Articles & FAQs (`/blogs`, `/manageblogs`, `/faqs`, `/managefaqs`)
 
 ### How to Add & Manage Blog Articles (`/blogs`, `/manageblogs`)
+
 1. Open **`/blogs`** (optionally upload `sample-blog.json` via `JsonImporter`).
 2. In the **EN** tab, fill in **Title** (auto-generates URL Slug), **Author**, **Category**, **Read Time**, **Summary**, and full **Blog** body.
 3. Switch to **JA** (or click **`+`** to add another ISO language) and translate all fields.
@@ -165,6 +235,7 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 5. Edit or delete published articles anytime at **`/manageblogs`** → **Edit** (`/manageblogs/[id]/edit`).
 
 ### How to Add & Manage FAQs (`/faqs`, `/managefaqs`)
+
 1. Open **`/faqs`** and start in the **English (`EN`)** tab.
 2. Fill in **Category** (e.g., `Booking & Payments`, `Airport Pickup`), **Question**, and **Answer**.
 3. Switch to the **JA** tab (or click **`+`** for custom languages) and enter the Japanese Category, Question, and Answer.
@@ -188,6 +259,7 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 ## 8. Users, Media Gallery, Reviews & Contact (`/users`, `/imageupload`, `/comments`, `/contact`)
 
 ### How to Manage Registered Users (`/users`)
+
 1. Open **`/users`** to view the **Total Customers KPI Bar** (`Active Accounts`, `VIP Members`, `Verified`, `Suspended`) and customer directory.
 2. **Branded Customer Reference ID (`IKISAKI-XXXXXX`):**
    - Every registered customer receives a clean, human-readable branded reference code (e.g., `IKISAKI-8F42M9`) upon email or social OAuth sign-up (auto-backfilled for legacy accounts).
@@ -204,10 +276,12 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 8. **View Technical UUID:** Click the **Eye icon** on any card or row to reveal or hide the internal database primary key.
 
 ### Media Gallery (`/imageupload`)
+
 > [!IMPORTANT]
 > **Strict Upload Rules:** `/imageupload` accepts **`.webp` files ONLY** and a maximum of **4 images per batch**. Convert JPG/PNG files to `.webp` before staging.
 
 ### Reviews & Feedback (`/comments`) & Contact Inbox (`/contact`)
+
 - **Reviews (`/comments`):** Filter by `All Types`, `Website Feedback`, `Package Review`, or **`By Not Responded`**; toggle public visibility; and post official **Admin Replies** beneath customer reviews.
 - **Contact (`/contact`):** Read public Contact Us submissions and delete resolved/spam entries.
 
@@ -216,6 +290,7 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 ## 9. Legal Policies & Admin Operations Log (`/legaldocs`, `/adminlogs`)
 
 ### How to Add & Edit Legal Policy Documents (`/legaldocs`)
+
 1. Open **`/legaldocs`** and click **New Document** in the left `DocumentSidebar` to open the **New Policy Document** modal.
 2. Enter **Document Title** (e.g., `Cancellation Policy`) — the unique **Document ID** auto-generates (`cancellation-policy`). Set **Eyebrow** (`Legal & Compliance`), **Accent Color**, and **Last Updated** date, then create.
 3. Select the document in the sidebar and click **`+ Add Section`** to add ordered clauses (**Heading**, **Content**, and nested **Sub-Items**).
@@ -223,6 +298,7 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 5. Click **Save Changes** to publish live to the website footer legal pages.
 
 ### How to Record Daily Operations Logs (`/adminlogs`)
+
 1. Open **`/adminlogs`** and select a **Log Type**: `👤 Allocation`, `📅 Schedule`, `⚠️ Issue / Alert`, or `📝 General Note`.
 2. Optionally add a **Request ID** (e.g., `req_1`) and **Assigned Staff** (e.g., `Saman (Driver)`).
 3. Enter your operational note and submit to append it to the live team timeline.
@@ -233,18 +309,19 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 
 Every JSON-importable module in the Admin Panel has a ready-to-download template in [`public/sample-packages/`](./public/sample-packages) (and inside **`/manual` → Section 12** with 1-click Copy & AI Prompts):
 
-| Template File | Module | Upload Route |
-| :--- | :--- | :--- |
-| `sample-oneday-tour.json` | One-Day Tour Packages | `/addpackage` |
-| `sample-multiday-tour.json` | Multi-Day Tour Packages | `/addpackage` |
-| `sample-destination.json` | Sri Lanka Destinations | `/destinations` |
-| `sample-blog.json` | Multilingual Blog Articles | `/blogs` |
+| Template File               | Module                     | Upload Route    |
+| :-------------------------- | :------------------------- | :-------------- |
+| `sample-oneday-tour.json`   | One-Day Tour Packages      | `/addpackage`   |
+| `sample-multiday-tour.json` | Multi-Day Tour Packages    | `/addpackage`   |
+| `sample-destination.json`   | Sri Lanka Destinations     | `/destinations` |
+| `sample-blog.json`          | Multilingual Blog Articles | `/blogs`        |
 
 > [!TIP]
-> **Using AI (ChatGPT / Gemini / Claude) to Generate JSON Files:**  
-> 1. Open **`/manual` → Section 12 (JSON Templates & AI Prompts)** inside the Admin Panel.  
-> 2. Click **Download `.json`** (or **Copy JSON**) for the module you need.  
-> 3. Click **Copy AI Prompt** for Tour Package, Destination, or Blog, paste it into your AI tool together with the JSON structure and your rough notes (English, Sinhala, or Japanese).  
+> **Using AI (ChatGPT / Gemini / Claude) to Generate JSON Files:**
+>
+> 1. Open **`/manual` → Section 12 (JSON Templates & AI Prompts)** inside the Admin Panel.
+> 2. Click **Download `.json`** (or **Copy JSON**) for the module you need.
+> 3. Click **Copy AI Prompt** for Tour Package, Destination, or Blog, paste it into your AI tool together with the JSON structure and your rough notes (English, Sinhala, or Japanese).
 > 4. Save the AI's raw JSON output as a `.json` file, upload it into the Admin Panel's JSON Uploader, attach your photos manually, and click **Save**.
 
 ---
@@ -252,7 +329,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 ## 11. Pre-Publish Tour Checklist
 
 - [ ] Both **English (`EN`)** and **Japanese (`JA`)** tabs are completely translated.
-- [ ] **Highlighted Words (Title 2)** matches exact characters inside **Package Title (Title 1)** in *both* `EN` and `JA`.
+- [ ] **Highlighted Words (Title 2)** matches exact characters inside **Package Title (Title 1)** in _both_ `EN` and `JA`.
 - [ ] **URL Slug** is clean, readable, and unique.
 - [ ] **Group Discount Tiers** have **zero gaps** and **zero overlaps**.
 - [ ] Verified final totals in the **Live Pricing Preview Simulator**.
@@ -264,48 +341,53 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 
 ## 12. Common Issues & Troubleshooting
 
-| Issue | Module | Root Cause | Solution |
-| :--- | :--- | :--- | :--- |
-| **`500 Error` / `packages_slug_unique`** | Tour Packages | Another tour already uses the exact same URL slug. | Slightly modify English **Package Title (Title 1)** for a unique slug, or edit the existing tour in `/managepackages`. |
-| **Japanese title has no Gold Highlight** | Tour Packages | Kanji vs Katakana mismatch between Title 1 and Title 2. | Copy the exact Japanese substring directly from Title 1 into Highlighted Words (Title 2). |
-| **Save Package blocked while on `JA` tab** | Tour Packages | Core English (`EN`) required fields are empty. | Switch back to the **`EN`** tab, fill all required English fields, attach images, and save. |
-| **No gallery upload in `/managepackages`** | Tour Packages | `/managepackages` uses text-only `PATCH` to protect existing photos. | Use `/managepackages` for text/pricing/itinerary edits and `/addpackage` for new photo uploads. |
-| **Sudden Solo price jump for 3–4 or 5–7 guests** | Dynamic Pricing | A gap exists between `Max Pax` of one tier and `Min Pax` of the next. | Edit tiers in `/managepackages` so every `next.minPax === prev.maxPax + 1`. |
-| **`Invalid JSON file format` error** | Media & JSON | AI output included ```` ```json ```` backticks, extra text, or `.txt` extension. | Ensure the file starts with `{`, ends with `}`, has no markdown fences, and ends in `.json`. |
-| **`Please select at least one gallery image`** | Media & JSON | JSON import fills text/pricing only — never image binaries. | Attach at least 1 tour photo manually in the Gallery section before saving. |
-| **Media Gallery rejects uploaded files** | Media & JSON | Non-WebP format (`.jpg`/`.png`) or more than 4 files selected. | Convert images to **`.webp`** and upload at most **4 images per batch**. |
-| **Wrong Hero image on Destination page** | Media & JSON | Index 0 (first photo, ★ Hero) is used as the main banner (max 6 photos). | Clear staged photos and select your main Hero landscape photo **first**. |
-| **Blocked dates still open on website** | Availability | Clicking dates stages local changes until **Save Changes** is clicked. | Review `ClosedDatesList`, click **Save Changes**, and wait for confirmation. |
-| **Legal Doc `ID already in use` / lost edits** | Legal Docs | Duplicate policy Document ID or unsaved editor changes. | Choose a unique Title/ID, check **Live Preview**, and click **Save** before leaving. |
-| **`401/403` error or `Desktop Screen Required`** | System & Auth | Missing API key, backend cold start (3–5s), or narrow viewport (`< 768px`). | Wait 5s & refresh for cold starts; verify `.env.local` keys; open on desktop (`≥ 1024px`). |
+| Issue                                            | Module          | Root Cause                                                                  | Solution                                                                                                               |
+| :----------------------------------------------- | :-------------- | :-------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| **`500 Error` / `packages_slug_unique`**         | Tour Packages   | Another tour already uses the exact same URL slug.                          | Slightly modify English **Package Title (Title 1)** for a unique slug, or edit the existing tour in `/managepackages`. |
+| **Japanese title has no Gold Highlight**         | Tour Packages   | Kanji vs Katakana mismatch between Title 1 and Title 2.                     | Copy the exact Japanese substring directly from Title 1 into Highlighted Words (Title 2).                              |
+| **Save Package blocked while on `JA` tab**       | Tour Packages   | Core English (`EN`) required fields are empty.                              | Switch back to the **`EN`** tab, fill all required English fields, attach images, and save.                            |
+| **No gallery upload in `/managepackages`**       | Tour Packages   | `/managepackages` uses text-only `PATCH` to protect existing photos.        | Use `/managepackages` for text/pricing/itinerary edits and `/addpackage` for new photo uploads.                        |
+| **Sudden Solo price jump for 3–4 or 5–7 guests** | Dynamic Pricing | A gap exists between `Max Pax` of one tier and `Min Pax` of the next.       | Edit tiers in `/managepackages` so every `next.minPax === prev.maxPax + 1`.                                            |
+| **`Invalid JSON file format` error**             | Media & JSON    | AI output included ` ```json ` backticks, extra text, or `.txt` extension.  | Ensure the file starts with `{`, ends with `}`, has no markdown fences, and ends in `.json`.                           |
+| **`Please select at least one gallery image`**   | Media & JSON    | JSON import fills text/pricing only — never image binaries.                 | Attach at least 1 tour photo manually in the Gallery section before saving.                                            |
+| **Media Gallery rejects uploaded files**         | Media & JSON    | Non-WebP format (`.jpg`/`.png`) or more than 4 files selected.              | Convert images to **`.webp`** and upload at most **4 images per batch**.                                               |
+| **Wrong Hero image on Destination page**         | Media & JSON    | Index 0 (first photo, ★ Hero) is used as the main banner (max 6 photos).    | Clear staged photos and select your main Hero landscape photo **first**.                                               |
+| **Blocked dates still open on website**          | Availability    | Clicking dates stages local changes until **Save Changes** is clicked.      | Review `ClosedDatesList`, click **Save Changes**, and wait for confirmation.                                           |
+| **Legal Doc `ID already in use` / lost edits**   | Legal Docs      | Duplicate policy Document ID or unsaved editor changes.                     | Choose a unique Title/ID, check **Live Preview**, and click **Save** before leaving.                                   |
+| **`401/403` error or `Desktop Screen Required`** | System & Auth   | Missing API key, backend cold start (3–5s), or narrow viewport (`< 768px`). | Wait 5s & refresh for cold starts; verify `.env.local` keys; open on desktop (`≥ 1024px`).                             |
 
 ---
 
 ## 13. November 19, 2026 Operational Upgrades (from 07:45 AM onwards)
 
 ### 13.1 Universal 1-Click Live Visibility Toggle
+
 - **Modules Covered:** Tour Packages (`/managepackages`), Blog Articles (`/manageblogs`), Destinations (`/managedestinations`), and FAQs (`/managefaqs`).
-- **Functionality:** 
+- **Functionality:**
   - Allows operations staff to instantly toggle any item between **Live on Site** (Emerald badge) and **Hidden / Draft** (Slate badge) with a single click.
   - Public website queries automatically filter `WHERE isLive = true`, preventing unfinished drafts or seasonal tours from appearing to guests or search engines.
   - Each module features an **All Visibility** dropdown filter (`All Visibility`, `Live on Site`, `Hidden / Drafts`) to inspect active vs staged inventory.
 
 ### 13.2 Edit-Mode Image Upload Isolation
+
 - **Modules Covered:** Edit Destination (`/managedestinations/[id]/edit`) and Edit Blog (`/manageblogs/[id]/edit`).
 - **Behavior:** The file upload input is now automatically hidden during edit mode via `hideImageUpload={true}`.
 - **Why:** The backend update endpoints (`PATCH /destinations/:id` and `PATCH /blogs/:id`) process JSON metadata updates only. Hiding the file picker prevents accidental re-upload attempts and guarantees existing Cloudflare R2 photos remain uncorrupted.
 
 ### 13.3 Clean Overview-First Data Tables & Compact Search
+
 - **Standardized Search Bar:** Compact width across all management modules (`w-full sm:w-64 lg:w-72 shrink-0`) aligned with the Reviews page design.
-- **Tour Services (`/tourservices`):** Route & schedule details are concise; Airport/Intercity transfers display *"Awaiting Quote (Distance Based)"* instead of $0; Service Notes vehicle dropdowns right-aligned.
+- **Tour Services (`/tourservices`):** Route & schedule details are concise; Airport/Intercity transfers display _"Awaiting Quote (Distance Based)"_ instead of $0; Service Notes vehicle dropdowns right-aligned.
 - **Reviews & Feedback (`/comments`):** Distinct handling for Website Feedback vs Tour Package reviews; official industry-standard staff reply presets.
 - **Contact Inquiries (`/contact`):** Truncated messages prevent horizontal layout blowout; Inquiry Type column pulled cleanly to the left.
 
 ### 13.4 Unified Luxury Delete Modal (`AdminDeleteModal`) & Dynamic Toasts (`AdminToast`)
+
 - **Centered Top Warning Icon:** Reusable delete modal with item preview card and loading spinner, preventing layout distortion.
 - **Dynamic Width Toast:** Auto-adjusts width to notification content (`min-w-[240px]` up to `max-w-md` with `break-words`).
 
 ### 13.5 Zero Trust Enterprise Admin Authentication & Edge Route Guard
+
 - **Edge Route Guard Protection (`src/proxy.ts` / `middleware.ts`):** Automatically blocks any unauthenticated direct URL visits and redirects to `/login?redirect=...`.
 - **Light Luxury Login Portal (`/login`):** Fully integrated into the light luxury theme of the admin panel (`bg-slate-50`, crisp white cards, 256-bit encryption badge).
 - **Dedicated Sign Out:** Accessible anytime from the bottom of the hover sidebar.
@@ -319,6 +401,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 - **Brute Force Lockout:** 5 consecutive incorrect attempts automatically locks the account for 30 minutes (HTTP 429).
 
 ### 13.6 Enterprise Two-Factor Authentication (2FA / TOTP) Engine
+
 - **RFC 6238 Standard:** TOTP engine implemented using Node.js built-in `crypto` for 100% serverless Vercel compatibility without ESM bundling conflicts.
 - **Activation Flow (Google Authenticator / Authy):**
   1. Any staff member opens the **Admin Profile & Security Modal** (click avatar at bottom-left of sidebar).
@@ -335,6 +418,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 - **Deactivation:** Disabling 2FA (`POST /api/admin/auth/2fa/disable`) requires re-entering the staff member's current account password.
 
 ### 13.7 10-Role Staff Management & Access Control Engine (RBAC - `/staff`)
+
 - **Restricted Access:** Only `SUPER_ADMIN` can view and manage the Staff & Access Control module (`/staff`).
 - **The 10 Specialized Roles:**
   1. `SUPER_ADMIN` (Executive Root / Owner — Unrestricted access across all modules).
@@ -359,9 +443,10 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 - **Dual Display Modes:** Toggle seamlessly between dense **Table View** and responsive **Cards View**.
 
 ### 13.8 Staff Account Lifecycle & Security Guards
+
 - **Account Suspension & Invalidation:**
   - Toggling staff status to `Suspended` (`PATCH /api/admin/staff/:id/status`) immediately revokes all active sessions for that user in `admin_sessions`.
-  - Suspended staff accounts are blocked at login with HTTP 403: *"Your staff account has been suspended. Please contact your Super Administrator."*
+  - Suspended staff accounts are blocked at login with HTTP 403: _"Your staff account has been suspended. Please contact your Super Administrator."_
 - **Self-Suspension & Self-Deletion Safeguards:**
   - The system strictly prevents Super Admins from suspending or deleting their own account, preventing accidental lockouts.
 - **Temporary Password Reset (`StaffResetPasswordModal`):**
@@ -372,6 +457,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - All feedback notifications are rendered exclusively through `AdminToast`.
 
 ### 13.9 Dual-Lock Route Guard & Zero-Flash Protection (`AdminShell` + `AdminAccessRestricted`)
+
 - **Global Route Interceptor (`AdminShell.tsx`):**
   - Evaluates `isRoutePermitted(pathname, user.role)` before rendering `{children}`.
   - Eliminates the Flash of Unauthorized Content (FOUC): Unauthorized page components are never mounted into the DOM, and their data-fetching API requests are never dispatched.
@@ -383,11 +469,13 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Even if a client bypasses the frontend, the backend returns HTTP 403 Forbidden, keeping the PostgreSQL database 100% secure.
 
 ### 13.10 Cloudflare R2 WebP Profile Photo Engine & Automatic Asset Cleanup
+
 - **Automatic Client-Side WebP Conversion:** Photos uploaded in the Admin Profile modal are compressed and converted to `.webp` before sending to Cloudflare R2.
 - **Cache Busting:** Avatar URLs include unique versioning timestamps so browsers update immediately upon photo changes.
 - **Backend Automatic Cleanup:** When a new avatar photo replaces an existing one, the backend automatically issues a delete command to Cloudflare R2, removing the old orphaned file and keeping cloud storage clean.
 
 ### 13.11 Customer Account Suspension & Zero-Trust Defense-in-Depth
+
 - **Real-Time Database Verification (`JwtAuthGuard`):**
   - Customer JWT tokens contain only `{ sub: user.id }`.
   - On every incoming authenticated customer request, the NestJS `JwtAuthGuard` executes a real-time Drizzle ORM query against PostgreSQL (`users` table).
@@ -421,6 +509,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - If an unauthenticated visitor navigates directly to `/profile`, they are prompted with `<AuthRequiredModal />` or redirected to sign in, while public tour/destination pages remain completely open.
 
 ### 13.12 Branded Customer Reference ID System (`IKISAKI-XXXXXX`)
+
 - **Clean Alphanumeric Generation (`reference-id.util.ts`):**
   - Produces high-readability 6-character codes excluding ambiguous characters (`0`, `O`, `1`, `I`), prefixed with `IKISAKI-` (e.g., `IKISAKI-8F42M9`).
 - **Generation Touchpoints:**
@@ -433,6 +522,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Served as the foundation for future customer referral tracking and loyalty rewards.
 
 ### 13.13 UI/UX Resilience: Content-Adaptive Toast Engine & Sidebar Navigation Auto-Centering
+
 - **Content-Adaptive Dynamic Toast Notifications (`AdminToast.tsx`):**
   - Toast width smoothly adjusts according to message content (`w-auto max-w-[min(52rem,calc(100vw-3rem))]`) without forced fixed minimums or artificial width caps.
   - Standard messages under 95 characters remain strictly on a single line (`whitespace-nowrap max-sm:whitespace-normal`), preventing awkward single-word wrapping onto line 2 (e.g. `code.`).
@@ -445,6 +535,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Hover auto-scroll (`onMouseEnter` with 180ms delay) automatically and smoothly glides the sidebar to the currently active page when expanding the navigation.
 
 ### 13.14 Customer Two-Factor Authentication (2FA / RFC 6238 TOTP) Architecture
+
 - **Customer Account Protection:**
   - Registered travelers can activate Google Authenticator / Authy from their Profile Security settings.
   - Activation endpoints: `POST /api/auth/2fa/generate` produces an `otpauth://` QR Code Data URL and Base32 setup key; `POST /api/auth/2fa/enable` verifies the 6-digit TOTP code and commits `is_two_factor_enabled = true`.
@@ -455,6 +546,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Customer 2FA status is surfaced directly in the `/users` table and card views with a teal `2FA` shield badge for operational awareness.
 
 ### 13.15 Session Timeout Interceptor, 401 Recovery Modal & Return URL Navigation
+
 - **3-Hour Token Expiration & Global 401 Interception:**
   - Administrative JWT tokens are active for 3 hours (`exp` timestamp check) so staff can conduct extensive operations without abrupt session cutoffs.
   - API interceptors in `api-client.ts`, `auth.service.ts`, and `service-notes.service.ts` catch HTTP 401 responses and dispatch a centralized `admin:session-expired` event.
@@ -465,12 +557,14 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Upon successful credentials and 2FA authentication, the system immediately returns the administrator directly to their in-progress workspace without getting stuck.
 
 ### 13.16 Cloudflare R2 Automatic Orphaned Asset Cleanup
+
 - **Automatic Image Pruning:**
   - When a customer or admin replaces their profile avatar or deletes their account, the backend automatically issues an asynchronous S3/R2 `DeleteObjectCommand` to Cloudflare R2.
   - External OAuth avatars (Google `lh3.googleusercontent.com` and Facebook `graph.facebook.com`) are automatically preserved and never targeted for deletion.
   - Prevents orphaned image accumulation, keeping Cloudflare R2 storage clutter-free.
 
 ### 13.17 Admin Profile & Security Modal Ergonomics, Centered Notifications & 2FA Password Verification
+
 - **Centered Content-Adaptive Notifications (`AdminSecurityModal.tsx`):**
   - Feedback toasts (`profileMsg`, `passwordMsg`, `twoFactorMsg`) automatically scale to message length (`w-fit max-w-md mx-auto`), horizontally centered with backdrop blur, dismiss (`X`) button, and auto-dismiss after 4.5 seconds.
   - Discarding manual dismissal fatigue: alerts disappear smoothly after 4.5 seconds so staff can continue editing without clutter.
@@ -482,6 +576,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Disabling 2FA strictly requires entering the administrator's current account password, protecting staff accounts against unauthorized physical or browser takeovers.
 
 ### 13.18 Login UX Resilience: Single-Line Session Timeout Notice & 3-Hour Expiry Policy
+
 - **Concise Single-Line Timeout Banner:**
   - Replaced bulky multiline warning banners with the concise `"Session expired. Please sign in again."` notice.
   - Guarantees zero text truncation, zero single-word wrapping, and clean presentation on both mobile and desktop viewports.
@@ -489,6 +584,7 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
   - Accurately displays `Session: 3-Hour Expiry` matching the NestJS backend JWT session duration (`expiresIn: '3h'`).
 
 ### 13.19 Transfer Services Dynamic Notes & Multi-Table Operations Standardization
+
 - **Dynamic Service Notes (`/servicenotes`):**
   - Centralized management of Transfer Service vehicle specifications, maximum passenger capacities, luggage allowances, and airport pickup (BIA) guidelines.
   - Localized in English and Japanese with real-time validation and reactive updates to the customer booking forms.
@@ -497,4 +593,4 @@ Every JSON-importable module in the Admin Panel has a ready-to-download template
 
 ---
 
-*Maintained by **Aetheria Labs** for **Ikisaki Tours** (`www.ikisakitours.com`).*
+_Maintained by **Two2Flod** for **Ikisaki Tours** (`www.ikisakitours.com`)._

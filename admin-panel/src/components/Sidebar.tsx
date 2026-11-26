@@ -506,7 +506,7 @@ export default function Sidebar() {
             <span className="relative shrink-0 flex items-center justify-center">
               <span className="absolute inset-0 rounded-lg bg-emerald-400/40 opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100" />
               <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-400 to-teal-500 text-xs font-extrabold leading-none text-slate-950 shadow-md shadow-emerald-500/20 ring-1 ring-white/25 transition-transform duration-300 group-hover:scale-105">
-                AL
+                T2F
               </span>
             </span>
 
@@ -518,17 +518,16 @@ export default function Sidebar() {
                   <span className="text-[10px] font-medium text-slate-500">Powered by</span>
                   <span className="flex items-baseline gap-1">
                     <span className="text-[12px] font-bold tracking-wide text-slate-300 transition-colors duration-300 group-hover:text-emerald-300">
-                      AETHERIA
+                      Two2Flod
                     </span>
-                    <span className="text-[12px] font-light tracking-wide text-slate-400 transition-colors duration-300 group-hover:text-teal-300/80">
+                    {/* <span className="text-[12px] font-light tracking-wide text-slate-400 transition-colors duration-300 group-hover:text-teal-300/80">
                       LABS
-                    </span>
+                    </span> */}
                   </span>
                 </p>
-
                 {/* Line 2: Engineer credit */}
                 <p className="text-[10px] leading-none text-slate-600">
-                  Engineered by <span className="text-slate-400">Shehan_W</span>
+                  Engineered by <span className="text-slate-400">Shehan_W & Pramos_S</span>
                 </p>
               </div>
             )}

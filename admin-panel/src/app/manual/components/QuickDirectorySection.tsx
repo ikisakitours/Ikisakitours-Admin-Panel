@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowUpRight, Monitor, Sparkles } from "lucide-react";
+import { ArrowUpRight, Hash, Monitor, MoveHorizontal, Sparkles } from "lucide-react";
 import { QUICK_DIRECTORY_MODULES } from "../data/manualMockData";
 import { SectionCard } from "./SectionCard";
 import { ManualIcon } from "./ManualIcon";
@@ -22,8 +22,7 @@ export function QuickDirectorySection() {
             <Monitor className="w-4 h-4 text-indigo-600" /> Desktop-First Workspace
           </p>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Operate on a PC or laptop screen (<strong>≥ 1024px</strong> width). Narrow mobile screens are intentionally blocked by{" "}
-            <code>DesktopOnlyGuard</code> to protect complex tables, itineraries, and pricing rules.
+            Operate on a PC or laptop screen (<strong>≥ 1024px</strong> width). Small mobile screens are blocked automatically to protect complex pricing tables and multi-day itineraries from accidental edits.
           </p>
         </div>
 
@@ -32,7 +31,25 @@ export function QuickDirectorySection() {
             <Sparkles className="w-4 h-4 text-emerald-600" /> Hover-to-Expand Sidebar
           </p>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Move your cursor over the left navigation rail to expand all 10 module groups. Clicking any link loads the page cleanly while keeping the sidebar locked in place.
+            Move your cursor over the left navigation rail to expand all 11 module groups. Clicking any link loads the page cleanly while keeping the sidebar in place.
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-1.5">
+          <p className="text-xs font-extrabold text-slate-800 flex items-center gap-2">
+            <MoveHorizontal className="w-4 h-4 text-blue-600" /> Hover to Read Long Text
+          </p>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Long titles, questions, answers, and routes stay neatly on a single line so tables never break. Simply <strong>move your mouse over</strong> any long text to smoothly scroll and read the full sentence — it resets when you move your mouse away.
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-1.5">
+          <p className="text-xs font-extrabold text-slate-800 flex items-center gap-2">
+            <Hash className="w-4 h-4 text-amber-600" /> Easy-to-Track Reference Numbers
+          </p>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Every record has a clear reference code for fast search and support: <code>IKISAKI-XXXXXX</code> (Users), <code>IK-...</code> (Tour Bookings), <code>SRV-XXXXXXXX</code> (Tour Services), <code>INQ-XXXXXXXX</code> (Contact Inquiries), <code>REV-</code> / <code>FDB-</code> (Reviews &amp; Feedback), and <code>FAQ-XXXXXX</code> (FAQs).
           </p>
         </div>
       </div>

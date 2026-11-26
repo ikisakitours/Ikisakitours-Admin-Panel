@@ -13,8 +13,7 @@ const robotoMono = Roboto_Mono({
   display: "swap",
 });
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://ikisakitours-admin-panel.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ikisakitours-admin-panel.vercel.app";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -35,7 +34,6 @@ export const metadata: Metadata = {
     apple: [{ url: "/Layout-Icons/favicon.png?v=2", sizes: "180x180", type: "image/png" }],
   },
 
-
   title: {
     default: "Ikisaki Tours | Admin Panel",
     template: "%s | Ikisaki Tours Admin",
@@ -43,14 +41,8 @@ export const metadata: Metadata = {
   description:
     "Internal operations and content management dashboard for Ikisaki Tours — manage Sri Lanka tour packages, dynamic group pricing, bookings, multilingual content (EN/JA), destinations, and availability.",
   applicationName: "Ikisaki Tours Admin Panel",
-  keywords: [
-    "Ikisaki Tours",
-    "Admin Panel",
-    "Sri Lanka Tours",
-    "Tour Management System",
-    "Booking Operations",
-  ],
-  creator: "Aetheria Labs",
+  keywords: ["Ikisaki Tours", "Admin Panel", "Sri Lanka Tours", "Tour Management System", "Booking Operations"],
+  creator: "Two2Flod",
   publisher: "Ikisaki Tours",
   robots: {
     index: false,
@@ -99,8 +91,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Ikisaki Tours | Admin Panel",
-    description:
-      "Internal operations and CMS dashboard for Ikisaki Tours (www.ikisakitours.com).",
+    description: "Internal operations and CMS dashboard for Ikisaki Tours (www.ikisakitours.com).",
     images: [
       {
         url: "/Layout-Icons/image-1200x630.webp",
@@ -120,9 +111,7 @@ export default function RootLayout({
       {/* Apply the font class directly to the body so it inherits everywhere */}
       <body className={`${robotoMono.className} min-h-full bg-slate-50 text-slate-900`}>
         <DesktopOnlyGuard>
-          <AdminShell>
-            {children}
-          </AdminShell>
+          <AdminShell>{children}</AdminShell>
         </DesktopOnlyGuard>
       </body>
     </html>

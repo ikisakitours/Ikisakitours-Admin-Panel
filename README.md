@@ -41,8 +41,9 @@
   - [5. Enterprise Zero-Trust Admin Authentication, 10-Role RBAC & 2FA Engine](#5-enterprise-zero-trust-admin-authentication-10-role-rbac--2fa-engine)
   - [6. Dual-Lock Route Guard, Zero-Flash Protection & Cloudflare R2 WebP Profile Engine](#6-dual-lock-route-guard-zero-flash-protection--cloudflare-r2-webp-profile-engine)
   - [7. Customer Account Suspension & Zero-Trust Access Guard](#7-customer-account-suspension--zero-trust-access-guard)
-  - [8. Branded Customer Reference ID Engine & UI/UX Resilience](#8-branded-customer-reference-id-engine--uiux-resilience)
+  - [8. Branded Entity Reference ID Engine, HoverScrollText Component & UI/UX Resilience](#8-branded-entity-reference-id-engine-hoverscrolltext-component--uiux-resilience)
   - [9. Session Timeout Interceptor, 401 Recovery & Cloudflare R2 Asset Lifecycle](#9-session-timeout-interceptor-401-recovery--cloudflare-r2-asset-lifecycle)
+  - [10. PDF Itinerary Studio & Word Hub (`/itinerary-editor`)](#10-pdf-itinerary-studio--word-hub-itinerary-editor)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -87,21 +88,21 @@ flowchart LR
 
 ## Module Directory (All 12 Groups)
 
-| Group | Route(s) | Operational Capabilities |
-| :--- | :--- | :--- |
-| **Authentication & Access** | `/login` | Zero Trust executive login portal with 256-bit encrypted session handling, Edge Middleware route protection, and instant sidebar Sign Out |
-| **Staff & Team (RBAC)** | `/staff` | 10-role internal staff directory, role provisioning, status toggles (Active/Suspended) with immediate session invalidation, temporary password resets, and 2FA compliance tracking |
-| **Overview** | `/dashboard` | Monthly KPI cards (Visitors, Feed Impressions, Total Clicks, Avg. SEO Rank) + interactive Recharts `GrowthChart` |
-| **Bookings & Operations** | `/tours`, `/tourservices` | One-Day / Multi-Day package booking statuses (`Pending`, `Confirmed`, `Completed`, `Cancelled`); tabbed service inquiries (`Custom Made Tours`, `Private Chauffeur`, `Transfers`) with status filters (`Pending`, `Approved`, `Active`, `Rejected`) |
-| **User Management** | `/users` | Customer directory with total count badge and live **VIP**, **Active Access**, and **Verified** status toggles |
-| **Tour Packages** | `/addpackage`, `/managepackages` | EN/JA/+ tour builder, 1-click JSON prefill, 18 conversion badges, Title + Gold Highlight rules, dynamic group pricing tiers, passenger rules, add-ons, dynamic meals/accommodation lists, Live Pricing Simulator, text-only `PATCH` inline editing, and 1-click Live Visibility toggle |
-| **Destinations** | `/destinations`, `/managedestinations`, `/managedestinations/[id]/edit` | Reusable Sri Lanka destination hubs with JSON uploader, quick facts, multilingual content, 1-click Live Visibility, and isolated edit mode (`hideImageUpload`) |
-| **Blog Articles** | `/blogs`, `/manageblogs`, `/manageblogs/[id]/edit` | Multilingual travel blog CMS with JSON importer, auto-slugify + custom slug override, 1-click Live Visibility toggle, and isolated edit mode (`hideImageUpload`) |
-| **FAQs & Help** | `/faqs`, `/managefaqs`, `/managefaqs/[id]/edit` | Localized English & Japanese customer support Q&A management with 1-click Live Visibility toggle |
-| **Availability & Rates** | `/newupdates`, `/servicepricing`, `/servicenotes` | Closed-date monthly calendar with tour-type closures & multilingual notes; 3-tab service pricing (`Charter`, `Custom`, `Transfer`); vehicle specs & multilingual service guidelines |
-| **Media & Engagement** | `/imageupload`, `/comments`, `/contact` | Strict `.webp` batch uploader (max 4/batch); unified Website Feedback + Package Reviews moderation (visibility toggle + direct **Admin Replies**); Contact Us inquiry inbox |
-| **Compliance & System** | `/legaldocs`, `/adminlogs` | Multilingual structured Legal Document CMS (Privacy Policy, Terms, sections & sub-items) and internal Admin Operations Log |
-| **Help & Guide** | `/manual` | Modular, searchable in-app Admin Manual Guide with 1-click sample JSON downloads, interactive Pre-Publish Checklist, and Troubleshooting Accordion |
+| Group                       | Route(s)                                                                | Operational Capabilities                                                                                                                                                                                                                                                                                                                                      |
+| :-------------------------- | :---------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Authentication & Access** | `/login`                                                                | Zero Trust executive login portal with 256-bit encrypted session handling, Edge Middleware route protection, and instant sidebar Sign Out                                                                                                                                                                                                                     |
+| **Staff & Team (RBAC)**     | `/staff`                                                                | 10-role internal staff directory, role provisioning, status toggles (Active/Suspended) with immediate session invalidation, temporary password resets, and 2FA compliance tracking                                                                                                                                                                            |
+| **Overview**                | `/dashboard`                                                            | Monthly KPI cards (Visitors, Feed Impressions, Total Clicks, Avg. SEO Rank) + interactive Recharts `GrowthChart`                                                                                                                                                                                                                                              |
+| **Bookings & Operations**   | `/tours`, `/tourservices`, `/itinerary-editor`                          | One-Day / Multi-Day package booking statuses (`Pending`, `Confirmed`, `Completed`, `Cancelled`); tabbed service inquiries (`Custom Made Tours`, `Private Chauffeur`, `Transfers`); plus **PDF Itinerary Studio** for A4 print-ready Word vouchers & Japanese agency (HIS) standard travel itineraries with EN/JA dual-language engine and local draft storage |
+| **User Management**         | `/users`                                                                | Customer directory with total count badge and live **VIP**, **Active Access**, and **Verified** status toggles                                                                                                                                                                                                                                                |
+| **Tour Packages**           | `/addpackage`, `/managepackages`                                        | EN/JA/+ tour builder, 1-click JSON prefill, 18 conversion badges, Title + Gold Highlight rules, dynamic group pricing tiers, passenger rules, add-ons, dynamic meals/accommodation lists, Live Pricing Simulator, text-only `PATCH` inline editing, and 1-click Live Visibility toggle                                                                        |
+| **Destinations**            | `/destinations`, `/managedestinations`, `/managedestinations/[id]/edit` | Reusable Sri Lanka destination hubs with JSON uploader, quick facts, multilingual content, 1-click Live Visibility, and isolated edit mode (`hideImageUpload`)                                                                                                                                                                                                |
+| **Blog Articles**           | `/blogs`, `/manageblogs`, `/manageblogs/[id]/edit`                      | Multilingual travel blog CMS with JSON importer, auto-slugify + custom slug override, 1-click Live Visibility toggle, and isolated edit mode (`hideImageUpload`)                                                                                                                                                                                              |
+| **FAQs & Help**             | `/faqs`, `/managefaqs`, `/managefaqs/[id]/edit`                         | Localized English & Japanese customer support Q&A management with 1-click Live Visibility toggle                                                                                                                                                                                                                                                              |
+| **Availability & Rates**    | `/newupdates`, `/servicepricing`, `/servicenotes`                       | Closed-date monthly calendar with tour-type closures & multilingual notes; 3-tab service pricing (`Charter`, `Custom`, `Transfer`); vehicle specs & multilingual service guidelines                                                                                                                                                                           |
+| **Media & Engagement**      | `/imageupload`, `/comments`, `/contact`                                 | Strict `.webp` batch uploader (max 4/batch); unified Website Feedback + Package Reviews moderation (visibility toggle + direct **Admin Replies**); Contact Us inquiry inbox                                                                                                                                                                                   |
+| **Compliance & System**     | `/legaldocs`, `/adminlogs`                                              | Multilingual structured Legal Document CMS (Privacy Policy, Terms, sections & sub-items) and internal Admin Operations Log                                                                                                                                                                                                                                    |
+| **Help & Guide**            | `/manual`                                                               | Modular, searchable in-app Admin Manual Guide with 1-click sample JSON downloads, interactive Pre-Publish Checklist, and Troubleshooting Accordion                                                                                                                                                                                                            |
 
 ---
 
@@ -111,14 +112,14 @@ flowchart LR
 
 Tour pricing aligns with real Sri Lanka private vehicle capacities and room-sharing economics:
 
-| Tier | Min Pax | Max Pax | Sri Lanka Vehicle Class |
-| :--- | :---: | :---: | :--- |
-| **Solo** | `1` | `1` | Sedan Car (Prius / Axio) |
-| **Couple** | `2` | `2` | Sedan Car (1 Double/Twin Room) |
-| **Small Group** | `3` | `4` | Flat-Roof Van / Mini-Van (KDH / Noah) |
-| **Medium Group** | `5` | `7` | High-Roof Van (Toyota KDH High Roof) |
-| **Large Group** | `8` | `15` | Mini Coach (Mitsubishi Rosa / Coaster) |
-| **Coach Group** *(Optional)* | `16` | `30+` | Full-Size Luxury Coach (33–45 Seater) |
+| Tier                         | Min Pax | Max Pax | Sri Lanka Vehicle Class                |
+| :--------------------------- | :-----: | :-----: | :------------------------------------- |
+| **Solo**                     |   `1`   |   `1`   | Sedan Car (Prius / Axio)               |
+| **Couple**                   |   `2`   |   `2`   | Sedan Car (1 Double/Twin Room)         |
+| **Small Group**              |   `3`   |   `4`   | Flat-Roof Van / Mini-Van (KDH / Noah)  |
+| **Medium Group**             |   `5`   |   `7`   | High-Roof Van (Toyota KDH High Roof)   |
+| **Large Group**              |   `8`   |  `15`   | Mini Coach (Mitsubishi Rosa / Coaster) |
+| **Coach Group** _(Optional)_ |  `16`   |  `30+`  | Full-Size Luxury Coach (33–45 Seater)  |
 
 - **Passenger Rules**: Couple (`auto_tier` or `fixed`), Child (`percentage` e.g. `50%` or `fixed`), Infant (default `$0`).
 - **Tour Add-Ons**: Multilingual optional extras supporting `per_person`, `per_room`, and `per_booking` (one-time flat fee) billing modes inside the customer Booking Review Modal.
@@ -187,6 +188,7 @@ Tour pricing aligns with real Sri Lanka private vehicle capacities and room-shar
 ### 4. Interactive In-App Operations Manual (`/manual`)
 
 Built as a modular, data-driven documentation hub inside [`admin-panel/src/app/manual/`](./admin-panel/src/app/manual):
+
 - Centralized typed content store (`data/manualMockData.ts`) powering 11 focused React components
 - Live full-text search across all 13 sections + hashtag quick-filter chips
 - Direct 1-click downloads for One-Day and Multi-Day sample JSON templates
@@ -262,13 +264,22 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - Suspended customers cannot view any protected pages (even for a millisecond); they are immediately locked onto the luxury `<AccessRestricted />` screen.
   - The **"SIGN OUT"** action purges auth cookies and local state, instantly restoring public guest browsing capabilities.
 
-### 8. Branded Customer Reference ID Engine & UI/UX Resilience
+### 8. Branded Entity Reference ID Engine, HoverScrollText Component & UI/UX Resilience
 
-- **Branded Customer Reference ID System (`IKISAKI-XXXXXX`)**:
-  - High-readability 6-character alphanumeric codes excluding confusing characters (`0`, `O`, `1`, `I`), e.g., `IKISAKI-8F42M9`.
-  - Automatically generated upon email registration and Social OAuth (Google, Facebook, Instagram), with automatic on-the-fly backfill for legacy accounts.
-  - Displayed across customer profile screens and the `<AccessRestricted />` screen with a pre-filled support `mailto:` link for immediate issue resolution.
-  - Fully integrated into the Admin Panel `/users` table with 1-click clipboard copy and real-time omni-search filtering by Reference ID, Name, or Email.
+- **Unified Entity Reference ID Architecture**:
+  - Implements standardized, high-readability branded alphanumeric identifiers across all operational workflows:
+    - **Customer Accounts (`/users`)**: `IKISAKI-XXXXXX` (e.g. `IKISAKI-8F42M9`, excluding confusing chars `0`, `O`, `1`, `I`).
+    - **Package Tour Bookings (`/tours`)**: `IK-XXXXXXXX` (uses `bookingReference`).
+    - **Tour Service Requests (`/tourservices`)**: `SRV-XXXXXXXX` (Custom tours, Chauffeur hire, Transfers).
+    - **Contact Inquiries (`/contact`)**: `INQ-XXXXXXXX` (Direct customer inquiries).
+    - **Reviews & Feedback (`/comments`)**: `REV-XXXXXXXX` (Package Reviews) / `FDB-XXXXXXXX` (Website Feedback).
+    - **Support FAQs (`/managefaqs`)**: `FAQ-XXXXXX` (Categorized Q&A entries).
+  - Enables instant 1-click clipboard copying, omni-search filtering by Reference ID, and rapid customer support issue tracking across email, WhatsApp, and phone channels.
+- **Reusable Vercel-Style Hover Scroll Component (`HoverScrollText.tsx`)**:
+  - **Default State**: Long multi-word table columns (Tour Package Names, Questions, Answers, Routes, Titles) are strictly clamped to a single line (`whitespace-nowrap overflow-hidden`). Eliminates awkward table column widening, layout warping, or messy multi-line breaks.
+  - **On Hover ("Vercel Magic")**: When the user hovers their cursor over the text cell, an intelligent `useCallback` measures `scrollWidth - clientWidth`. If the text overflows its container, it smoothly pans horizontally (`translateX(-${overflowDistance}px)`) at a natural reading velocity (~45px/second, minimum 1.8s duration), revealing the entire content effortlessly.
+  - **Mouse Leave Reset**: On mouse leave, the text smoothly glides back to its initial position (`0.3s transition`).
+  - **Adaptive Guard**: If the text is short and fits within its container (`overflowDistance <= 0`), zero translation occurs and the cursor remains standard, incurring zero layout or animation overhead. Automatically recalculates on window resize events.
 - **Dynamic Content-Adaptive Toast Engine (`AdminToast.tsx`)**:
   - Toast width adjusts dynamically according to message content (`w-auto max-w-[min(52rem,calc(100vw-3rem))]`) without forced fixed minimums or artificial width caps.
   - Standard messages under 95 characters remain strictly on a single line (`whitespace-nowrap max-sm:whitespace-normal`), preventing single-word line breaks (e.g. `code.`).
@@ -305,44 +316,70 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
   - External social avatars (Google `lh3.googleusercontent.com` and Facebook `graph.facebook.com`) are automatically identified and protected from deletion.
   - Keeps Cloudflare R2 bucket storage clean and eliminates orphan image storage costs without blocking HTTP responses.
 
+### 10. PDF Itinerary Studio & Word Hub (`/itinerary-editor`)
+
+- **Microsoft Word-Style Document Hub**:
+  - Centralized document manager providing two streamlined entry pathways:
+    - **Blank Document**: Clean-slate document creator with zero mock data, default remarks, and official Ikisaki branding.
+    - **From Tour Booking**: 1-click import from confirmed client bookings (`/tours`) that auto-populates guest party names, room configurations (`1TWN`, `1DBL`, `1SGL`, `FAMILY`), flight schedules, tour dates, and destinations.
+- **Two-Pane Live Studio Architecture**:
+  - **Left Form Editor**: Manages Tour Metadata, dynamic Guest Party lists, Inbound/Outbound Flight tables, Day-by-Day schedule contents, Hotel check-ins, Meal indicators (`HOTEL`, `CLIENT`, `NONE`, `BOX MEAL`, `RESTAURANT`, `AIRPORT`), and Legal remarks.
+  - **Right Live A4 Preview**: Built to exacting Japanese agency (HIS style) standards. Features bold table headers (`Date`, `Tour Content`, `Meals`), `font-normal` body typography, and strictly vertically aligned Meal indicators (`B - HOTEL`, `L - CLIENT`, `D - HOTEL`).
+- **Activities & Scenic Stops Control with Trash Deletion & Restore**:
+  - Each of **Activities**, **Scenic Stops & Viewpoints**, and **Tour Highlights & Notes** has an individual **Trash (`🗑️`)** icon on its label row to delete the section from any day.
+  - Convenient restore buttons (`+ Add Activities`, `+ Add Scenic Stops`, `+ Add Tour Highlights`) appear at the bottom of the day card to bring any deleted section back in one click.
+- **Dynamic Custom Sections Engine (`+ Add Custom Section`)**:
+  - Administrators can add unlimited custom blocks per day with a **Section Title** and multi-line **Description/Notes** field, each equipped with its own Trash icon.
+  - Every new line (`Enter` key or click) in the description automatically formats as a crisp, aligned bullet point (`• `) in the preview, matching Tour Highlights.
+- **Dual-Language Engine (`EN` & `JA`) & Brand Protection**:
+  - 1-click language switcher between **(EN)** English and **(JA)** Japanese. Form Editor labels remain in English for ease of admin operation.
+  - Legal corporate entity name `Ikisaki Tours (Private) Limited` is strictly preserved in English even in Japanese vouchers.
+  - Standardized official corporate contact info: `492/14, Halbarawa Road, Thalahena, Malabe, Sri Lanka`, direct operations phone `+94 75 797 2582`, and official email `info@ikisakitours.com`.
+- **Offline-First Local Draft Storage**:
+  - All drafts are auto-saved to browser `localStorage` (`ikisaki_itinerary_drafts`, `ikisaki_active_itinerary_draft`).
+  - Drafts persist across browser closures and computer reboots, with zero backend API latency.
+- **Architectural Distinction**:
+  - _Package Itinerary Builder (`/addpackage` & `/managepackages`, Section 4.6)_: Configures public multilingual tour package listings stored in PostgreSQL.
+  - _PDF Itinerary Studio (`/itinerary-editor`, Section 10)_: Produces customized, printable A4 guest travel vouchers stored in browser `localStorage`.
+
 ---
 
 ## API Service Layer Reference
 
 All backend communication lives in strongly typed modules under [`admin-panel/src/services/`](./admin-panel/src/services):
 
-| Service File | Primary Endpoint(s) | Purpose |
-| :--- | :--- | :--- |
-| `auth.service.ts` | `/api/admin/auth/login`, `/logout`, `/me`, `/profile`, `/change-password`, `/2fa/*` | Zero-Trust login, RFC 6238 2FA challenge, profile WebP updates, and password changes |
-| `staff.service.ts` | `/api/admin/staff`, `/api/admin/staff/:id/*` | 10-Role Staff directory, onboarding, role updates, account suspension/session revocation, password reset & deletion |
-| `package.service.ts` | `/addpackages` (`GET`, `POST`, `PATCH`, `DELETE`) | Create packages (`FormData` + images), fetch by slug, text-only updates |
-| `package-booking.service.ts` | `/package-bookings`, `/package-bookings/:id/status` | List fixed tour bookings, update status, delete |
-| `tourservice.service.ts` | `/services/custom`, `/services/chauffeur`, `/services/transfer` | Manage tailor-made tour, chauffeur & transfer requests |
-| `destination.service.ts` | `/destinations`, `/uploads/batch` | CRUD operations for Sri Lanka destination hubs |
-| `blog.service.ts` | `/blogs`, `/uploads/batch` | Multilingual blog creation, editing & listing |
-| `faq.service.ts` | `/faqs`, `/faqs/admin` | Multilingual FAQ CRUD management |
-| `availability.service.ts` | `/availability` | Fetch & save closed booking dates and localized notes |
-| `servicepricing.service.ts` | `/service-pricing` | Manage Charter, Custom Tour & Transfer rate cards |
-| `service-notes.service.ts` | `/services/notes` | Manage vehicle specs & multilingual service guidelines |
-| `uploads.service.ts` | `/uploads/batch` | Batch upload up to 4 `.webp` images to storage |
-| `comments.service.ts` | `/comments`, `/comments/:id/reply`, `/comments/:id/visibility` | Website feedback replies & visibility toggles |
-| `package-reviews.service.ts` | `/comments/package-reviews`, `/comments/package-review/:id/reply` | Package review replies & public visibility toggles |
-| `contact.service.ts` | `/contacts`, `/contacts/:id` | Public Contact Us inquiry inbox & deletion |
-| `users.service.ts` | `/auth/users`, `/auth/users/:id/status` | Customer listing & VIP / Access / Verified toggles |
-| `legaldocs.service.ts` | `/legal-docs` | Multilingual Legal Document CMS CRUD |
+| Service File                 | Primary Endpoint(s)                                                                 | Purpose                                                                                                             |
+| :--------------------------- | :---------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------ |
+| `auth.service.ts`            | `/api/admin/auth/login`, `/logout`, `/me`, `/profile`, `/change-password`, `/2fa/*` | Zero-Trust login, RFC 6238 2FA challenge, profile WebP updates, and password changes                                |
+| `staff.service.ts`           | `/api/admin/staff`, `/api/admin/staff/:id/*`                                        | 10-Role Staff directory, onboarding, role updates, account suspension/session revocation, password reset & deletion |
+| `package.service.ts`         | `/addpackages` (`GET`, `POST`, `PATCH`, `DELETE`)                                   | Create packages (`FormData` + images), fetch by slug, text-only updates                                             |
+| `package-booking.service.ts` | `/package-bookings`, `/package-bookings/:id/status`                                 | List fixed tour bookings, update status, delete                                                                     |
+| `tourservice.service.ts`     | `/services/custom`, `/services/chauffeur`, `/services/transfer`                     | Manage tailor-made tour, chauffeur & transfer requests                                                              |
+| `destination.service.ts`     | `/destinations`, `/uploads/batch`                                                   | CRUD operations for Sri Lanka destination hubs                                                                      |
+| `blog.service.ts`            | `/blogs`, `/uploads/batch`                                                          | Multilingual blog creation, editing & listing                                                                       |
+| `faq.service.ts`             | `/faqs`, `/faqs/admin`                                                              | Multilingual FAQ CRUD management                                                                                    |
+| `availability.service.ts`    | `/availability`                                                                     | Fetch & save closed booking dates and localized notes                                                               |
+| `servicepricing.service.ts`  | `/service-pricing`                                                                  | Manage Charter, Custom Tour & Transfer rate cards                                                                   |
+| `service-notes.service.ts`   | `/services/notes`                                                                   | Manage vehicle specs & multilingual service guidelines                                                              |
+| `uploads.service.ts`         | `/uploads/batch`                                                                    | Batch upload up to 4 `.webp` images to storage                                                                      |
+| `comments.service.ts`        | `/comments`, `/comments/:id/reply`, `/comments/:id/visibility`                      | Website feedback replies & visibility toggles                                                                       |
+| `package-reviews.service.ts` | `/comments/package-reviews`, `/comments/package-review/:id/reply`                   | Package review replies & public visibility toggles                                                                  |
+| `contact.service.ts`         | `/contacts`, `/contacts/:id`                                                        | Public Contact Us inquiry inbox & deletion                                                                          |
+| `users.service.ts`           | `/auth/users`, `/auth/users/:id/status`                                             | Customer listing & VIP / Access / Verified toggles                                                                  |
+| `legaldocs.service.ts`       | `/legal-docs`                                                                       | Multilingual Legal Document CMS CRUD                                                                                |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | Next.js `16.2.10` (App Router, Turbopack, React Compiler) |
-| **UI & Styling** | React `19.2`, Tailwind CSS `v4`, Shadcn / Base UI, Lucide React |
-| **Language** | TypeScript `5.x` |
-| **Charts** | Recharts `3.8` |
-| **Utilities** | `exifr` (EXIF metadata), `clsx`, `tailwind-merge`, `class-variance-authority` |
-| **Backend API** | NestJS + Drizzle ORM + PostgreSQL (`NEXT_PUBLIC_API_URL`) |
+| Layer            | Technology                                                                    |
+| :--------------- | :---------------------------------------------------------------------------- |
+| **Framework**    | Next.js `16.2.10` (App Router, Turbopack, React Compiler)                     |
+| **UI & Styling** | React `19.2`, Tailwind CSS `v4`, Shadcn / Base UI, Lucide React               |
+| **Language**     | TypeScript `5.x`                                                              |
+| **Charts**       | Recharts `3.8`                                                                |
+| **Utilities**    | `exifr` (EXIF metadata), `clsx`, `tailwind-merge`, `class-variance-authority` |
+| **Backend API**  | NestJS + Drizzle ORM + PostgreSQL (`NEXT_PUBLIC_API_URL`)                     |
 
 ---
 
@@ -419,11 +456,11 @@ npm install
 
 Create `admin-panel/.env.local`:
 
-| Variable | Required | Description |
-| :--- | :---: | :--- |
-| `NEXT_PUBLIC_API_URL` | Yes | Base URL of the Ikisaki Tours NestJS Backend API |
-| `NEXT_PUBLIC_ADMIN_API_KEY` | Yes | Admin API key for protected administrative endpoints |
-| `NEXT_PUBLIC_SITE_URL` | Optional | Canonical admin panel URL used for OpenGraph & Twitter `metadataBase` |
+| Variable                    | Required | Description                                                           |
+| :-------------------------- | :------: | :-------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`       |   Yes    | Base URL of the Ikisaki Tours NestJS Backend API                      |
+| `NEXT_PUBLIC_ADMIN_API_KEY` |   Yes    | Admin API key for protected administrative endpoints                  |
+| `NEXT_PUBLIC_SITE_URL`      | Optional | Canonical admin panel URL used for OpenGraph & Twitter `metadataBase` |
 
 ```env
 NEXT_PUBLIC_API_URL=https://ikisakitours-backend.vercel.app
@@ -456,6 +493,7 @@ npm run start
 To log into the Admin Panel, at least one **SUPER_ADMIN** user must exist in the database. The backend repository includes a dedicated seed CLI command to create the primary Super Admin account securely.
 
 #### A. Configure Backend `.env`
+
 In the **backend** repository (`ikisakitours-backend`), ensure the following environment variables are defined in your `.env` file:
 
 ```env
@@ -467,6 +505,7 @@ ADMIN_SESSION_COOKIE_SECRET=your_super_secret_cookie_encryption_key
 ```
 
 #### B. Execute the Seeding Script
+
 In the backend repository, run the seed command from your terminal:
 
 ```bash
@@ -475,6 +514,7 @@ npm run seed:admin
 ```
 
 **What this command does:**
+
 1. Verifies database connectivity to PostgreSQL via Drizzle ORM.
 2. Reads `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD` from `.env`.
 3. Hashes the password using `bcrypt` (12 rounds of salt).
@@ -482,20 +522,23 @@ npm run seed:admin
 5. Logs a clean success confirmation with the email and provisioned role.
 
 #### C. Local Development Login Credentials
+
 Once seeded, navigate to `http://localhost:3000/login` (or your production admin URL) and log in with:
 
-| Field | Development Value |
-| :--- | :--- |
-| **Email Address** | `admin@ikisakitours.com` *(or your custom `INITIAL_ADMIN_EMAIL`)* |
-| **Password** | `IkisakiAdmin2026!` *(or your custom `INITIAL_ADMIN_PASSWORD`)* |
-| **Provisioned Role** | `SUPER_ADMIN` |
+| Field                | Development Value                                                 |
+| :------------------- | :---------------------------------------------------------------- |
+| **Email Address**    | `admin@ikisakitours.com` _(or your custom `INITIAL_ADMIN_EMAIL`)_ |
+| **Password**         | `IkisakiAdmin2026!` _(or your custom `INITIAL_ADMIN_PASSWORD`)_   |
+| **Provisioned Role** | `SUPER_ADMIN`                                                     |
 
 > [!TIP]
 > **Production Recommendation:** For production environments, choose a strong, high-entropy password (minimum 16 characters with mixed cases, numbers, and symbols) for `INITIAL_ADMIN_PASSWORD` before running `npm run seed:admin`.
 
 #### D. Supabase Row Level Security (RLS) Configuration
+
 When executing the SQL table schema migrations in Supabase SQL Editor for Section 7 (`admin_users`, `admin_sessions`, `admin_audit_logs`), Supabase displays a modal:
-> *"Potential issue detected: This query creates tables without enabling Row Level Security. Clients using anon or authenticated keys may be able to access these tables."*
+
+> _"Potential issue detected: This query creates tables without enabling Row Level Security. Clients using anon or authenticated keys may be able to access these tables."_
 
 - **Always choose:** **`Run and enable RLS`** (the green button).
 - **Why this is critical:** Enabling RLS blocks public users with the Supabase `anon` API key from querying or modifying administrative tables via client REST endpoints. Since the NestJS backend connects directly to PostgreSQL using the database connection string (`DATABASE_URL`), it completely bypasses RLS with full administrative privileges while keeping the tables 100% shielded from public internet scraping.
@@ -534,23 +577,44 @@ When executing the SQL table schema migrations in Supabase SQL Editor for Sectio
 
 ## Credits & License
 
-| Attribute | Details |
-| :--- | :--- |
-| **Client & Owner** | **Ikisaki Tours (Pvt) Ltd** — [www.ikisakitours.com](https://www.ikisakitours.com) |
-| **Powered By** | **Aetheria Labs** |
-| **Engineered By** | **Pramod_Siriwardhana** & **Shehan_W** |
-| **License** | All rights reserved © 2026 Ikisaki Tours (Pvt) Ltd |
+<div align="center">
+
+<a href="https://pramod-siriwardhana.vercel.app/" target="_blank" rel="noopener noreferrer">
+  <img src="admin-panel/public/Layout-Icons/two2flod-readme-logo.webp" alt="Two2Flod Logo" width="84" height="84" />
+</a>
+
+### Luxury Travel Operations & Admin CMS Suite — Client & Engineering
+
+</div>
+
+| Attribute | Entity / Specification | Details |
+| :--- | :--- | :--- |
+| **Client & Business Owner** | **Ikisaki Tours (Private) Limited** | Sri Lanka Luxury Inbound Tour Operator · [www.ikisakitours.com](https://www.ikisakitours.com) · [`info@ikisakitours.com`](mailto:info@ikisakitours.com) |
+| **Technology Partner** | **Two2Flod** | Web Architecture, Bespoke UI/UX Design & Next-Gen Engineering · [Portfolio](https://pramod-siriwardhana.vercel.app/) |
+| **Lead Software Engineer** | **Pramod Siriwardhana** | Full-Stack Architecture, React 19 Engine, Cloudflare R2 Pipeline & Bilingual i18n Suite · [Profile](https://pramod-siriwardhana.vercel.app/) |
+| **Software Engineer** | **Shehan Wijekoon** | Core Engineering, UI Implementation & Module Integration · Two2Flod |
+| **Platform Ecosystem** | **Ikisaki Enterprise Suite** | Customer Web Platform (Next.js 16) · Admin CMS Panel (Next.js 16) · Core API (NestJS + PostgreSQL) |
+| **Intellectual Property Rights** | **All Rights Reserved** | Copyright © 2026 Ikisaki Tours (Private) Limited & Two2Flod ([`LICENSE`](./LICENSE)) |
 
 > [!IMPORTANT]
-> **Proprietary Software Notice:** This application and its source code are private, proprietary assets built exclusively for the internal operations of **Ikisaki Tours (Pvt) Ltd**. Unauthorized copying, modification, redistribution, or commercial use of any part of this repository without prior written consent is strictly prohibited.
+> **PROPRIETARY SOFTWARE — STRICTLY CONFIDENTIAL:**
+> This repository, including all source code, architecture, UI/UX designs, documentation, assets, localization files, and associated materials (collectively, the "Software"), is the exclusive, confidential, and proprietary intellectual property of **Ikisaki Tours (Private) Limited** ([www.ikisakitours.com](https://www.ikisakitours.com) / [`info@ikisakitours.com`](mailto:info@ikisakitours.com)) and **Two2Flod** (the "Rights Holders").
+>
+> No license, right, or permission—express or implied—is granted to any third party. Without prior, explicit, written authorization signed by authorized representatives of **BOTH** Ikisaki Tours (Private) Limited and Two2Flod, you are strictly prohibited from:
+> - **(a)** Using, running, or deploying the Software (in whole or in part) in any personal, educational, commercial, or production environment;
+> - **(b)** Copying, cloning, downloading, mirroring, scraping, or reproducing any part of the Software;
+> - **(c)** Modifying, adapting, translating, reverse-engineering, decompiling, or creating derivative works based on the Software;
+> - **(d)** Publishing, redistributing, selling, licensing, sublicensing, or sharing the Software or any modified version thereof on any platform, repository, or hosting service.
 
-> [!NOTE]
-> **Copyright © 2026 Ikisaki Tours (Pvt) Ltd. All rights reserved.**  
-> This repository and its source code, design assets, and localization dictionaries are proprietary and confidential. Unauthorized copying, redistribution, modification, or commercial use is strictly prohibited without prior written consent from Ikisaki Tours (Pvt) Ltd. See [`LICENSE`](./LICENSE) for full terms.
+> [!WARNING]
+> **LEGAL CONSEQUENCES & STATUTORY ENFORCEMENT:**
+> Any unauthorized access, copying, modification, distribution, deployment, or use of this Software or any portion thereof constitutes willful copyright infringement and misappropriation of proprietary intellectual property. Violators are subject to strict legal action, including but not limited to immediate DMCA takedown notices, injunctions, claims for monetary damages, and civil or criminal penalties under the **Intellectual Property Act, No. 36 of 2003 of Sri Lanka** and applicable international copyright laws and treaties.
+
 ---
 
 <div align="center">
 
-**© 2026 Ikisaki Tours (Pvt) Ltd** · Powered by **Aetheria Labs** · Engineered by **Pramod_Siriwardhana** & **Shehan_W**
+**© 2026 Ikisaki Tours (Private) Limited & Two2Flod** · All Rights Reserved  
+Client: [**Ikisaki Tours (Private) Limited**](https://www.ikisakitours.com) · Engineered by [**Pramod Siriwardhana**](https://pramod-siriwardhana.vercel.app/) & **Shehan Wijekoon** ([**Two2Flod**](https://pramod-siriwardhana.vercel.app/))
 
 </div>

@@ -36,7 +36,7 @@ export function getDisplayReference(booking: PackageBooking): string {
   if (booking.bookingReference && booking.bookingReference.trim()) {
     return booking.bookingReference.trim();
   }
-  return `REF-${booking.id.slice(0, 8).toUpperCase()}`;
+  return `IK-${booking.id.slice(0, 8).toUpperCase()}`;
 }
 
 export function getTotalPax(booking: PackageBooking): number {
