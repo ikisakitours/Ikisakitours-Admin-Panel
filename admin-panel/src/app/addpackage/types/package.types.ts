@@ -98,6 +98,7 @@ export interface PackageFormData {
   price: string;
   discount: string;
   provider: string;
+  gallery?: string[];
   activityDetails: ActivityDetail[];
   itinerary: ItineraryItem[];
   destinations: DestinationSnapshot[];

@@ -1,3 +1,5 @@
+import { uploadImagesDirectlyToR2 } from "@/services/uploads.service";
+
 export type DestinationLanguage = "en" | "ja" | "fr";
 
 export interface DestinationPayload {
@@ -32,8 +34,25 @@ export interface DestinationPreview {
   heroImage: string | null;
 }
 
+function parseErrorMessage(errorData: unknown, fallback: string): string {
+  if (!errorData) return fallback;
+  if (typeof errorData === "object" && errorData !== null) {
+    const errObj = errorData as Record<string, unknown>;
+    if (Array.isArray(errObj.message)) {
+      return errObj.message.join(", ");
+    }
+    if (typeof errObj.message === "string") {
+      return errObj.message;
+    }
+    if (typeof errObj.error === "string") {
+      return String(errObj.error);
+    }
+  }
+  return fallback;
+}
+
 class DestinationService {
-  private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  private API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
   private getHeaders(isJson: boolean = true): Record<string, string> {
     const adminKey = process.env.NEXT_PUBLIC_ADMIN_API_KEY || "";
@@ -45,28 +64,12 @@ class DestinationService {
     };
   }
 
-  // Step 1: Upload raw image files to Cloudflare R2 batch endpoint
-  async uploadImages(files: File[], folder: string = "destinations"): Promise<string[]> {
-    const formData = new FormData();
-    files.forEach((file) => formData.append("images", file));
-    formData.append("folder", folder);
-
-    const res = await fetch(`${this.API_URL}/uploads/batch`, {
-      method: "POST",
-      headers: this.getHeaders(false),
-      credentials: "include",
-      body: formData,
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to upload images to R2");
-    }
-
-    const data: { urls: string[] } = await res.json();
-    return data.urls;
+  // Upload optimized WebP images directly to Cloudflare R2
+  async uploadImages(files: File[], _folder: string = "destination-images"): Promise<string[]> {
+    return uploadImagesDirectlyToR2(files, "destination-images");
   }
 
-  // Step 2: Save destination payload (with R2 URLs) to database
+  // Save destination payload (pure application/json with Cloudflare R2 image URLs)
   async createDestination(payload: DestinationPayload) {
     const res = await fetch(`${this.API_URL}/destinations`, {
       method: "POST",
@@ -77,7 +80,7 @@ class DestinationService {
 
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to create destination");
+      throw new Error(parseErrorMessage(error, "Failed to create destination"));
     }
 
     return res.json();
@@ -93,7 +96,7 @@ class DestinationService {
 
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to fetch admin destinations");
+      throw new Error(parseErrorMessage(error, "Failed to fetch admin destinations"));
     }
 
     return res.json();
@@ -109,7 +112,7 @@ class DestinationService {
 
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to fetch destination details");
+      throw new Error(parseErrorMessage(error, "Failed to fetch destination details"));
     }
 
     return res.json();
@@ -126,7 +129,7 @@ class DestinationService {
 
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to update destination");
+      throw new Error(parseErrorMessage(error, "Failed to update destination"));
     }
 
     return res.json();
@@ -142,7 +145,7 @@ class DestinationService {
 
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to fetch destination previews");
+      throw new Error(parseErrorMessage(error, "Failed to fetch destination previews"));
     }
 
     return res.json();
@@ -159,7 +162,7 @@ class DestinationService {
 
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to fetch destination package previews");
+      throw new Error(parseErrorMessage(error, "Failed to fetch destination package previews"));
     }
 
     return res.json();
@@ -175,7 +178,7 @@ class DestinationService {
 
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Failed to delete destination");
+      throw new Error(parseErrorMessage(error, "Failed to delete destination"));
     }
 
     return res.json();

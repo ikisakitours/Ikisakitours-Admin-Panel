@@ -471,6 +471,7 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
                 $
               </span>
               <input
+                id="pkg_input_price"
                 type="number"
                 min="0"
                 step="any"

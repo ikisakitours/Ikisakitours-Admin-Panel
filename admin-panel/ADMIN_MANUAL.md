@@ -11,6 +11,7 @@
 - [1. System Requirements & Navigation](#1-system-requirements--navigation)
   - [1.1 Operational Reference ID Schema](#operational-reference-id-schema)
   - [1.2 Silent Auto-Save & Crash-Resilient Draft Recovery Guide (All Forms)](#12-silent-auto-save--crash-resilient-draft-recovery-guide-all-forms)
+  - [1.3 Real-Time Form Status Tracker & Multilingual Assistant (All Forms)](#13-real-time-form-status-tracker--multilingual-assistant-all-forms)
 - [2. Dashboard & Platform Analytics (`/dashboard`)](#2-dashboard--platform-analytics-dashboard)
 - [3. Bookings, Services & PDF Itinerary Studio (`/tours`, `/tourservices`, `/itinerary-editor`)](#3-bookings-services--pdf-itinerary-studio-tours-tourservices-itinerary-editor)
   - [3.1 Fixed Tour Bookings (`/tours`)](#fixed-tour-bookings-tours)
@@ -101,6 +102,35 @@ When you return to any form that has unsaved work, a floating amber card appears
 
 #### 5. Automatic Clean-Up
 As soon as you click **"Publish Package"**, **"Update Destination"**, **"Save Blog"**, or **"Update FAQ"** and the form successfully saves to the server, the temporary local draft is **automatically cleared**. You don't have to manually delete anything!
+
+---
+
+### 1.3 Real-Time Form Status Tracker & Multilingual Assistant (All Forms)
+
+> [!TIP]
+> **Complete Forms with Confidence:** When creating or editing complex items (Tour Packages, Destinations, Blogs, FAQs, Legal Policies, and Service Pricing/Notes), a real-time completion tracker helps you ensure that no field, description, or Japanese translation is accidentally missed!
+
+#### 1. Docked Floating Pill (Right Screen Edge)
+- A compact vertical pill is docked neatly along the right side of your screen:
+  - 🟢 **`100% FORM STATUS`**: All recommended English and Japanese fields are filled and ready to publish.
+  - 🔵 **`XX% FORM STATUS`**: Live completion percentage updating in real time as you type.
+- **Always Accessible:** The pill stays pinned to your screen as you scroll up and down long forms.
+
+#### 2. Slide-Out Quality Checklist Drawer
+Click the pill to open the slide-out checklist drawer:
+- **Comprehensive Field Inspection:** Inspects all key inputs—Titles, Category, Duration, Highlights, Overview, Itinerary days, Meals, Accommodations, and Translations.
+- **Status Badges:** Each item shows a clear status (e.g., `✓ Filled` or `Empty`), indicating whether it is in English (`EN`) or Japanese (`JA`).
+- **Filter Tabs:** Quickly filter between **`All`**, **`Empty`** (fields needing your attention), and **`Filled`** (completed fields).
+
+#### 3. 1-Click "Jump to field" with Auto-Language Switch & Focus Highlight
+Clicking any field row or the **`Jump to field →`** link triggers smart navigation:
+- **Auto-Close:** The drawer smoothly closes immediately so your view of the form is completely clear.
+- **Auto-Language Switching:** If the field belongs to another language (such as Japanese), the form automatically switches the active language tab for you.
+- **Smooth Auto-Scroll & Temporary Highlight:** The page smoothly scrolls directly to the exact input field and temporarily flashes a colored outline (`Rose` for empty fields, `Emerald` for filled fields) so your eyes land on the exact spot to type.
+- **Automatic Cursor Focus:** Your cursor is immediately placed inside the input field, ready for you to type without manual clicking.
+
+#### 4. Helpful Best-Practice Guidance
+- A clear English advice note at the bottom of the drawer reminds you of SEO benefits and prompts you to double-check all translations and details before publishing live to international travelers.
 
 ---
 
@@ -208,7 +238,7 @@ flowchart LR
 | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Package Title (Title 1)**              | Full tour name (e.g., `The Ultimate Sri Lanka Grand Explorer`).                                                                                   |
 | **Highlighted Words in Title (Title 2)** | Exact substring inside Title 1 to render in **Gold Italic** on the website (e.g., `Ultimate Sri Lanka`).                                          |
-| **URL Slug (Auto)**                      | Auto-generated **strictly from English Title 1** (e.g., `the-ultimate-sri-lanka-grand-explorer`). Changing Title 2 never modifies the slug.       |
+| **URL Slug (Auto & Read-Only)**          | Auto-generated **strictly from English Title 1** (e.g., `the-ultimate-sri-lanka-grand-explorer`). To prevent broken website links or manual typos, this field is strictly **read-only**. |
 | **Badge**                                | Choose from 18 conversion badges (`Best Seller`, `Top Rated`, `All-Inclusive Package`, `Instant Confirmation`, `UNESCO Heritage Explorer`, etc.). |
 
 > [!WARNING]
@@ -277,7 +307,10 @@ Open **`/addpackage`** (when creating a tour) or **`/managepackages` → Edit** 
 - **Dynamic Meals (`+ Add Meal`):** Add each meal as its own line so guests clearly see inclusions & exclusions (e.g., `Breakfast Included`, `Lunch Not Included`, `Gourmet Dinner Included`).
 - **Dynamic Accommodation (`+ Add Accommodation`):** List one or more hotel options per overnight stay (e.g., `Heritance Kandalama (5-Star)`, `Aliya Resort & Spa (4-Star)`). Each entry renders with its own gold icon on the website.
 - **Route Flow, Locations, Scenic Stops & Activities:** Fill in EN and JA for clean arrow-connected route pills and timelines.
-- **Gallery Images:** At least **1 high-resolution landscape photo** is mandatory for new packages (recommended `< 2MB`, WebP/JPG).
+- **Gallery Images & Interactive 16:9 Image Cropper:**
+  - At least **1 high-resolution landscape photo** is mandatory for new packages (recommended `< 2MB`, WebP/JPG).
+  - **Visual 16:9 Cropper:** Click the blue Crop icon (`✂`) on any uploaded photo card to open the cropper modal. You can pan, drag, and zoom the photo inside a fixed 16:9 widescreen frame to ensure the focal point (e.g. mountain peaks, monuments, or people) is perfectly centered without heads or scenery being cut off on customer screens.
+  - **Direct-to-WebP Compression:** Cropped images are automatically converted to optimized `.webp` format in real time, saving up to 80%–90% of file size (e.g., `80 MB → 385 KB`) with zero visible quality loss.
 
 ### 4.7 Editing Live Packages Safely (`/managepackages`)
 
@@ -361,10 +394,11 @@ Click **Edit** on any package row to modify text, badges, pricing tiers, add-ons
 ### How to Add & Edit Legal Policy Documents (`/legaldocs`)
 
 1. Open **`/legaldocs`** and click **New Document** in the left `DocumentSidebar` to open the **New Policy Document** modal.
-2. Enter **Document Title** (e.g., `Cancellation Policy`) — the unique **Document ID** auto-generates (`cancellation-policy`). Set **Eyebrow** (`Legal & Compliance`), **Accent Color**, and **Last Updated** date, then create.
+2. Enter **Document Title** (e.g., `Cancellation Policy`) — the unique **Document ID (Slug)** is automatically generated (`cancellation-policy`) and kept strictly **read-only** to ensure stable URLs. Set **Eyebrow** (`Legal & Compliance`), **Accent Color**, and **Last Updated** date, then create.
 3. Select the document in the sidebar and click **`+ Add Section`** to add ordered clauses (**Heading**, **Content**, and nested **Sub-Items**).
 4. Switch the top language switcher from **EN** to **JA** (or click **`+`**) and translate Title, Eyebrow, Sections, and Sub-Items.
-5. Click **Save Changes** to publish live to the website footer legal pages.
+5. Use the docked **Form Status Drawer** to ensure all section titles, paragraphs, and nested sub-item texts across English and Japanese are complete. Clicking any item automatically jumps to and highlights that exact field.
+6. Click **Save Changes** to publish live to the website footer legal pages.
 
 ### How to Record Daily Operations Logs (`/adminlogs`)
 

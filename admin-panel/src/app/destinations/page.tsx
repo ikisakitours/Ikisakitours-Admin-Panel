@@ -12,13 +12,13 @@ export default function DestinationsAdminPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 py-10 px-4 space-y-8">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="w-full max-w-7xl mx-auto">
         <h1 className="text-3xl font-extrabold text-slate-900">Destination Management</h1>
         <p className="text-slate-600 mt-1">Add and manage travel destinations across multiple languages.</p>
       </div>
 
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="w-full max-w-7xl mx-auto space-y-8">
         <DestinationForm onSuccess={handleSuccess} />
         <DestinationList refreshKey={refreshKey} />
       </div>

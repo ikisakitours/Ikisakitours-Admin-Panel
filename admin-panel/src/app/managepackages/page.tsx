@@ -11,11 +11,15 @@ import { PricingSection } from "@/app/addpackage/components/sections/PricingSect
 import { ActivitiesSection } from "@/app/addpackage/components/sections/ActivitiesSection";
 import { ItinerarySection } from "@/app/addpackage/components/sections/ItinerarySection";
 import { HighlightsAndExtras } from "@/app/addpackage/components/sections/HighlightsAndExtras";
+import { GallerySection } from "@/app/addpackage/components/sections/GallerySection";
 import { PackageDestinationPicker } from "../addpackage/components/sections/PackageDestinationPicker";
 import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
+import { uploadImagesDirectlyToR2 } from "@/services/uploads.service";
+import { formatBackendErrorMessage } from "@/utils/errorHelper";
+import FormReadinessDrawer, { FormReadinessItem } from "@/components/FormReadinessDrawer";
 import {
   ArrowLeft,
   Save,
@@ -39,6 +43,8 @@ export default function ManagePackagesPage() {
   const [loadingPackage, setLoadingPackage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<PackageFormData | null>(null);
+  const [existingGallery, setExistingGallery] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // Filters & Controls
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -117,29 +123,64 @@ export default function ManagePackagesPage() {
 
       setAvailableLanguages(Array.from(discoveredLangs));
       setFormData(data);
+      const rawGallery = (data as any).gallery || [];
+      setExistingGallery(Array.isArray(rawGallery) ? rawGallery : []);
+      setSelectedFiles([]);
     } catch (err: any) {
-      notify("Failed to load package details: " + err.message, "error");
+      notify("Failed to load package details: " + formatBackendErrorMessage(err), "error");
       setEditingSlug(null);
     } finally {
       setLoadingPackage(false);
     }
   };
 
-  // Submit text-only updates via PATCH
+  const handleRemoveExistingImage = (index: number) => {
+    setExistingGallery((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Submit updates via PATCH with Cloudflare R2 gallery URLs
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData || !editingSlug) return;
 
+    // Smart Validation: Only core required fields
+    const englishTitle = formData.title?.en?.trim() || Object.values(formData.title || {})[0]?.trim();
+    if (!englishTitle) {
+      notify("Please provide a title for the package (English title required).", "warning");
+      return;
+    }
+    if (!formData.slug?.trim()) {
+      notify("Package slug is required.", "warning");
+      return;
+    }
+    const priceNum = Number(formData.price);
+    if (isNaN(priceNum) || priceNum < 0) {
+      notify("Please enter a valid base price (>= 0).", "warning");
+      return;
+    }
+    if (existingGallery.length + selectedFiles.length === 0) {
+      notify("Please keep or attach at least one gallery image.", "warning");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      await packageService.updatePackageTextOnly(editingSlug, formData);
+      let newUploadedUrls: string[] = [];
+      if (selectedFiles.length > 0) {
+        newUploadedUrls = await uploadImagesDirectlyToR2(selectedFiles, "package-images");
+      }
+      const finalGallery = [...existingGallery, ...newUploadedUrls];
+
+      await packageService.updatePackage(editingSlug, formData, finalGallery);
       clearDraft();
       notify("Package updated successfully!", "success");
       setEditingSlug(null);
       setFormData(null);
+      setExistingGallery([]);
+      setSelectedFiles([]);
       fetchPackages();
     } catch (err: any) {
-      notify("Error updating package: " + err.message, "error");
+      notify("Error updating package: " + formatBackendErrorMessage(err), "error");
     } finally {
       setSubmitting(false);
     }
@@ -178,7 +219,7 @@ export default function ManagePackagesPage() {
       notify(`Package "${pkgToDelete.slug}" deleted successfully.`, "info");
       setPkgToDelete(null);
     } catch (err: any) {
-      notify(err.message || "Failed to delete package", "error");
+      notify(formatBackendErrorMessage(err) || "Failed to delete package", "error");
     } finally {
       setDeletingSlug(null);
     }
@@ -198,7 +239,7 @@ export default function ManagePackagesPage() {
         newLiveStatus ? "success" : "info"
       );
     } catch (err: any) {
-      notify(err.message || "Failed to update package visibility", "error");
+      notify(formatBackendErrorMessage(err) || "Failed to update package visibility", "error");
     } finally {
       setUpdatingSlug(null);
     }
@@ -240,6 +281,246 @@ export default function ManagePackagesPage() {
     setTypeFilter("all");
     setVisibilityFilter("all");
   };
+
+  // Form readiness tracking for Package Editor
+  const readinessItems: FormReadinessItem[] = useMemo(() => {
+    if (!formData) return [];
+    return [
+      {
+        id: "pkg-title-en",
+        label: "Package Title (English)",
+        isComplete: Boolean(formData.title?.en?.trim()),
+        elementId: "pkg_input_title",
+        targetLang: "en",
+        hint: "Primary package headline in English",
+      },
+      {
+        id: "pkg-title-ja",
+        label: "Package Title (Japanese)",
+        isComplete: Boolean(formData.title?.ja?.trim()),
+        elementId: "pkg_input_title",
+        targetLang: "ja",
+        hint: "Japanese translation of the title",
+      },
+      {
+        id: "pkg-emphasis-en",
+        label: "Title Highlight Words (English)",
+        isComplete: Boolean(formData.titleEmphasis?.en?.trim()),
+        elementId: "pkg_input_emphasis",
+        targetLang: "en",
+        hint: "Words displayed in gold emphasis (EN)",
+      },
+      {
+        id: "pkg-emphasis-ja",
+        label: "Title Highlight Words (Japanese)",
+        isComplete: Boolean(formData.titleEmphasis?.ja?.trim()),
+        elementId: "pkg_input_emphasis",
+        targetLang: "ja",
+        hint: "Words displayed in gold emphasis (JA)",
+      },
+      {
+        id: "pkg-slug",
+        label: "URL Slug",
+        isComplete: Boolean(formData.slug?.trim()),
+        elementId: "pkg_input_slug",
+        hint: "Auto-generated web address slug (Read-only)",
+      },
+      {
+        id: "pkg-category-en",
+        label: "Category (English)",
+        isComplete: Boolean(formData.category?.en?.trim()),
+        elementId: "pkg_input_category",
+        targetLang: "en",
+        hint: "Tour category e.g. Adventure, Wildlife (EN)",
+      },
+      {
+        id: "pkg-category-ja",
+        label: "Category (Japanese)",
+        isComplete: Boolean(formData.category?.ja?.trim()),
+        elementId: "pkg_input_category",
+        targetLang: "ja",
+        hint: "Tour category (JA)",
+      },
+      {
+        id: "pkg-origin-en",
+        label: "Origin / Departure (English)",
+        isComplete: Boolean(formData.origin?.en?.trim()),
+        elementId: "pkg_input_origin",
+        targetLang: "en",
+        hint: "Starting point e.g. Colombo (EN)",
+      },
+      {
+        id: "pkg-origin-ja",
+        label: "Origin / Departure (Japanese)",
+        isComplete: Boolean(formData.origin?.ja?.trim()),
+        elementId: "pkg_input_origin",
+        targetLang: "ja",
+        hint: "Starting point (JA)",
+      },
+      {
+        id: "pkg-duration-en",
+        label: "Duration (English)",
+        isComplete: Boolean(formData.duration?.en?.trim()),
+        elementId: "pkg_input_duration",
+        targetLang: "en",
+        hint: "e.g. 5 Days / 4 Nights (EN)",
+      },
+      {
+        id: "pkg-duration-ja",
+        label: "Duration (Japanese)",
+        isComplete: Boolean(formData.duration?.ja?.trim()),
+        elementId: "pkg_input_duration",
+        targetLang: "ja",
+        hint: "Duration in Japanese (JA)",
+      },
+      {
+        id: "pkg-provider",
+        label: "Tour Provider",
+        isComplete: Boolean(formData.provider?.trim()),
+        elementId: "pkg_input_provider",
+        hint: "Operator name (e.g. Ikisaki Tours)",
+      },
+      {
+        id: "pkg-price",
+        label: "Base Starting Price ($)",
+        isComplete: Number(formData.price) >= 0 && formData.price !== "",
+        elementId: "pkg_input_price",
+        hint: "Starting rate per adult in USD",
+      },
+      {
+        id: "pkg-gallery",
+        label: "Gallery Photos (≥ 1 Photo)",
+        isComplete: existingGallery.length + selectedFiles.length > 0,
+        elementId: "pkg_input_gallery",
+        hint: "At least one showcase tour photo",
+      },
+      {
+        id: "pkg-destinations",
+        label: "Destinations Sequence (≥ 1)",
+        isComplete: Boolean(formData.destinations && formData.destinations.length > 0),
+        elementId: "pkg_input_destinations",
+        hint: "Ordered list of tour stops",
+      },
+      {
+        id: "pkg-lead-title-en",
+        label: "Lead Title (English)",
+        isComplete: Boolean(formData.leadTitle?.en?.trim()),
+        elementId: "edit_pkg_input_lead_title",
+        targetLang: "en",
+        hint: "Short hero card teaser headline (EN)",
+      },
+      {
+        id: "pkg-lead-title-ja",
+        label: "Lead Title (Japanese)",
+        isComplete: Boolean(formData.leadTitle?.ja?.trim()),
+        elementId: "edit_pkg_input_lead_title",
+        targetLang: "ja",
+        hint: "Short hero card teaser headline (JA)",
+      },
+      {
+        id: "pkg-lead-desc-en",
+        label: "Lead Description (English)",
+        isComplete: Boolean(formData.leadDescription?.en?.trim()),
+        elementId: "edit_pkg_input_lead_desc",
+        targetLang: "en",
+        hint: "Teaser description for listings (EN)",
+      },
+      {
+        id: "pkg-lead-desc-ja",
+        label: "Lead Description (Japanese)",
+        isComplete: Boolean(formData.leadDescription?.ja?.trim()),
+        elementId: "edit_pkg_input_lead_desc",
+        targetLang: "ja",
+        hint: "Teaser description for listings (JA)",
+      },
+      {
+        id: "pkg-itinerary",
+        label: "Itinerary Schedule (Day 1)",
+        isComplete: Boolean(
+          formData.itinerary &&
+          formData.itinerary.length > 0 &&
+          (formData.itinerary[0]?.title?.en?.trim() || formData.itinerary[0]?.title?.[locale]?.trim())
+        ),
+        elementId: "edit-package-itinerary-section",
+        hint: "Day-by-day itinerary schedule and locations",
+      },
+      {
+        id: "pkg-activities",
+        label: "Activities & Experiences (≥ 1)",
+        isComplete: Boolean(
+          formData.activityDetails &&
+          formData.activityDetails.length > 0 &&
+          (formData.activityDetails[0]?.title?.en?.trim() || formData.activityDetails[0]?.title?.[locale]?.trim())
+        ),
+        elementId: "edit-package-activities-section",
+        hint: "Key activities included in tour",
+      },
+      {
+        id: "pkg-highlights-en",
+        label: "Key Highlights (English)",
+        isComplete: (formData.highlights?.en || []).filter((h) => h?.trim?.() !== "").length > 0,
+        elementId: "edit-package-highlights-section",
+        targetLang: "en",
+        hint: "Bullet points of top attractions (EN)",
+      },
+      {
+        id: "pkg-highlights-ja",
+        label: "Key Highlights (Japanese)",
+        isComplete: (formData.highlights?.ja || []).filter((h) => h?.trim?.() !== "").length > 0,
+        elementId: "edit-package-highlights-section",
+        targetLang: "ja",
+        hint: "Bullet points of top attractions (JA)",
+      },
+      {
+        id: "pkg-includes-en",
+        label: "Inclusions (English)",
+        isComplete: (formData.includes?.en || []).filter((i) => i?.trim?.() !== "").length > 0,
+        elementId: "edit-package-highlights-section",
+        targetLang: "en",
+        hint: "What is included in this package (EN)",
+      },
+      {
+        id: "pkg-includes-ja",
+        label: "Inclusions (Japanese)",
+        isComplete: (formData.includes?.ja || []).filter((i) => i?.trim?.() !== "").length > 0,
+        elementId: "edit-package-highlights-section",
+        targetLang: "ja",
+        hint: "What is included in this package (JA)",
+      },
+      {
+        id: "pkg-excludes-en",
+        label: "Exclusions (English)",
+        isComplete: (formData.excludes?.en || []).filter((e) => e?.trim?.() !== "").length > 0,
+        elementId: "edit-package-highlights-section",
+        targetLang: "en",
+        hint: "What is excluded from package (EN)",
+      },
+      {
+        id: "pkg-excludes-ja",
+        label: "Exclusions (Japanese)",
+        isComplete: (formData.excludes?.ja || []).filter((e) => e?.trim?.() !== "").length > 0,
+        elementId: "edit-package-highlights-section",
+        targetLang: "ja",
+        hint: "What is excluded from package (JA)",
+      },
+      {
+        id: "pkg-description-en",
+        label: "Detailed Description (English)",
+        isComplete: Boolean(formData.description?.en?.trim()),
+        elementId: "edit_pkg_input_description",
+        targetLang: "en",
+        hint: "Full background narrative (EN)",
+      },
+      {
+        id: "pkg-description-ja",
+        label: "Detailed Description (Japanese)",
+        isComplete: Boolean(formData.description?.ja?.trim()),
+        elementId: "edit_pkg_input_description",
+        targetLang: "ja",
+        hint: "Full background narrative (JA)",
+      },
+    ];
+  }, [formData, locale, existingGallery.length, selectedFiles.length]);
 
   // Helper type-safe setter for sub-components
   const safeSetFormData = setFormData as React.Dispatch<React.SetStateAction<PackageFormData>>;
@@ -556,19 +837,40 @@ export default function ManagePackagesPage() {
                   className="w-full space-y-8 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200 shadow-xs"
                 >
                 {/* Pass locale down to all sections */}
-                <BasicOverviewSection formData={formData} setFormData={safeSetFormData} locale={locale} />
-                <PricingSection formData={formData} setFormData={safeSetFormData} locale={locale} />
-                <PackageDestinationPicker
-                  selectedDestinations={formData.destinations}
-                  onChange={(destinations) => setFormData({ ...formData, destinations })}
-                  locale={locale}
-                />
-                <ActivitiesSection formData={formData} setFormData={safeSetFormData} locale={locale} />
-                <ItinerarySection formData={formData} setFormData={safeSetFormData} locale={locale} />
-                <HighlightsAndExtras formData={formData} setFormData={safeSetFormData} locale={locale} />
+                <div id="edit-package-basic-overview">
+                  <BasicOverviewSection formData={formData} setFormData={safeSetFormData} locale={locale} />
+                </div>
+                <div id="edit-package-pricing-section">
+                  <PricingSection formData={formData} setFormData={safeSetFormData} locale={locale} />
+                </div>
+                <div id="edit-package-gallery-section">
+                  <GallerySection
+                    existingUrls={existingGallery}
+                    onRemoveExisting={handleRemoveExistingImage}
+                    selectedFiles={selectedFiles}
+                    setSelectedFiles={setSelectedFiles}
+                    disabled={submitting}
+                  />
+                </div>
+                <div id="edit-package-destination-picker">
+                  <PackageDestinationPicker
+                    selectedDestinations={formData.destinations}
+                    onChange={(destinations) => setFormData({ ...formData, destinations })}
+                    locale={locale}
+                  />
+                </div>
+                <div id="edit-package-activities-section">
+                  <ActivitiesSection formData={formData} setFormData={safeSetFormData} locale={locale} />
+                </div>
+                <div id="edit-package-itinerary-section">
+                  <ItinerarySection formData={formData} setFormData={safeSetFormData} locale={locale} />
+                </div>
+                <div id="edit-package-highlights-section">
+                  <HighlightsAndExtras formData={formData} setFormData={safeSetFormData} locale={locale} />
+                </div>
 
                 {/* Lead Header Info */}
-                <div className="space-y-4 pt-4 border-t border-slate-100">
+                <div id="edit-package-lead-header" className="space-y-4 pt-4 border-t border-slate-100">
                   <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                     Lead Header Information ({locale.toUpperCase()})
                   </h3>
@@ -578,11 +880,12 @@ export default function ManagePackagesPage() {
                         Lead Title ({locale.toUpperCase()})
                       </label>
                       <input
+                        id="edit_pkg_input_lead_title"
                         type="text"
                         required={locale === "en"}
                         value={formData.leadTitle?.[locale] || ""}
                         onChange={(e) => handleRecordChange("leadTitle", e.target.value)}
-                        className="w-full text-xs border border-slate-200 rounded-xl p-2.5 outline-none focus:border-emerald-500"
+                        className="w-full text-xs border border-slate-200 rounded-xl p-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
                       />
                     </div>
                     <div>
@@ -590,29 +893,42 @@ export default function ManagePackagesPage() {
                         Lead Description ({locale.toUpperCase()})
                       </label>
                       <input
+                        id="edit_pkg_input_lead_desc"
                         type="text"
                         required={locale === "en"}
                         value={formData.leadDescription?.[locale] || ""}
                         onChange={(e) => handleRecordChange("leadDescription", e.target.value)}
-                        className="w-full text-xs border border-slate-200 rounded-xl p-2.5 outline-none focus:border-emerald-500"
+                        className="w-full text-xs border border-slate-200 rounded-xl p-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Detailed Description */}
-                <div className="space-y-2 pt-4 border-t border-slate-100">
+                <div id="edit-package-description-section" className="space-y-2 pt-4 border-t border-slate-100">
                   <label className="block text-xs font-semibold text-slate-600">
                     Detailed Description ({locale.toUpperCase()})
                   </label>
                   <textarea
+                    id="edit_pkg_input_description"
                     rows={4}
                     required={locale === "en"}
                     value={formData.description?.[locale] || ""}
                     onChange={(e) => handleRecordChange("description", e.target.value)}
-                    className="w-full text-xs border border-slate-200 rounded-xl p-2.5 outline-none resize-y focus:border-emerald-500"
+                    className="w-full text-xs border border-slate-200 rounded-xl p-2.5 outline-none resize-y focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
                   />
                 </div>
+
+                {/* Form Completion & Readiness Assistant */}
+                <FormReadinessDrawer
+                  items={readinessItems}
+                  entityTitle={formData.title?.[locale] || formData.title?.en || "Tour Package"}
+                  onNavigateToField={(item) => {
+                    if (item.targetLang) {
+                      setLocale(item.targetLang);
+                    }
+                  }}
+                />
 
                 {/* FOOTER ACTIONS */}
                 <div className="flex items-center justify-between pt-6 border-t border-slate-100">
@@ -621,6 +937,8 @@ export default function ManagePackagesPage() {
                     onClick={() => {
                       setEditingSlug(null);
                       setFormData(null);
+                      setExistingGallery([]);
+                      setSelectedFiles([]);
                     }}
                     className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer"
                   >

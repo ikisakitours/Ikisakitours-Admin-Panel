@@ -25,6 +25,7 @@ import {
 } from "@/services/servicepricing.service";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
+import { FormReadinessDrawer, FormReadinessItem } from "@/components/FormReadinessDrawer";
 import CharterRatesForm from "./CharterServiceRatesForm";
 import CustomTourForm from "./CustomTourForm";
 import TransferRatesForm from "./TransferRatesForm";
@@ -158,8 +159,92 @@ export default function CharterPricingManager() {
     }
   };
 
+  // Comprehensive Service Pricing Field Checklist across the active tab
+  const readinessItems: FormReadinessItem[] = [
+    {
+      id: "pricing_active_tab",
+      label: `Service Tab: ${activeTab.toUpperCase()}`,
+      isComplete: true,
+      elementId: "pricing_tab_buttons",
+      hint: `Currently configuring ${activeTab} service pricing`,
+    },
+    {
+      id: "pricing_title_base_en",
+      label: `${activeTab.toUpperCase()} Base Title (English)`,
+      isComplete: Boolean(currentPricingConfig?.titleBase?.en?.trim()),
+      elementId: "pricing_input_title_base",
+      targetLang: "en",
+      hint: "Main headline base text (EN)",
+    },
+    {
+      id: "pricing_title_base_ja",
+      label: `${activeTab.toUpperCase()} Base Title (Japanese)`,
+      isComplete: Boolean(currentPricingConfig?.titleBase?.ja?.trim()),
+      elementId: "pricing_input_title_base",
+      targetLang: "ja",
+      hint: "Main headline base text (JA)",
+    },
+    {
+      id: "pricing_title_accent_en",
+      label: `${activeTab.toUpperCase()} Accent Title (English)`,
+      isComplete: Boolean(currentPricingConfig?.titleAccent?.en?.trim()),
+      elementId: "pricing_input_title_accent",
+      targetLang: "en",
+      hint: "Highlighted accent headline text (EN)",
+    },
+    {
+      id: "pricing_title_accent_ja",
+      label: `${activeTab.toUpperCase()} Accent Title (Japanese)`,
+      isComplete: Boolean(currentPricingConfig?.titleAccent?.ja?.trim()),
+      elementId: "pricing_input_title_accent",
+      targetLang: "ja",
+      hint: "Highlighted accent headline text (JA)",
+    },
+    {
+      id: "pricing_subtitle_en",
+      label: `${activeTab.toUpperCase()} Subtitle (English)`,
+      isComplete: Boolean(currentPricingConfig?.subtitle?.en?.trim()),
+      elementId: "pricing_input_subtitle",
+      targetLang: "en",
+      hint: "Service pricing subtitle description (EN)",
+    },
+    {
+      id: "pricing_subtitle_ja",
+      label: `${activeTab.toUpperCase()} Subtitle (Japanese)`,
+      isComplete: Boolean(currentPricingConfig?.subtitle?.ja?.trim()),
+      elementId: "pricing_input_subtitle",
+      targetLang: "ja",
+      hint: "Service pricing subtitle description (JA)",
+    },
+    {
+      id: "pricing_notes_en",
+      label: `${activeTab.toUpperCase()} Bullet Notes (English)`,
+      isComplete: (currentPricingConfig?.notes?.en || []).filter((n) => n?.trim()).length > 0,
+      elementId: "pricing_input_notes",
+      targetLang: "en",
+      hint: "Important pricing notes & conditions (EN)",
+    },
+    {
+      id: "pricing_notes_ja",
+      label: `${activeTab.toUpperCase()} Bullet Notes (Japanese)`,
+      isComplete: (currentPricingConfig?.notes?.ja || []).filter((n) => n?.trim()).length > 0,
+      elementId: "pricing_input_notes",
+      targetLang: "ja",
+      hint: "Important pricing notes & conditions (JA)",
+    },
+  ];
+
   return (
     <div className="w-full space-y-6">
+      <FormReadinessDrawer
+        items={readinessItems}
+        entityTitle="Service Pricing"
+        onNavigateToField={(item) => {
+          if (item.targetLang) {
+            setLocale(item.targetLang);
+          }
+        }}
+      />
       {/* ── Page Header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3 pb-5 border-b border-slate-200">
         <div>
@@ -245,7 +330,7 @@ export default function CharterPricingManager() {
         )}
 
         {/* ── Multi-Section Switcher Tabs ──────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 relative z-0">
+        <div id="pricing_tab_buttons" className="grid grid-cols-1 md:grid-cols-3 gap-3 relative z-0">
           <button
             type="button"
             onClick={() => setActiveTab("charter")}
@@ -318,6 +403,7 @@ export default function CharterPricingManager() {
 
         {/* ── Main Content: Editor Form ────────────────────────────────────── */}
         <form
+          id="pricing_active_form_container"
           onSubmit={handleSave}
           className="w-full space-y-6 p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 shadow-xs"
         >

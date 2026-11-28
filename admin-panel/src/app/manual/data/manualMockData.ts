@@ -630,13 +630,14 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         ],
       },
       {
-        title: "Gallery Images & Destination Sequence Picker",
+        title: "Gallery Images, 16:9 Cropper & Destination Sequence Picker",
         icon: "images",
         iconColorClass: "text-pink-600",
-        summary: "Visual storytelling & route linking for every package.",
+        summary: "Visual storytelling, interactive 16:9 cropping & route linking for every package.",
         bullets: [
           "At least 1 Gallery Image is mandatory when creating a new tour package (JSON upload does not attach image files).",
-          "Upload crisp landscape photos (16:9 or 4:3 aspect ratio, preferably WebP/JPG under 2MB each).",
+          "Interactive 16:9 Image Cropper: Click the blue Crop icon (✂) on any photo card to visually drag, zoom, and frame the 16:9 widescreen view without cutting off scenic landmarks or people.",
+          "Automatic WebP Compression: Cropped photos are instantly compressed into ultra-fast .webp format, saving up to 80%–90% of file size while keeping images sharp and crisp.",
           "Use the Destination Sequence Picker to attach pre-created destinations in exact chronological order.",
         ],
       },
@@ -968,9 +969,10 @@ export const GENERIC_GUIDE_SECTIONS: Record<
         badges: ["New Policy Modal", "Sections & Sub-Items", "EN / JA / +"],
         steps: [
           "Open /legaldocs and click 'New Document' in the left DocumentSidebar to open the New Policy Document modal.",
-          "Enter Document Title (e.g. Cancellation Policy) — the unique Document ID auto-generates (e.g. cancellation-policy). Set Eyebrow label (e.g. Legal & Compliance), Accent Color, and Last Updated date, then submit.",
-          "Select the document from the left sidebar and click '+ Add Section' to add structured clauses (Heading, Content, and optional nested Sub-Items with title + body).",
+          "Enter Document Title (e.g. Cancellation Policy) — the unique Document ID (Slug) is automatically generated and kept strictly read-only to ensure permanent, unbroken web links. Set Eyebrow label, Accent Color, and Last Updated date, then submit.",
+          "Select the document from the left sidebar and click '+ Add Section' to add structured clauses (Heading, Content, and optional nested Sub-Items with individual titles and descriptions).",
           "Switch the top language tab from EN to JA (or click + to add another language) and translate Title, Eyebrow, Sections, and Sub-Items.",
+          "Use the docked Form Status Drawer on the right to track completion: clicking any empty section or sub-item automatically closes the drawer, switches language tabs, and scrolls directly to that exact input field.",
           "Click Save Changes to publish your updated policy live to the website footer pages.",
         ],
         bullets: [
@@ -1138,6 +1140,13 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "Clicking dates on the calendar stages local unsaved changes only — the backend is not updated until you click Save Changes.",
     solution:
       "Check the ClosedDatesList summary and click the top 'Save Changes' button. Wait for the green Saved confirmation before leaving /newupdates.",
+  },
+  {
+    question: "Why is the URL Slug or Legal Document ID field greyed out / read-only?",
+    module: "All Forms",
+    cause: "Slugs and Document IDs are automatically generated from English titles to protect website search engine rankings and prevent broken links or formatting errors.",
+    solution:
+      "To update the slug of a package, destination, blog, or legal document, simply update the English Title. The system will automatically and safely sync the slug.",
   },
   {
     question: "Legal Policy modal says 'This ID is already in use' or edits disappear on refresh",

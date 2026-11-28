@@ -84,6 +84,37 @@ export function PackagesTitleHighlightSection() {
           </div>
         </div>
 
+        {/* Real-Time Form Status Tracker & Multilingual Field Assistant */}
+        <div className="rounded-2xl border border-indigo-300/80 bg-indigo-50/70 p-4 sm:p-5 space-y-2.5">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h4 className="text-xs font-extrabold text-indigo-950 flex items-center gap-2 uppercase tracking-wider">
+              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+              Real-Time Form Status Tracker &amp; 1-Click Field Jumper
+            </h4>
+            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-indigo-200/80 text-indigo-800">
+              Docked on Right Edge
+            </span>
+          </div>
+          <p className="text-xs text-indigo-950/90 leading-relaxed">
+            A vertical badge docked on the right screen edge displays your live form completion percentage (e.g.{" "}
+            <strong>100% FORM STATUS</strong>). Click it anytime to open a comprehensive field inspection drawer.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-[11px] text-indigo-950">
+            <div className="bg-white/80 rounded-xl p-2.5 border border-indigo-200/80">
+              <strong className="block font-bold text-indigo-800 mb-0.5">📋 Smart Field Checklist</strong>
+              Inspects every English &amp; Japanese field (Titles, Categories, Itinerary days, Meals, Accommodations) with <code>Filled</code> or <code>Empty</code> indicators.
+            </div>
+            <div className="bg-white/80 rounded-xl p-2.5 border border-indigo-200/80">
+              <strong className="block font-bold text-indigo-800 mb-0.5">🌐 Auto-Language Switch</strong>
+              Clicking any Japanese field automatically switches the form tab to <strong>JA</strong> before jumping, so you never have to manually switch tabs.
+            </div>
+            <div className="bg-white/80 rounded-xl p-2.5 border border-indigo-200/80">
+              <strong className="block font-bold text-indigo-800 mb-0.5">🎯 Exact Focus &amp; Highlight</strong>
+              Drawer auto-closes, the screen smoothly scrolls to the exact input, and a colored outline highlights the field with your cursor ready to type.
+            </div>
+          </div>
+        </div>
+
         {/* Critical Title 1 vs Title 2 Gold Highlight Rule */}
         <div className="rounded-2xl border border-amber-300/80 bg-amber-50/70 p-5 space-y-3">
           <div className="flex items-center gap-2 text-amber-900">

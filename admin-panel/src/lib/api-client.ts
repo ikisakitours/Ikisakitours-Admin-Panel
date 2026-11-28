@@ -28,7 +28,10 @@ export async function fetcher<T>(endpoint: string, options: RequestInit = {}): P
       }
       throw new Error('Your administrative session has timed out. Please sign in again.');
     }
-    throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
+    const message = Array.isArray(errorData.message)
+      ? errorData.message.join(", ")
+      : errorData.message || `API Error: ${response.status} ${response.statusText}`;
+    throw new Error(message);
   }
 
   return response.json();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -171,6 +171,7 @@ function SubItemEditor({
               Title ({langLabel})
             </label>
             <input
+              id={`legal_subitem_title_${item.id}`}
               type="text"
               value={item.title?.[locale] ?? ""}
               onChange={(e) => updateLocalized("title", e.target.value)}
@@ -187,6 +188,7 @@ function SubItemEditor({
               : `Body / Description (${langLabel})`}
           </label>
           <input
+            id={`legal_subitem_body_${item.id}`}
             type="text"
             value={item.body?.[locale] ?? ""}
             onChange={(e) => updateLocalized("body", e.target.value)}
@@ -229,9 +231,21 @@ export default function SectionEditor({
   onUpdate,
   onDelete,
 }: SectionEditorProps) {
-  const [expanded, setExpanded] = useState(section.expanded ?? false);
+  const [expanded, setExpanded] = useState(section.expanded ?? true);
 
-  const toggle = () => setExpanded((v: boolean) => !v);
+  useEffect(() => {
+    if (section.expanded !== undefined) {
+      setExpanded(section.expanded);
+    }
+  }, [section.expanded]);
+
+  const toggle = () => {
+    setExpanded((v: boolean) => {
+      const next = !v;
+      onUpdate({ ...section, expanded: next });
+      return next;
+    });
+  };
   const langLabel = locale.toUpperCase();
 
   const updateLocalized = (field: "heading" | "content", val: string) => {
@@ -273,7 +287,11 @@ export default function SectionEditor({
   const displayHeading = resolveLocalized(section.heading, locale);
 
   return (
-    <div className="border border-slate-200 rounded-xl overflow-hidden transition-all">
+    <div
+      id={`legal_section_card_${section.id}`}
+      data-element-id={`legal_section_card_${index}`}
+      className="border border-slate-200 rounded-xl overflow-hidden transition-all"
+    >
       {/* ── Section Header Bar ── */}
       <div
         className="flex items-center gap-3 px-4 py-3 bg-white cursor-pointer select-none hover:bg-slate-50/70 transition-colors"
@@ -373,6 +391,8 @@ export default function SectionEditor({
                 Section Heading ({langLabel}) *
               </label>
               <input
+                id={`legal_input_heading_${section.id}`}
+                data-element-id={`legal_input_heading_${index}`}
                 type="text"
                 value={section.heading?.[locale] ?? ""}
                 onChange={(e) => updateLocalized("heading", e.target.value)}
@@ -416,6 +436,8 @@ export default function SectionEditor({
                 Paragraph Content ({langLabel}) *
               </label>
               <textarea
+                id={`legal_input_content_${section.id}`}
+                data-element-id={`legal_input_content_${index}`}
                 rows={4}
                 value={section.content?.[locale] ?? ""}
                 onChange={(e) => updateLocalized("content", e.target.value)}

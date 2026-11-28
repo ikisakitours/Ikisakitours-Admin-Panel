@@ -19,6 +19,7 @@ import { DestinationCardList } from "./components/DestinationCardList";
 import { DestinationSummaryBar } from "./components/DestinationSummaryBar";
 import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
+import { formatBackendErrorMessage } from "@/utils/errorHelper";
 
 export default function ManageDestinationsPage() {
   const [destinations, setDestinations] = useState<DestinationPayload[]>([]);
@@ -146,7 +147,7 @@ export default function ManageDestinationsPage() {
         newIsLive ? "success" : "info"
       );
     } catch (err: any) {
-      notify(err.message || "Failed to update destination visibility", "error");
+      notify(formatBackendErrorMessage(err) || "Failed to update destination visibility", "error");
     } finally {
       setUpdatingId(null);
     }
@@ -163,7 +164,7 @@ export default function ManageDestinationsPage() {
       notify("Destination removed from database.", "info");
       setDestToDelete(null);
     } catch (err: any) {
-      notify(err.message || "Failed to delete destination", "error");
+      notify(formatBackendErrorMessage(err) || "Failed to delete destination", "error");
     } finally {
       setDeletingId(null);
     }

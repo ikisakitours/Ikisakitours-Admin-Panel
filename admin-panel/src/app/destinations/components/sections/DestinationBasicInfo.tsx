@@ -54,6 +54,7 @@ export default function DestinationBasicInfo({
             Title ({language.toUpperCase()})
           </label>
           <input
+            id="dest_input_title"
             type="text"
             required
             value={title[language] || ""}
@@ -65,13 +66,14 @@ export default function DestinationBasicInfo({
 
         <div>
           <label className="block text-xs font-semibold mb-1">
-            URL Slug <span className="text-slate-400 font-normal">(Shared across languages)</span>
+            URL Slug <span className="text-slate-400 font-normal">(Auto-generated & Read-only)</span>
           </label>
           <input
+            id="dest_input_slug"
             type="text"
             value={slug}
-            onChange={onSlugChange}
-            className="w-full text-xs border rounded-lg p-2.5 bg-slate-50 outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-slate-600 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300"
+            readOnly
+            className="w-full text-xs border rounded-lg p-2.5 bg-slate-100/90 outline-none font-mono text-slate-500 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
             placeholder="kyoto"
           />
         </div>
@@ -83,6 +85,7 @@ export default function DestinationBasicInfo({
           Province / Region ({language.toUpperCase()})
         </label>
         <input
+          id="dest_input_province"
           type="text"
           required
           value={province[language] || ""}

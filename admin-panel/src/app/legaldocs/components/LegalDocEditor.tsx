@@ -26,6 +26,7 @@ import { LegalIcon } from "./LegalIcon";
 import { legalDocsService } from "@/services/legaldocs.service";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
+import FormReadinessDrawer, { FormReadinessItem } from "@/components/FormReadinessDrawer";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LegalDocEditor – the main per-document editing pane:
@@ -91,6 +92,166 @@ export default function LegalDocEditor({
   const badgeClass = ACCENT_BADGE[doc.accent ?? "indigo"] ?? ACCENT_BADGE.indigo;
   const displayTitle = resolveLocalized(doc.title, locale, "Untitled Policy");
   const displayEyebrow = resolveLocalized(doc.eyebrow, locale);
+
+  // Form readiness tracking for Legal Document (Exact field tracking including Sub-Items)
+  const readinessItems: FormReadinessItem[] = [
+    {
+      id: "doc-title-en",
+      label: "Document Title (English)",
+      isComplete: Boolean(doc.title?.en?.trim()),
+      elementId: "legal_meta_input_title",
+      targetLang: "en",
+      hint: "Policy title in English",
+    },
+    {
+      id: "doc-title-ja",
+      label: "Document Title (Japanese)",
+      isComplete: Boolean(doc.title?.ja?.trim()),
+      elementId: "legal_meta_input_title",
+      targetLang: "ja",
+      hint: "Policy title in Japanese",
+    },
+    {
+      id: "doc-id",
+      label: "Document Identifier (ID)",
+      isComplete: Boolean(doc.id?.trim()),
+      elementId: "legal_meta_input_title",
+      hint: "Unique policy slug (read-only)",
+    },
+    {
+      id: "doc-eyebrow-en",
+      label: "Eyebrow / Category Tag (English)",
+      isComplete: Boolean(doc.eyebrow?.en?.trim()),
+      elementId: "legal_meta_input_eyebrow",
+      targetLang: "en",
+      hint: "Top badge pill such as 'Legal & Compliance' (EN)",
+    },
+    {
+      id: "doc-eyebrow-ja",
+      label: "Eyebrow / Category Tag (Japanese)",
+      isComplete: Boolean(doc.eyebrow?.ja?.trim()),
+      elementId: "legal_meta_input_eyebrow",
+      targetLang: "ja",
+      hint: "Top badge pill in Japanese (JA)",
+    },
+    {
+      id: "doc-sections",
+      label: "Document Sections (≥ 1 Section)",
+      isComplete: doc.sections.length > 0,
+      elementId: "legal-doc-add-section-btn",
+      hint: "At least one clause or policy section",
+    },
+  ];
+
+  // Dynamically add every individual section heading, paragraph, or sub-item to the tracker!
+  doc.sections.forEach((section, sIdx) => {
+    const secNum = sIdx + 1;
+    // Section Heading (EN & JA)
+    readinessItems.push({
+      id: `sec-${section.id}-heading-en`,
+      label: `Sec ${secNum}: Heading (English)`,
+      sectionName: `Section #${secNum}`,
+      sectionId: section.id,
+      isComplete: Boolean(section.heading?.en?.trim()),
+      elementId: `legal_input_heading_${section.id}`,
+      targetLang: "en",
+      hint: `Headline for section #${secNum} (EN)`,
+    });
+    readinessItems.push({
+      id: `sec-${section.id}-heading-ja`,
+      label: `Sec ${secNum}: Heading (Japanese)`,
+      sectionName: `Section #${secNum}`,
+      sectionId: section.id,
+      isComplete: Boolean(section.heading?.ja?.trim()),
+      elementId: `legal_input_heading_${section.id}`,
+      targetLang: "ja",
+      hint: `Headline for section #${secNum} (JA)`,
+    });
+
+    if (section.type === "paragraph") {
+      readinessItems.push({
+        id: `sec-${section.id}-content-en`,
+        label: `Sec ${secNum}: Paragraph Body (English)`,
+        sectionName: `Section #${secNum}`,
+        sectionId: section.id,
+        isComplete: Boolean(section.content?.en?.trim()),
+        elementId: `legal_input_content_${section.id}`,
+        targetLang: "en",
+        hint: `Body text for section #${secNum} (EN)`,
+      });
+      readinessItems.push({
+        id: `sec-${section.id}-content-ja`,
+        label: `Sec ${secNum}: Paragraph Body (Japanese)`,
+        sectionName: `Section #${secNum}`,
+        sectionId: section.id,
+        isComplete: Boolean(section.content?.ja?.trim()),
+        elementId: `legal_input_content_${section.id}`,
+        targetLang: "ja",
+        hint: `Body text for section #${secNum} (JA)`,
+      });
+    } else {
+      // If list/checklist type has zero sub-items, remind admin to add items
+      if ((section.subItems ?? []).length === 0) {
+        readinessItems.push({
+          id: `sec-${section.id}-empty-items`,
+          label: `Sec ${secNum}: Items (Add at least 1 item)`,
+          sectionName: `Section #${secNum}`,
+          sectionId: section.id,
+          isComplete: false,
+          elementId: `legal_section_card_${section.id}`,
+          hint: `Click Add Item in section #${secNum} to add content`,
+        });
+      }
+
+      // Sub-items (checklist, contact, bullet, card, etc.)
+      (section.subItems || []).forEach((item, itemIdx) => {
+        const itemNum = itemIdx + 1;
+        const showTitle = section.type !== "checklist";
+        if (showTitle) {
+          readinessItems.push({
+            id: `subitem-${item.id}-title-en`,
+            label: `Sec ${secNum} Item ${itemNum}: Title (English)`,
+            sectionName: `Section #${secNum} Sub-Item`,
+            sectionId: section.id,
+            isComplete: Boolean(item.title?.en?.trim()),
+            elementId: `legal_subitem_title_${item.id}`,
+            targetLang: "en",
+            hint: `Item ${itemNum} title in section #${secNum} (EN)`,
+          });
+          readinessItems.push({
+            id: `subitem-${item.id}-title-ja`,
+            label: `Sec ${secNum} Item ${itemNum}: Title (Japanese)`,
+            sectionName: `Section #${secNum} Sub-Item`,
+            sectionId: section.id,
+            isComplete: Boolean(item.title?.ja?.trim()),
+            elementId: `legal_subitem_title_${item.id}`,
+            targetLang: "ja",
+            hint: `Item ${itemNum} title in section #${secNum} (JA)`,
+          });
+        }
+        readinessItems.push({
+          id: `subitem-${item.id}-body-en`,
+          label: `Sec ${secNum} Item ${itemNum}: Description (English)`,
+          sectionName: `Section #${secNum} Sub-Item`,
+          sectionId: section.id,
+          isComplete: Boolean(item.body?.en?.trim()),
+          elementId: `legal_subitem_body_${item.id}`,
+          targetLang: "en",
+          hint: `Item ${itemNum} description in section #${secNum} (EN)`,
+        });
+        readinessItems.push({
+          id: `subitem-${item.id}-body-ja`,
+          label: `Sec ${secNum} Item ${itemNum}: Description (Japanese)`,
+          sectionName: `Section #${secNum} Sub-Item`,
+          sectionId: section.id,
+          isComplete: Boolean(item.body?.ja?.trim()),
+          elementId: `legal_subitem_body_${item.id}`,
+          targetLang: "ja",
+          hint: `Item ${itemNum} description in section #${secNum} (JA)`,
+        });
+      });
+    }
+  });
 
   // ── Section CRUD ────────────────────────────────────────────────────────
 
@@ -187,6 +348,7 @@ export default function LegalDocEditor({
 
           {/* Meta edit */}
           <button
+            id="legal-doc-settings-btn"
             type="button"
             onClick={() => setMetaOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-xs font-semibold transition-all"
@@ -293,6 +455,7 @@ export default function LegalDocEditor({
               Sections ({doc.sections.length}) · {locale.toUpperCase()}
             </span>
             <button
+              id="legal-doc-add-section-btn"
               type="button"
               onClick={addSection}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition-all shadow-sm"
@@ -313,7 +476,7 @@ export default function LegalDocEditor({
           )}
 
           {/* Section list */}
-          <div className="space-y-2">
+          <div id="legal-doc-sections-container" className="space-y-2">
             {doc.sections.map((section: LegalSection, idx: number) => (
               <SectionEditor
                 key={section.id}
@@ -333,6 +496,35 @@ export default function LegalDocEditor({
               Remember to click <strong>Save Changes</strong> after editing.
             </div>
           )}
+
+          {/* Form Completion & Readiness Drawer */}
+          <FormReadinessDrawer
+            items={readinessItems}
+            entityTitle={displayTitle}
+            onNavigateToField={(item) => {
+              // 1. Switch language tab if target language differs
+              if (item.targetLang) {
+                onLocaleChange(item.targetLang);
+              }
+              // 2. Open metadata modal if clicking document title, eyebrow, or ID
+              if (
+                item.id.startsWith("doc-title") ||
+                item.id.startsWith("doc-eyebrow") ||
+                item.id === "doc-id"
+              ) {
+                setMetaOpen(true);
+              }
+              // 3. Automatically expand the section accordion containing the target field
+              if (item.sectionId) {
+                onUpdate({
+                  ...doc,
+                  sections: doc.sections.map((sec) =>
+                    sec.id === item.sectionId ? { ...sec, expanded: true } : sec
+                  ),
+                });
+              }
+            }}
+          />
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto">

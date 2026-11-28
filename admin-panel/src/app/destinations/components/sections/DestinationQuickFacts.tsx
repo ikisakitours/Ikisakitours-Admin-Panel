@@ -29,6 +29,7 @@ export default function DestinationQuickFacts({
             Best Time to Visit ({language.toUpperCase()})
           </label>
           <input
+            id="dest_input_best_time"
             type="text"
             required
             value={bestTimeToVisit[language] || ""}
@@ -42,6 +43,7 @@ export default function DestinationQuickFacts({
             Climate ({language.toUpperCase()})
           </label>
           <input
+            id="dest_input_climate"
             type="text"
             required
             value={climate[language] || ""}
@@ -55,6 +57,7 @@ export default function DestinationQuickFacts({
             Primary Language ({language.toUpperCase()})
           </label>
           <input
+            id="dest_input_language"
             type="text"
             required
             value={primaryLanguage[language] || ""}
@@ -68,6 +71,7 @@ export default function DestinationQuickFacts({
             Local Currency ({language.toUpperCase()})
           </label>
           <input
+            id="dest_input_currency"
             type="text"
             required
             value={localCurrency[language] || ""}

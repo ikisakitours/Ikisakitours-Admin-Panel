@@ -19,6 +19,7 @@ import { BlogCardList } from "./components/BlogCardList";
 import { BlogSummaryBar } from "./components/BlogSummaryBar";
 import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
+import { formatBackendErrorMessage } from "@/utils/errorHelper";
 
 export default function ManageBlogsPage() {
   const [blogs, setBlogs] = useState<BlogPayload[]>([]);
@@ -142,7 +143,7 @@ export default function ManageBlogsPage() {
         newIsLive ? "success" : "info"
       );
     } catch (err: any) {
-      notify(err.message || "Failed to update article visibility", "error");
+      notify(formatBackendErrorMessage(err) || "Failed to update article visibility", "error");
     } finally {
       setUpdatingId(null);
     }
@@ -159,7 +160,7 @@ export default function ManageBlogsPage() {
       notify("Blog article deleted successfully.", "info");
       setBlogToDelete(null);
     } catch (err: any) {
-      notify(err.message || "Failed to delete blog article", "error");
+      notify(formatBackendErrorMessage(err) || "Failed to delete blog article", "error");
     } finally {
       setDeletingId(null);
     }

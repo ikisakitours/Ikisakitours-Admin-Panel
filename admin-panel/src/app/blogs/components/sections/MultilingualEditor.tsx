@@ -72,13 +72,13 @@ export default function MultilingualEditor({
 
                 <div>
                     <label className="block text-xs font-semibold mb-1">
-                        URL Slug <span className="text-slate-400 font-normal">(Auto-generated)</span>
+                        URL Slug <span className="text-slate-400 font-normal">(Auto-generated & Read-only)</span>
                     </label>
                     <input
                         type="text"
+                        readOnly
                         value={formData.slug}
-                        onChange={handleSlugChange}
-                        className="w-full text-xs border rounded-lg p-2.5 bg-slate-50 outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-slate-600"
+                        className="w-full text-xs border rounded-lg p-2.5 bg-slate-100/90 outline-none font-mono text-slate-500 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                         placeholder="getting-started-with-nextjs-nestjs"
                     />
                 </div>

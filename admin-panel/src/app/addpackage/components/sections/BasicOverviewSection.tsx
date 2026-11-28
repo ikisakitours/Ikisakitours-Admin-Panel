@@ -56,7 +56,7 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
           <select
             value={formData.type}
             onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           >
             <option value="multiday">Multi Day Tour</option>
             <option value="oneday">One Day Tour</option>
@@ -65,34 +65,37 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">Category ({locale.toUpperCase()})</label>
           <input
+            id="pkg_input_category"
             type="text"
             required
             value={formData.category?.[locale] || ""}
             onChange={(e) => handleRecordChange("category", e.target.value)}
             placeholder="e.g. Wildlife, Adventure"
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           />
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">Origin / Departure ({locale.toUpperCase()})</label>
           <input
+            id="pkg_input_origin"
             type="text"
             required
             value={formData.origin?.[locale] || ""}
             onChange={(e) => handleRecordChange("origin", e.target.value)}
             placeholder="e.g. Colombo, Kandy"
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           />
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">Duration ({locale.toUpperCase()})</label>
           <input
+            id="pkg_input_duration"
             type="text"
             required
             value={formData.duration?.[locale] || ""}
             onChange={(e) => handleRecordChange("duration", e.target.value)}
             placeholder="e.g. 4 Days / 8 Hours"
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           />
         </div>
         <div>
@@ -100,7 +103,7 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
           <select
             value={formData.badge || "none"}
             onChange={(e) => setFormData({ ...formData, badge: e.target.value as PackageBadge })}
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white font-medium text-slate-700"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-white font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           >
             <option value="none">No Badge (None)</option>
 
@@ -139,12 +142,13 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
             Package Title ({locale.toUpperCase()})
           </label>
           <input
+            id="pkg_input_title"
             type="text"
             required={locale === "en"}
             value={formData.title?.[locale] || ""}
             onChange={(e) => handleTitle1Change(e.target.value)}
             placeholder="e.g. The Ultimate Sri Lanka Grand Explorer"
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           />
         </div>
         <div>
@@ -153,31 +157,34 @@ export function BasicOverviewSection({ formData, setFormData, locale }: Props) {
             <span className="text-[10px] text-amber-600 font-normal ml-1.5">(Text to highlight in Gold)</span>
           </label>
           <input
+            id="pkg_input_emphasis"
             type="text"
             value={formData.titleEmphasis?.[locale] || ""}
             onChange={(e) => handleTitle2Change(e.target.value)}
             placeholder="e.g. Ultimate Sri Lanka"
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           />
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">URL Slug (Auto)</label>
           <input
+            id="pkg_input_slug"
             type="text"
             readOnly
             value={formData.slug}
-            className="w-full text-xs bg-slate-50 border border-slate-200 text-slate-500 rounded-lg p-2.5 outline-none"
+            className="w-full text-xs bg-slate-50 border border-slate-200 text-slate-500 rounded-lg p-2.5 outline-none cursor-not-allowed select-none"
           />
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1">Provider</label>
           <input
+            id="pkg_input_provider"
             type="text"
             required
             value={formData.provider}
             onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
             placeholder="e.g. Ikisaki Tours"
-            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none"
+            className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
           />
         </div>
       </div>
