@@ -1,6 +1,9 @@
 'use client';
 
+import { useState, useCallback } from "react";
 import { faqService } from "@/services/faq.service";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
+import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
 
 export interface FaqItem {
   id: string;
@@ -10,14 +13,27 @@ export interface FaqItem {
 }
 
 export default function FaqList({ faqs, onDeleted }: { faqs: FaqItem[]; onDeleted: () => void }) {
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this FAQ?')) return;
+  const [faqToDelete, setFaqToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [deleting, setDeleting] = useState<boolean>(false);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+
+  const notify = useCallback((message: string, variant: ToastVariant = "info") => {
+    setToast({ id: Date.now(), message, variant });
+  }, []);
+
+  const confirmDelete = async () => {
+    if (!faqToDelete) return;
 
     try {
-      await faqService.deleteFaq(id);
+      setDeleting(true);
+      await faqService.deleteFaq(faqToDelete.id);
+      notify("FAQ deleted successfully!", "success");
+      setFaqToDelete(null);
       onDeleted();
     } catch (err) {
-      alert('Error deleting FAQ');
+      notify("Error deleting FAQ", "error");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -88,14 +104,34 @@ export default function FaqList({ faqs, onDeleted }: { faqs: FaqItem[]; onDelete
             </div>
 
             <button
-              onClick={() => handleDelete(faq.id)}
-              className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-xs font-mono font-medium transition duration-200 shrink-0"
+              onClick={() =>
+                setFaqToDelete({
+                  id: faq.id,
+                  title: faq.question?.en || faq.question?.ja || `FAQ #${faq.id.slice(0, 6)}`,
+                })
+              }
+              className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-xs font-mono font-medium transition duration-200 shrink-0 cursor-pointer"
             >
               Delete
             </button>
           </div>
         ))}
       </div>
+
+      {/* Unified Luxury AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={Boolean(faqToDelete)}
+        title="Delete FAQ"
+        description="Are you sure you want to delete this FAQ item? This action will permanently remove it from the system."
+        itemTitle={faqToDelete?.title}
+        confirmLabel="Delete FAQ"
+        loading={deleting}
+        onClose={() => setFaqToDelete(null)}
+        onConfirm={confirmDelete}
+      />
+
+      {/* Executive Toast Notification */}
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

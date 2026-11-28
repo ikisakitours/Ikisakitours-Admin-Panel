@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { destinationService, DestinationPayload } from '@/services/destination.service';
 import { Edit2, Trash2, RefreshCw, Eye } from 'lucide-react';
+import { AdminDeleteModal } from '@/components/AdminDeleteModal';
+import { AdminToast, type AdminToastState, type ToastVariant } from '@/components/AdminToast';
 
 interface DestinationListItem extends DestinationPayload {
   id: string;
@@ -13,6 +15,12 @@ export function DestinationList() {
   const [destinations, setDestinations] = useState<DestinationListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [destToDelete, setDestToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+
+  const notify = useCallback((message: string, variant: ToastVariant = "info") => {
+    setToast({ id: Date.now(), message, variant });
+  }, []);
 
   const fetchDestinations = async () => {
     setLoading(true);
@@ -22,6 +30,7 @@ export function DestinationList() {
       setDestinations(data.filter((d): d is DestinationListItem => Boolean(d.id)));
     } catch (err: any) {
       console.error('Failed to load destinations:', err);
+      notify("Failed to load destinations", "error");
     } finally {
       setLoading(false);
     }
@@ -45,16 +54,17 @@ export function DestinationList() {
     return provinceField['en'] || Object.values(provinceField)[0] || 'N/A';
   };
 
-  const handleDelete = async (id: string, rawTitle: any) => {
-    const displayTitle = resolveTitle(rawTitle);
-    if (!confirm(`Are you sure you want to delete "${displayTitle}"?`)) return;
+  const confirmDelete = async () => {
+    if (!destToDelete) return;
 
-    setDeletingId(id);
+    setDeletingId(destToDelete.id);
     try {
-      await destinationService.deleteDestination(id);
-      setDestinations((prev) => prev.filter((d) => d.id !== id));
+      await destinationService.deleteDestination(destToDelete.id);
+      setDestinations((prev) => prev.filter((d) => d.id !== destToDelete.id));
+      notify("Destination deleted successfully!", "success");
+      setDestToDelete(null);
     } catch (err: any) {
-      alert(`Failed to delete destination: ${err.message}`);
+      notify(`Failed to delete destination: ${err.message}`, "error");
     } finally {
       setDeletingId(null);
     }
@@ -124,11 +134,11 @@ export function DestinationList() {
                       <button
                         type="button"
                         disabled={deletingId === dest.id}
-                        onClick={() => handleDelete(dest.id, dest.title)}
+                        onClick={() => setDestToDelete({ id: dest.id, title: resolveTitle(dest.title) })}
                         className="px-3 py-1.5 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 font-semibold rounded-lg transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        {deletingId === dest.id ? '...' : 'Delete'}
+                        <span>{deletingId === dest.id ? '...' : 'Delete'}</span>
                       </button>
                     </td>
                   </tr>
@@ -138,6 +148,21 @@ export function DestinationList() {
           </table>
         </div>
       )}
+
+      {/* Unified Luxury AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={Boolean(destToDelete)}
+        title="Delete Travel Destination"
+        description="Are you sure you want to permanently delete this travel destination? This action will remove it from the database and cannot be undone."
+        itemTitle={destToDelete?.title}
+        confirmLabel="Delete Destination"
+        loading={Boolean(deletingId)}
+        onClose={() => setDestToDelete(null)}
+        onConfirm={confirmDelete}
+      />
+
+      {/* Executive Toast Notification */}
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

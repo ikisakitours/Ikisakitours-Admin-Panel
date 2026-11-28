@@ -198,6 +198,41 @@
           "ja": "天然薬草オイルを使用した全身マッサージ（アビヤンガ）、薬草スチームサウナ、シロダーラ。"
         }
       }
+    ],
+    "pricingNotes": [
+      {
+        "id": "note-1",
+        "title": {
+          "en": "DYNAMIC GROUP PRICING",
+          "ja": "ダイナミックグループ料金"
+        },
+        "description": {
+          "en": "Rates per person decrease automatically as your party size increases to match vehicle capacity tiers.",
+          "ja": "参加人数が増えるにつれて、車両定員に合わせたグループ割引が自動的に適用され、1名あたりの料金がお得になります。"
+        }
+      },
+      {
+        "id": "note-2",
+        "title": {
+          "en": "TRAVELER CATEGORIES",
+          "ja": "旅行者区分と料金"
+        },
+        "description": {
+          "en": "Couple rates apply to 2 adults sharing a room. Child rates (with applicable discount) apply for ages 2–11. Infants under 2 travel free.",
+          "ja": "カップル料金は同室2名様に適用されます。子供料金（割引適用）は2〜11歳が対象です。2歳未満の幼児は無料です。"
+        }
+      },
+      {
+        "id": "note-3",
+        "title": {
+          "en": "COMPREHENSIVE INCLUSIONS",
+          "ja": "充実のパッケージ内容"
+        },
+        "description": {
+          "en": "Includes private AC luxury vehicle, dedicated chauffeur-guide, fuel, highway tolls, accommodations, and itinerary-specified meal plans.",
+          "ja": "専用エアコン完備の専用車、専属ドライバーガイド、燃料代、高速道路料金、宿泊費、日程表に記載されたお食事プランが含まれています。"
+        }
+      }
     ]
   },
   "destinations": [

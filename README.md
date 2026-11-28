@@ -46,6 +46,7 @@
   - [10. PDF Itinerary Studio & Word Hub (`/itinerary-editor`)](#10-pdf-itinerary-studio--word-hub-itinerary-editor)
   - [11. Offline-Resilient Multilingual Form Auto-Save, Crash Recovery & Unsaved Navigation Guard Engine (`useFormDraft` & `DraftRecoveryBanner`)](#11-offline-resilient-multilingual-form-auto-save-crash-recovery--unsaved-navigation-guard-engine-useformdraft--draftrecoverybanner)
   - [12. Universal Multilingual Form Readiness & Completion Assistant (`FormReadinessDrawer`), Direct-to-R2 Interactive 16:9 Image Cropper & Read-Only Slug Architecture](#12-universal-multilingual-form-readiness--completion-assistant-formreadinessdrawer-direct-to-r2-interactive-169-image-cropper--read-only-slug-architecture)
+  - [13. Universal AI JSON Prompt Studio, Dual-Mode Ingestion & 1-Click Clipboard Engine (Tour Packages, Destinations & Blogs)](#13-universal-ai-json-prompt-studio-dual-mode-ingestion--1-click-clipboard-engine-tour-packages-destinations--blogs)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -409,6 +410,19 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
 - **System-Wide Read-Only URL Slug Guardrail**:
   - All URL slugs across Tour Packages, Destinations, Blogs, and Legal Documents are strictly locked as `readOnly` (with disabled cursors and muted styling).
   - Automatically derives slugs from English entity titles, preventing human typographic mistakes, broken public hyperlinks, and SEO indexing penalties.
+
+### 13. Universal AI JSON Prompt Studio, Dual-Mode Ingestion & 1-Click Clipboard Engine (Tour Packages, Destinations & Blogs)
+
+- **Specialized Dual-Track AI Prompt Studio (`/manual` Section 12)**:
+  - **Module-Tailored Prompts & Schemas**: Dedicated, production-ready prompts specifically architected for One-Day Tour Packages (`sample-oneday-tour.json`), Multi-Day Tour Packages (`sample-multiday-tour.json`), Destinations (`sample-destination.json`), and Multilingual Blog Articles (`sample-blog.json`).
+  - **Concise Slug Enforcement**: Explicit rules strictly limit generated URL slugs to 3–5 clean, hyphenated lowercase keywords derived from `title.en` (e.g. `sigiriya-dambulla-day-tour`), eliminating overly verbose or repetitive URL path generation.
+  - **Character-for-Character Gold Title Highlighting**: Enforces strict substring parity between `title` and `titleEmphasis` in both English and Japanese (preventing Kanji/Katakana script mismatches).
+  - **Dynamic Group Pricing & Comprehensive Pricing Notes**: Prompts AI models to enforce gapless contiguous group tier economics and produce bilingual Japanese/English pricing guidance notes.
+- **Unified Luxury Multi-Mode Ingestion Pipeline**:
+  - Integrated across Tour Packages (`JsonUploaderSection.tsx`), Destinations (`DestinationJsonUploader.tsx`), and Blogs (`JsonImporter.tsx`).
+  - **Mode 1 — Drag-and-Drop File Uploader**: File input supporting standard `.json` format with live drag-state animations and validation alerts.
+  - **Mode 2 — Direct Raw JSON Editor**: In-browser monospace code editor allowing administrators to paste, format, clear, and review raw JSON payloads.
+  - **Mode 3 — ⚡ 1-Click Paste & Apply Engine (`handleQuickPasteAndApply`)**: Directly reads system clipboard content via `navigator.clipboard.readText()`, executes regex sanitization to strip markdown code blocks (````json ... ````), dynamically detects languages, deep-merges nested pricing configurations, and populates the entire form in a single click without opening Notepad or managing intermediate files.
 
 ---
 

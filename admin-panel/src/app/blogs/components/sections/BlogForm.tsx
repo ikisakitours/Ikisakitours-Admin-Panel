@@ -6,6 +6,7 @@ import { Save, Plus } from "lucide-react";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
+import { FormReadinessDrawer, FormReadinessItem } from "@/components/FormReadinessDrawer";
 import { formatBackendErrorMessage } from "@/utils/errorHelper";
 import JsonImporter from "./JsonImporter";
 import MultilingualEditor from "./MultilingualEditor";
@@ -228,6 +229,139 @@ export default function BlogForm({
         setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
+    // Form Readiness checklist tracking every single blog field
+    const readinessItems: FormReadinessItem[] = [
+        {
+            id: "blog_title_en",
+            label: "Title (English)",
+            isComplete: Boolean(formData.title?.en?.trim()),
+            elementId: "blog_input_title",
+            targetLang: "en",
+            hint: "English blog article headline",
+        },
+        {
+            id: "blog_title_ja",
+            label: "Title (Japanese)",
+            isComplete: Boolean(formData.title?.ja?.trim()),
+            elementId: "blog_input_title",
+            targetLang: "ja",
+            hint: "Japanese blog article headline",
+        },
+        {
+            id: "blog_slug",
+            label: "URL Slug",
+            isComplete: Boolean(formData.slug?.trim()),
+            elementId: "blog_input_slug",
+            hint: "SEO-friendly article slug",
+        },
+        {
+            id: "blog_author",
+            label: "Author",
+            isComplete: Boolean(formData.author?.trim()),
+            elementId: "blog_input_author",
+            hint: "Article author name",
+        },
+        {
+            id: "blog_category_en",
+            label: "Category (English)",
+            isComplete: Boolean(formData.category?.en?.trim()),
+            elementId: "blog_input_category",
+            targetLang: "en",
+            hint: "Travel category in English",
+        },
+        {
+            id: "blog_category_ja",
+            label: "Category (Japanese)",
+            isComplete: Boolean(formData.category?.ja?.trim()),
+            elementId: "blog_input_category",
+            targetLang: "ja",
+            hint: "Travel category in Japanese",
+        },
+        {
+            id: "blog_read_time_en",
+            label: "Read Time (English)",
+            isComplete: Boolean(formData.readTime?.en?.trim()),
+            elementId: "blog_input_read_time",
+            targetLang: "en",
+            hint: "e.g. 5 min read",
+        },
+        {
+            id: "blog_read_time_ja",
+            label: "Read Time (Japanese)",
+            isComplete: Boolean(formData.readTime?.ja?.trim()),
+            elementId: "blog_input_read_time",
+            targetLang: "ja",
+            hint: "e.g. 読了時間 5分",
+        },
+        {
+            id: "blog_summary_en",
+            label: "Summary / Excerpt (English)",
+            isComplete: Boolean(formData.summary?.en?.trim()),
+            elementId: "blog_input_summary",
+            targetLang: "en",
+            hint: "Preview excerpt for blog card & meta description",
+        },
+        {
+            id: "blog_summary_ja",
+            label: "Summary / Excerpt (Japanese)",
+            isComplete: Boolean(formData.summary?.ja?.trim()),
+            elementId: "blog_input_summary",
+            targetLang: "ja",
+            hint: "Japanese excerpt for preview cards",
+        },
+        {
+            id: "blog_content_en",
+            label: "Blog Content (English)",
+            isComplete: Boolean(formData.blog?.en?.trim()),
+            elementId: "blog_input_content",
+            targetLang: "en",
+            hint: "Full story and insider advice in English",
+        },
+        {
+            id: "blog_content_ja",
+            label: "Blog Content (Japanese)",
+            isComplete: Boolean(formData.blog?.ja?.trim()),
+            elementId: "blog_input_content",
+            targetLang: "ja",
+            hint: "Full story and travel advice in Japanese",
+        },
+        {
+            id: "blog_images",
+            label: "Article Images (≥ 1 Photo)",
+            isComplete: existingImages.length + selectedFiles.length > 0,
+            elementId: "blog_input_images",
+            hint: "Featured banner and gallery photos",
+        },
+    ];
+
+    // Track any additional custom languages
+    availableLanguages.forEach((lang) => {
+        if (lang !== "en" && lang !== "ja") {
+            readinessItems.push({
+                id: `blog_title_${lang}`,
+                label: `Title (${lang.toUpperCase()})`,
+                isComplete: Boolean(formData.title?.[lang]?.trim()),
+                elementId: "blog_input_title",
+                targetLang: lang,
+                hint: `Blog headline in ${lang.toUpperCase()}`,
+            });
+            readinessItems.push({
+                id: `blog_content_${lang}`,
+                label: `Content (${lang.toUpperCase()})`,
+                isComplete: Boolean(formData.blog?.[lang]?.trim()),
+                elementId: "blog_input_content",
+                targetLang: lang,
+                hint: `Blog content in ${lang.toUpperCase()}`,
+            });
+        }
+    });
+
+    const handleNavigateToField = (item: FormReadinessItem) => {
+        if (item.targetLang && availableLanguages.includes(item.targetLang)) {
+            setActiveLang(item.targetLang);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -390,6 +524,13 @@ export default function BlogForm({
                     disabled={loading}
                 />
             )}
+
+            {/* Form Completion & Readiness Assistant */}
+            <FormReadinessDrawer
+                items={readinessItems}
+                entityTitle={isEditMode ? "Blog Article (Edit)" : "Blog Article"}
+                onNavigateToField={handleNavigateToField}
+            />
         </form>
     );
 }
