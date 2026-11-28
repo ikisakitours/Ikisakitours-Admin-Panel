@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { CommentsService } from "@/services/comments.service";
 import { PackageReviewsService } from "@/services/package-reviews.service";
+import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
 
 export interface CommentCardProps {
   id: string;
@@ -33,6 +34,11 @@ export default function CommentCard({
 }: CommentCardProps) {
   const [isVisible, setIsVisible] = useState(initialIsVisible);
   const [isUpdatingVisibility, setIsUpdatingVisibility] = useState(false);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+
+  const notify = useCallback((message: string, variant: ToastVariant = "info") => {
+    setToast({ id: Date.now(), message, variant });
+  }, []);
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +68,7 @@ export default function CommentCard({
       }
     } catch (error: any) {
       setIsVisible(!newVisibility); // Revert UI state on failure
-      alert(error.message || "Failed to update visibility in database.");
+      notify(error.message || "Failed to update visibility in database.", "error");
     } finally {
       setIsUpdatingVisibility(false);
     }
@@ -92,10 +98,11 @@ export default function CommentCard({
         onReplyUpdated(updatedItem);
       }
 
+      notify("Reply posted successfully!", "success");
       setReplyText("");
       setIsReplying(false);
     } catch (error: any) {
-      alert(error.message || "Failed to post reply");
+      notify(error.message || "Failed to post reply", "error");
     } finally {
       setSubmitting(false);
     }
@@ -258,6 +265,8 @@ export default function CommentCard({
         </form>
       )}
 
+      {/* Executive Toast Notification */}
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

@@ -61,6 +61,7 @@ export default function MultilingualEditor({
                 <div>
                     <label className="block text-xs font-semibold mb-1">Title ({activeLang.toUpperCase()})</label>
                     <input
+                        id="blog_input_title"
                         type="text"
                         required={activeLang === "en"}
                         value={formData.title[activeLang] || ""}
@@ -75,6 +76,7 @@ export default function MultilingualEditor({
                         URL Slug <span className="text-slate-400 font-normal">(Auto-generated & Read-only)</span>
                     </label>
                     <input
+                        id="blog_input_slug"
                         type="text"
                         readOnly
                         value={formData.slug}
@@ -89,6 +91,7 @@ export default function MultilingualEditor({
                 <div>
                     <label className="block text-xs font-semibold mb-1">Author</label>
                     <input
+                        id="blog_input_author"
                         type="text"
                         required
                         value={formData.author}
@@ -101,6 +104,7 @@ export default function MultilingualEditor({
                 <div>
                     <label className="block text-xs font-semibold mb-1">Category ({activeLang.toUpperCase()})</label>
                     <input
+                        id="blog_input_category"
                         type="text"
                         required={activeLang === "en"}
                         value={formData.category[activeLang] || ""}
@@ -118,6 +122,7 @@ export default function MultilingualEditor({
                 <div>
                     <label className="block text-xs font-semibold mb-1">Read Time ({activeLang.toUpperCase()})</label>
                     <input
+                        id="blog_input_read_time"
                         type="text"
                         required={activeLang === "en"}
                         value={formData.readTime[activeLang] || ""}
@@ -137,6 +142,7 @@ export default function MultilingualEditor({
             <div>
                 <label className="block text-xs font-semibold mb-1">Summary / Excerpt ({activeLang.toUpperCase()})</label>
                 <textarea
+                    id="blog_input_summary"
                     rows={2}
                     required={activeLang === "en"}
                     value={formData.summary[activeLang] || ""}
@@ -155,6 +161,7 @@ export default function MultilingualEditor({
             <div>
                 <label className="block text-xs font-semibold mb-1">Blog Content ({activeLang.toUpperCase()})</label>
                 <textarea
+                    id="blog_input_content"
                     rows={8}
                     required={activeLang === "en"}
                     value={formData.blog[activeLang] || ""}

@@ -409,7 +409,7 @@ export default function PackageFormWrapper() {
     try {
       // Direct-to-Cloudflare R2 WebP pipeline + pure JSON creation
       const result = await packageService.createPackage(formData, selectedFiles);
-      notify(`Success! Package "${result.slug || formData.slug}" published successfully to Cloudflare R2!`, "success");
+      notify(`Success! Package "${result.slug || formData.slug}" published successfully`, "success");
 
       // Reset form data and uploaded files
       setSelectedFiles([]);

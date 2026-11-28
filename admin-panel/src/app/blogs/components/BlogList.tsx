@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { blogService } from "@/services/blog.service";
 import { Trash2, Clock, Tag, User, Globe } from "lucide-react";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
+import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
 
 interface BlogPreview {
   id: string;
@@ -27,6 +29,12 @@ export default function BlogList({ refreshKey }: BlogListProps) {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<string>("en");
+  const [blogToDelete, setBlogToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+
+  const notify = useCallback((message: string, variant: ToastVariant = "info") => {
+    setToast({ id: Date.now(), message, variant });
+  }, []);
 
   const fetchBlogs = async () => {
     try {
@@ -34,7 +42,7 @@ export default function BlogList({ refreshKey }: BlogListProps) {
       const data = await blogService.getPreviews(selectedLang);
       setBlogs(data);
     } catch (err: any) {
-      alert(`Failed to load blogs: ${err.message}`);
+      notify(`Failed to load blogs: ${err.message}`, "error");
     } finally {
       setLoading(false);
     }
@@ -46,16 +54,16 @@ export default function BlogList({ refreshKey }: BlogListProps) {
     });
   }, [refreshKey, selectedLang]);
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
-
+  const confirmDelete = async () => {
+    if (!blogToDelete) return;
     try {
-      setDeletingId(id);
-      await blogService.deleteBlog(id);
-      // Remove deleted post from state
-      setBlogs((prev) => prev.filter((b) => b.id !== id));
+      setDeletingId(blogToDelete.id);
+      await blogService.deleteBlog(blogToDelete.id);
+      setBlogs((prev) => prev.filter((b) => b.id !== blogToDelete.id));
+      notify("Blog article deleted successfully!", "success");
+      setBlogToDelete(null);
     } catch (err: any) {
-      alert(`Failed to delete blog: ${err.message}`);
+      notify(`Failed to delete blog: ${err.message}`, "error");
     } finally {
       setDeletingId(null);
     }
@@ -148,11 +156,11 @@ export default function BlogList({ refreshKey }: BlogListProps) {
                   <button
                     type="button"
                     disabled={deletingId === blog.id}
-                    onClick={() => handleDelete(blog.id, blog.title)}
-                    className="flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                    onClick={() => setBlogToDelete({ id: blog.id, title: blog.title })}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-medium transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                    {deletingId === blog.id ? "Deleting..." : "Delete"}
+                    <span>Delete</span>
                   </button>
                 </div>
               </div>
@@ -160,6 +168,21 @@ export default function BlogList({ refreshKey }: BlogListProps) {
           ))}
         </div>
       )}
+
+      {/* Unified Luxury AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={Boolean(blogToDelete)}
+        title="Delete Blog Article"
+        description="Are you sure you want to permanently delete this blog post? This action will remove it from the database and cannot be undone."
+        itemTitle={blogToDelete?.title}
+        confirmLabel="Delete Blog"
+        loading={Boolean(deletingId)}
+        onClose={() => setBlogToDelete(null)}
+        onConfirm={confirmDelete}
+      />
+
+      {/* Executive Toast Notification */}
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

@@ -51,6 +51,19 @@ export default function ManualGuideView() {
     }
   };
 
+  const handleScrollToAiPrompts = () => {
+    setActiveSection("json-ai");
+    setTimeout(() => {
+      const el = document.getElementById("ai-prompt-studio");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        const fallback = document.getElementById("json-ai");
+        fallback?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 60);
+  };
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -98,7 +111,7 @@ export default function ManualGuideView() {
 
           <button
             type="button"
-            onClick={() => handleSelectSection("json-ai")}
+            onClick={handleScrollToAiPrompts}
             className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/80 px-3 py-1.5 text-[11px] font-bold text-emerald-700 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
           >
             <Bot className="w-3.5 h-3.5" />

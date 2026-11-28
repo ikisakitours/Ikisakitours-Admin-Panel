@@ -27,6 +27,7 @@ import { legalDocsService } from "@/services/legaldocs.service";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
 import FormReadinessDrawer, { FormReadinessItem } from "@/components/FormReadinessDrawer";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LegalDocEditor – the main per-document editing pane:
@@ -69,6 +70,7 @@ export default function LegalDocEditor({
   const [saved, setSaved]         = useState(false);
   const [saving, setSaving]       = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [sectionToDelete, setSectionToDelete] = useState<{ index: number; title: string } | null>(null);
 
   // Crash-resilient draft auto-save and recovery
   const {
@@ -275,8 +277,15 @@ export default function LegalDocEditor({
   };
 
   const deleteSection = (idx: number) => {
-    if (!confirm("Remove this section?")) return;
-    onUpdate({ ...doc, sections: doc.sections.filter((_: LegalSection, i: number) => i !== idx) });
+    const targetSection = doc.sections[idx];
+    const sectionTitle = targetSection ? resolveLocalized(targetSection.heading, locale, `Section #${idx + 1}`) : `Section #${idx + 1}`;
+    setSectionToDelete({ index: idx, title: sectionTitle });
+  };
+
+  const confirmDeleteSection = () => {
+    if (sectionToDelete === null) return;
+    onUpdate({ ...doc, sections: doc.sections.filter((_: LegalSection, i: number) => i !== sectionToDelete.index) });
+    setSectionToDelete(null);
   };
 
   // ── Save (API Upsert) ─────────────────────────────────────────────────────
@@ -544,6 +553,17 @@ export default function LegalDocEditor({
           }}
         />
       )}
+
+      {/* Unified Luxury AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={Boolean(sectionToDelete)}
+        title="Remove Document Section"
+        description="Are you sure you want to remove this section from the legal document? This action cannot be undone once changes are saved."
+        itemTitle={sectionToDelete?.title}
+        confirmLabel="Remove Section"
+        onClose={() => setSectionToDelete(null)}
+        onConfirm={confirmDeleteSection}
+      />
     </div>
   );
 }

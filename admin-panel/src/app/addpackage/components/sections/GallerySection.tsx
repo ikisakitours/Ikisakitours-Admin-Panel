@@ -271,20 +271,20 @@ export function GallerySection({
                         ★ Cover
                       </span>
                     )}
-                    {/* Top-left dark pill: Original -> Compressed size */}
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900/90 backdrop-blur-md text-white font-mono text-[9px] font-bold border border-slate-700/60 shadow-md">
-                      {item.hasSavings ? (
-                        <>
-                          <span className="line-through text-slate-400">{item.formattedOriginalSize}</span>
-                          <span className="text-emerald-400">→ {item.formattedSize}</span>
-                        </>
-                      ) : (
-                        <span className="text-emerald-400">{item.formattedSize}</span>
-                      )}
+                    {/* Top-left dark badge: Explicit Actual Size & WebP Size */}
+                    <div className="flex flex-col gap-0.5 px-2 py-1 rounded-md bg-slate-950/95 backdrop-blur-md text-white font-mono text-[9px] border border-slate-700/80 shadow-md">
+                      <div className="flex items-center justify-between gap-1.5">
+                        <span className="text-[8px] uppercase tracking-wider text-slate-400 font-sans font-semibold">Actual:</span>
+                        <span className="font-bold text-slate-200">{item.formattedOriginalSize}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-1.5">
+                        <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-sans font-semibold">WebP:</span>
+                        <span className="font-extrabold text-emerald-300">{item.formattedSize}</span>
+                      </div>
                     </div>
                     {/* Green pill: ↓ X% Saved (WebP) */}
                     {item.savedPercent > 0 && (
-                      <div className="self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-600/95 backdrop-blur-md text-white text-[9px] font-extrabold shadow-md border border-emerald-400/40">
+                      <div className="self-start inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-600/95 backdrop-blur-md text-white text-[9px] font-extrabold shadow-md border border-emerald-400/40">
                         <span>↓ {item.savedPercent}% Saved (WebP)</span>
                       </div>
                     )}

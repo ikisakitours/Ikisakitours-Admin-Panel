@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from "react";
 import Cropper, { Point, Area } from "react-easy-crop";
 import { getCroppedWebPFile } from "@/utils/cropImageHelper";
+import { optimizeImageToWebP } from "@/utils/imageOptimizer";
 import {
   Crop as CropIcon,
   ZoomIn,
@@ -112,14 +113,27 @@ export function ImageCropperModal({
     }
   };
 
-  const handleSkipCrop = () => {
+  const handleSkipCrop = async () => {
     if (!currentItem) return;
-    const skipFile = currentItem.file;
-    (skipFile as any).originalSize = (currentItem.file as any).originalSize || currentItem.file.size;
-    (skipFile as any).originalSourceFile = (currentItem.file as any).originalSourceFile || currentItem.file;
-    const nextResults = [...croppedResults, skipFile];
-    setCroppedResults(nextResults);
-    proceedNext(nextResults);
+    setIsProcessing(true);
+    try {
+      const originalSize = (currentItem.file as any).originalSize || currentItem.file.size;
+      const webpFile = await optimizeImageToWebP(currentItem.file);
+      (webpFile as any).originalSize = originalSize;
+      (webpFile as any).originalSourceFile = (currentItem.file as any).originalSourceFile || currentItem.file;
+      const nextResults = [...croppedResults, webpFile];
+      setCroppedResults(nextResults);
+      proceedNext(nextResults);
+    } catch {
+      const skipFile = currentItem.file;
+      (skipFile as any).originalSize = (currentItem.file as any).originalSize || currentItem.file.size;
+      (skipFile as any).originalSourceFile = (currentItem.file as any).originalSourceFile || currentItem.file;
+      const nextResults = [...croppedResults, skipFile];
+      setCroppedResults(nextResults);
+      proceedNext(nextResults);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleCancelAll = () => {

@@ -219,6 +219,82 @@ export const SAMPLE_TEMPLATES: SampleTemplateDownload[] = [
 ];
 
 /* ── 2B. READY-TO-COPY AI PROMPTS FOR GENERATING / MODIFYING JSONS ── */
+export const ONE_DAY_PACKAGE_AI_PROMPT = `// ========================================================
+// IKISAKI TOURS — ONE-DAY TOUR PACKAGE AI PROMPT
+// TARGET SCHEMA: sample-oneday-tour.json (type: "oneday")
+// ========================================================
+
+You are an expert luxury Sri Lanka tour copywriter and JSON data engineer for Ikisaki Tours (www.ikisakitours.com).
+
+TASK:
+Using the attached/pasted "sample-oneday-tour.json" structure as the EXACT schema, generate a brand-new, production-ready, 100% valid ONE-DAY Tour Package JSON file based on my rough tour content/idea below.
+
+STRICT SCHEMA & BUSINESS RULES (DO NOT BREAK ANY RULE):
+1. Keep ALL top-level and nested keys identical to sample-oneday-tour.json. Return ONLY valid raw JSON (no markdown explanations outside the JSON block).
+2. Bilingual Content: Populate BOTH "en" (natural luxury travel English) and "ja" (natural polite Japanese for travelers) for every translatable object.
+3. "type": Must be strictly "oneday".
+4. "slug": Generate a CONCISE, clean, lowercase hyphenated URL slug strictly from title.en ONLY (keep it short and elegant, e.g. 3 to 5 key words max like "sigiriya-dambulla-day-tour"; NEVER produce overly long or verbose slugs, and do NOT include titleEmphasis in the slug).
+5. "title" & "titleEmphasis" (CRITICAL GOLD HIGHLIGHT RULE):
+   - "titleEmphasis.en" MUST be an exact character-for-character substring inside "title.en".
+   - "titleEmphasis.ja" MUST be an exact character-for-character substring inside "title.ja" using the EXACT SAME Japanese script (do NOT mix Kanji 究極 in title with Katakana アルティメット in titleEmphasis).
+6. "badge": Use ONLY one of these valid values:
+   "best_seller", "top_rated", "popular", "featured", "new_arrival", "exclusive", "limited_availability", "likely_to_sell_out", "instant_confirmation", "bucket_list", "all_inclusive", "family_friendly", "honeymoon_special", "unesco_heritage", "private_tour", "seasonal", "eco_friendly", "none".
+7. "pricingConfig.tiers": Must be contiguous with ZERO gaps and ZERO overlaps (e.g. 1-1, 2-2, 3-4, 5-7, 8-15). Per-person price must decrease as group size increases.
+8. "pricingConfig.options": Each add-on must have a unique "id" and "calculationType" set to strictly "per_person", "per_room", or "per_booking".
+9. "pricingConfig.pricingNotes": Provide 3 essential booking/pricing notes with "en" and "ja" translations for each "title" and "description":
+   - "DYNAMIC GROUP PRICING" / "ダイナミックグループ料金": explain that per-person rates drop as party size increases.
+   - "TRAVELER CATEGORIES" / "旅行者区分と料金": explain room-sharing rules for couples, child rates (ages 2-11), and infants under 2 free.
+   - "COMPREHENSIVE INCLUSIONS" / "充実のパッケージ内容": explain luxury vehicle, chauffeur guide, fuel, tolls, and admissions.
+10. "itinerary": Represents the single day schedule with Day 1 timeline, places, activities, and meals:
+   - "meals": { "en": ["Lunch Included"], "ja": ["昼食付き"] }
+   - "accommodation": { "en": ["Day Return Tour (No Overnight Accommodation)"], "ja": ["日帰りツアー（宿泊なし）"] }
+11. Do NOT include any image URLs or gallery files (I will upload gallery photos manually in the admin panel).
+12. PARAGRAPH-WISE WRITING RULE (CRITICAL): Write all long-form narrative (especially "description.en" and "description.ja", and itinerary details) in elegant, cohesive PARAGRAPHS separated by "\\n\\n" (minimum 2 to 3 well-formed paragraphs covering pickup & scenic morning drive, landmark exploration, authentic culinary/cultural encounter, and comfortable return). NEVER output a single giant unbroken wall of text.
+
+---
+[PASTE sample-oneday-tour.json HERE]
+
+---
+[PASTE YOUR ROUGH TOUR IDEA / NOTES / PRICES HERE (English,Japanese)]`;
+
+export const MULTI_DAY_PACKAGE_AI_PROMPT = `// ========================================================
+// IKISAKI TOURS — MULTI-DAY TOUR PACKAGE AI PROMPT
+// TARGET SCHEMA: sample-multiday-tour.json (type: "multiday")
+// ========================================================
+
+You are an expert luxury Sri Lanka tour copywriter and JSON data engineer for Ikisaki Tours (www.ikisakitours.com).
+
+TASK:
+Using the attached/pasted "sample-multiday-tour.json" structure as the EXACT schema, generate a brand-new, production-ready, 100% valid MULTI-DAY Tour Package JSON file based on my rough tour content/idea below.
+
+STRICT SCHEMA & BUSINESS RULES (DO NOT BREAK ANY RULE):
+1. Keep ALL top-level and nested keys identical to sample-multiday-tour.json. Return ONLY valid raw JSON (no markdown explanations outside the JSON block).
+2. Bilingual Content: Populate BOTH "en" (natural luxury travel English) and "ja" (natural polite Japanese for travelers) for every translatable object.
+3. "type": Must be strictly "multiday".
+4. "slug": Generate a CONCISE, clean, lowercase hyphenated URL slug strictly from title.en ONLY (keep it short and elegant, e.g. 3 to 6 key words max like "kandy-scenic-tea-escape"; NEVER produce overly long or verbose slugs, and do NOT include titleEmphasis in the slug).
+5. "title" & "titleEmphasis" (CRITICAL GOLD HIGHLIGHT RULE):
+   - "titleEmphasis.en" MUST be an exact character-for-character substring inside "title.en".
+   - "titleEmphasis.ja" MUST be an exact character-for-character substring inside "title.ja" using the EXACT SAME Japanese script (do NOT mix Kanji 究極 in title with Katakana アルティメット in titleEmphasis).
+6. "badge": Use ONLY one of these valid values:
+   "best_seller", "top_rated", "popular", "featured", "new_arrival", "exclusive", "limited_availability", "likely_to_sell_out", "instant_confirmation", "bucket_list", "all_inclusive", "family_friendly", "honeymoon_special", "unesco_heritage", "private_tour", "seasonal", "eco_friendly", "none".
+7. "pricingConfig.tiers": Must be contiguous with ZERO gaps and ZERO overlaps (e.g. 1-1, 2-2, 3-4, 5-7, 8-15). Per-person price must decrease as group size increases.
+8. "pricingConfig.options": Each add-on must have a unique "id" and "calculationType" set to strictly "per_person", "per_room", or "per_booking".
+9. "pricingConfig.pricingNotes": Provide 3 essential booking/pricing notes with "en" and "ja" translations for each "title" and "description":
+   - "DYNAMIC GROUP PRICING" / "ダイナミックグループ料金": explain that per-person rates drop as party size increases.
+   - "TRAVELER CATEGORIES" / "旅行者区分と料金": explain room-sharing rules for couples, child rates (ages 2-11), and infants under 2 free.
+   - "COMPREHENSIVE INCLUSIONS" / "充実のパッケージ内容": explain luxury vehicle, chauffeur guide, fuel, tolls, and hotels.
+10. "itinerary": Array of days (Day 1, Day 2, Day 3...) where every day's "meals" and "accommodation" MUST be multilingual arrays:
+   - "meals": { "en": ["Breakfast Included", "Dinner Included"], "ja": ["朝食付き", "夕食付き"] }
+   - "accommodation": { "en": ["Hotel Name (4-Star or Boutique Villa)"], "ja": ["ホテル名（4つ星またはブティックヴィラ）"] }
+11. Do NOT include any image URLs or gallery files (I will upload gallery photos manually in the admin panel).
+12. PARAGRAPH-WISE WRITING RULE (CRITICAL): Write all long-form narrative in elegant, cohesive PARAGRAPHS separated by "\\n\\n". The main package "description.en" and "description.ja" must be written in 3 rich, inspiring paragraphs (covering tour concept, premier sightseeing & cultural highlights, and private chauffeur hospitality). Every itinerary day's description must also be written paragraph-wise detailing morning departure, daytime adventures, and evening relaxation. NEVER output an unbroken wall of text.
+
+---
+[PASTE sample-multiday-tour.json HERE]
+
+---
+[PASTE YOUR ROUGH TOUR IDEA / NOTES / PRICES HERE (English,Japanese)]`;
+
 export const AI_GENERATOR_PROMPTS: AiPromptTemplate[] = [
   {
     id: "package",
@@ -227,34 +303,8 @@ export const AI_GENERATOR_PROMPTS: AiPromptTemplate[] = [
     targetRoute: "/addpackage",
     matchingJsonFile: "sample-oneday-tour.json or sample-multiday-tour.json",
     whenToUse:
-      "Use this when you have rough tour notes, a client itinerary idea, or an existing tour description (in English, Sinhala, or Japanese) and want ChatGPT / Gemini / Claude to generate a 100% upload-ready bilingual EN + JA JSON file.",
-    promptText: `You are an expert luxury Sri Lanka tour copywriter and JSON data engineer for Ikisaki Tours (www.ikisakitours.com).
-
-TASK:
-Using the attached/pasted Ikisaki Tours Sample Package JSON structure as the EXACT schema, generate a brand-new, production-ready, 100% valid JSON file based on my rough tour content/idea below.
-
-STRICT SCHEMA & BUSINESS RULES (DO NOT BREAK ANY RULE):
-1. Keep ALL top-level and nested keys identical to the sample JSON structure. Return ONLY valid raw JSON (no markdown explanations outside the JSON block).
-2. Bilingual Content: Populate BOTH "en" (natural luxury travel English) and "ja" (natural polite Japanese for travelers) for every translatable object.
-3. "type": Must be strictly "oneday" or "multiday".
-4. "slug": Generate a UNIQUE lowercase hyphenated URL slug strictly from title.en ONLY (do NOT include titleEmphasis in the slug).
-5. "title" & "titleEmphasis" (CRITICAL GOLD HIGHLIGHT RULE):
-   - "titleEmphasis.en" MUST be an exact character-for-character substring inside "title.en".
-   - "titleEmphasis.ja" MUST be an exact character-for-character substring inside "title.ja" using the EXACT SAME Japanese script (do NOT mix Kanji 究極 in title with Katakana アルティメット in titleEmphasis).
-6. "badge": Use ONLY one of these valid values:
-   "best_seller", "top_rated", "popular", "featured", "new_arrival", "exclusive", "limited_availability", "likely_to_sell_out", "instant_confirmation", "bucket_list", "all_inclusive", "family_friendly", "honeymoon_special", "unesco_heritage", "private_tour", "seasonal", "eco_friendly", "none".
-7. "pricingConfig.tiers": Must be contiguous with ZERO gaps and ZERO overlaps (e.g. 1-1, 2-2, 3-4, 5-7, 8-15). Per-person price must decrease as group size increases.
-8. "pricingConfig.options": Each add-on must have a unique "id" and "calculationType" set to strictly "per_person", "per_room", or "per_booking".
-9. "itinerary": Every day's "meals" and "accommodation" MUST be multilingual arrays of strings:
-   - "meals": { "en": ["Breakfast Included", "Lunch Not Included", "Dinner Included"], "ja": ["朝食付き", "昼食なし", "夕食付き"] }
-   - "accommodation": { "en": ["Hotel Name (4-Star)"], "ja": ["ホテル名（4つ星）"] }
-10. Do NOT include any image URLs or gallery files (I will upload gallery photos manually in the admin panel).
-
----
-[PASTE YOUR SAMPLE JSON STRUCTURE HERE]
-
----
-[PASTE YOUR ROUGH TOUR IDEA / NOTES / PRICES HERE (English, Sinhala, or Japanese)]`,
+      "Use this when you have rough tour notes, a client itinerary idea, or an existing tour description (in English,Japanese) and want ChatGPT / Gemini / Claude to generate a 100% upload-ready bilingual EN + JA JSON file.",
+    promptText: ONE_DAY_PACKAGE_AI_PROMPT,
   },
   {
     id: "destination",
@@ -272,11 +322,13 @@ Using the exact schema of "sample-destination.json" below, create a 100% valid, 
 STRICT RULES:
 1. Return ONLY valid raw JSON matching these exact keys:
    "slug", "title", "summary", "description", "province", "bestTimeToVisit", "climate", "primaryLanguage", "localCurrency", "coordinates": { "lat": number, "lng": number }, "highlights": { "en": string[], "ja": string[] }.
-2. "slug": Lowercase, hyphenated, unique URL slug derived from title.en.
+2. "slug": Concise, clean lowercase hyphenated URL slug derived from title.en (keep it short, e.g. 2 to 4 words max like "ella-rock" or "galle-fort", avoid overly long slugs).
 3. "coordinates": Provide accurate real-world Sri Lanka GPS latitude ("lat") and longitude ("lng") as numeric values.
-4. Provide natural, inspiring luxury travel copy in both English ("en") and Japanese ("ja").
-5. Include 4 to 6 strong bullet points in "highlights.en" and "highlights.ja".
-6. Do NOT include image fields (I will upload photos manually in the admin panel).
+4. "bestTimeToVisit" (STRICT CONCISE FORMAT RULE): Keep it VERY SHORT, simple, and punchy (e.g. "December to April" in EN, "12月〜4月" in JA, or "November to April"). Do NOT include long sentences, paragraphs, or extra advice in parentheses like "(Morning visits recommended for views)". It must fit cleanly in a 1-line badge on the website destination card.
+5. Provide natural, inspiring luxury travel copy in both English ("en") and Japanese ("ja").
+6. Include 4 to 6 strong bullet points in "highlights.en" and "highlights.ja".
+7. Do NOT include image fields (I will upload photos manually in the admin panel).
+8. PARAGRAPH-WISE WRITING RULE (CRITICAL): In "description.en" and "description.ja", write rich, inspiring storytelling structured into 2 to 3 distinct paragraphs separated by "\\n\\n" (covering geographic charm, cultural/wildlife significance, and traveler tips). Do NOT combine everything into one giant run-on paragraph.
 
 ---
 [PASTE sample-destination.json HERE]
@@ -300,10 +352,11 @@ Using the exact schema of "sample-blog.json" below, write a complete, engaging, 
 STRICT RULES:
 1. Return ONLY valid raw JSON with these exact keys:
    "slug" (string), "author" (string), "category" ({ "en", "ja" }), "readTime" ({ "en", "ja" }), "title" ({ "en", "ja" }), "summary" ({ "en", "ja" }), "blog" ({ "en", "ja" }).
-2. "slug": Clean, SEO-friendly lowercase hyphenated slug based on title.en.
-3. "blog.en" and "blog.ja": Write well-structured, informative paragraphs separated by \\n\\n with numbered sections and practical advice from Ikisaki Tours.
-4. Keep "summary" concise (1-2 compelling sentences) for blog preview cards and meta descriptions.
-5. Do NOT include image fields (I will upload cover images manually on /blogs).
+2. "slug": Clean, concise SEO-friendly lowercase hyphenated slug based on title.en (short and catchy, e.g. 3 to 5 words max like "sri-lanka-tea-train-guide", avoid overly long slugs).
+3. "category" (STRICT SHORT BADGE RULE): Keep it VERY SHORT, simple, and punchy (1 to 2 words max, e.g. "Travel Guide" / "旅行ガイド", "Cultural Heritage" / "文化遺産", "Wildlife" / "野生動物", "Scenic Trains" / "絶景列車", "Cuisine" / "グルメ"). NEVER write long multi-word sentences or complex categories because overly long text breaks blog badge pills on mobile and website card UI.
+4. PARAGRAPH-WISE WRITING RULE (CRITICAL): "blog.en" and "blog.ja" MUST be written paragraph-wise, structured into distinct, cohesive paragraphs separated by "\\n\\n" with numbered section headings and Ikisaki insider tips. Do NOT combine multiple thoughts into giant unbroken text blocks.
+5. Keep "summary" concise (1-2 compelling sentences) for blog preview cards and meta descriptions.
+6. Do NOT include image fields (I will upload cover images manually on /blogs).
 
 ---
 [PASTE sample-blog.json HERE]
@@ -1322,5 +1375,19 @@ export const TROUBLESHOOTING_GUIDE_ITEMS: TroubleshootingItemData[] = [
     cause: "The Admin Panel manages guidelines in two separate sections for two different traveler touchpoints.",
     solution:
       "1) Package Important Pricing Notes (/addpackage & /managepackages): Strictly configured for One-Day and Multi-Day tour packages. They appear inside the 'Important Pricing Notes' popup modal on the package booking page (explaining dynamic group discounts, couple room rates, child discounts, and tour inclusions). 2) Service Guidelines & Fleet Specs (/servicenotes): Configured for standalone Private Chauffeur, Airport Transfer, and Custom Fleet bookings (explaining passenger capacity, luggage limits, and driver overtime). Do not confuse these two distinct tools.",
+  },
+  {
+    question: "How does the Form Completion & Publish Readiness Assistant (Docked Pill & Drawer) work across all admin forms?",
+    module: "Form Quality Assurance & Readiness",
+    cause: "Creating and editing complex packages, destinations, blogs, FAQs, or legal documents involves multiple multilingual fields that must be verified before going live to international travelers.",
+    solution:
+      "A floating pill docked on the right edge of your screen displays your live completion percentage (e.g. 85% or 100% Ready). Clicking the pill slides out the Field Tracker drawer, letting you filter by All, Empty, or Filled items. Clicking any field card or 'Jump to field' automatically closes the drawer, auto-switches to the corresponding language tab (e.g. Japanese), smoothly auto-scrolls to the exact input box, flashes a temporary colored outline (rose for empty, emerald for filled), and focuses your cursor inside so you can type immediately without searching through long forms.",
+  },
+  {
+    question: "How does the 1-Click Paste & Apply and AI JSON Prompt Studio work without using Notepad?",
+    module: "AI Automation & Fast Ingestion",
+    cause: "Admins previously had to manually download JSON templates, copy prompts separately, and save AI responses into Notepad .json files on their computer.",
+    solution:
+      "The new AI Studio simplifies this into 2 steps: 1) In Section 12 (/manual), select your module (Tour Packages, Destinations, or Blogs), choose One-Day or Multi-Day type, and click 'Copy AI Prompt with JSON'. Paste it into Gemini or ChatGPT, type your rough notes at the bottom, and copy the AI's output. 2) In the module's Uploader, click the amber '1-Click Paste & Apply' button. The system reads your clipboard directly, automatically strips markdown code blocks (```json), parses the data, and populates all multilingual titles, itineraries, and pricing notes in 1 click without ever opening Notepad.",
   },
 ];

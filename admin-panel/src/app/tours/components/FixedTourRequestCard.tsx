@@ -29,6 +29,7 @@ import {
   getTotalPax,
   toNumber,
 } from "../utils/bookingFormatters";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 
 interface FixedTourCardProps {
   booking: PackageBooking;
@@ -49,6 +50,7 @@ export default function FixedTourCard({
 }: FixedTourCardProps) {
   const [loadingAction, setLoadingAction] = useState<"status" | "delete" | null>(null);
   const [copied, setCopied] = useState(false);
+  const [fallbackDeleteOpen, setFallbackDeleteOpen] = useState(false);
 
   const fullName = `${booking.firstname} ${booking.lastname}`;
   const refCode = getDisplayReference(booking);
@@ -87,7 +89,7 @@ export default function FixedTourCard({
       onNotify?.(`Status updated to ${newStatus.toUpperCase()}`, "success");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to update status";
-      onNotify ? onNotify(msg, "error") : alert(msg);
+      onNotify?.(msg, "error");
     } finally {
       setLoadingAction(null);
     }
@@ -98,16 +100,19 @@ export default function FixedTourCard({
       onDelete(booking);
       return;
     }
-    if (!confirm(`Delete booking ${refCode} for ${fullName}? This cannot be undone.`)) return;
+    setFallbackDeleteOpen(true);
+  };
 
+  const confirmFallbackDelete = async () => {
     try {
       setLoadingAction("delete");
       await packageBookingService.deleteBooking(booking.id);
       onDeleted?.(booking.id);
       onNotify?.(`Booking ${refCode} deleted.`, "info");
+      setFallbackDeleteOpen(false);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to delete booking";
-      onNotify ? onNotify(msg, "error") : alert(msg);
+      onNotify?.(msg, "error");
       setLoadingAction(null);
     }
   };
@@ -293,6 +298,19 @@ export default function FixedTourCard({
           </button>
         </div>
       </div>
+
+      {/* Fallback Luxury AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={fallbackDeleteOpen}
+        title="Delete Tour Booking"
+        description="Are you sure you want to delete this tour booking record? This cannot be undone."
+        itemTitle={fullName}
+        itemSubtitle={`Booking Ref: ${refCode}`}
+        confirmLabel="Delete Booking"
+        loading={loadingAction === "delete"}
+        onClose={() => setFallbackDeleteOpen(false)}
+        onConfirm={confirmFallbackDelete}
+      />
     </div>
   );
 }

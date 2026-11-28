@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
 
 export type ToastVariant = "success" | "error" | "warning" | "info";
@@ -17,13 +17,26 @@ interface AdminToastProps {
 }
 
 export function AdminToast({ toast, onDismiss }: AdminToastProps) {
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
+
+  // Dynamic duration: standard messages ~4000ms, longer messages up to ~6500ms
+  const duration = toast
+    ? Math.max(3800, Math.min(6500, toast.message.length * 60))
+    : 4000;
+
   useEffect(() => {
     if (!toast) return;
-    // Dynamic duration based on text length so users have ample time to read longer alerts
-    const duration = Math.max(4500, Math.min(10000, toast.message.length * 75));
-    const timer = setTimeout(onDismiss, duration);
-    return () => clearTimeout(timer);
-  }, [toast, onDismiss]);
+
+    // Auto-dismiss when duration completes
+    const dismissTimer = setTimeout(() => {
+      onDismissRef.current();
+    }, duration);
+
+    return () => {
+      clearTimeout(dismissTimer);
+    };
+  }, [toast?.id, duration]);
 
   if (!toast) return null;
 
@@ -34,13 +47,27 @@ export function AdminToast({ toast, onDismiss }: AdminToastProps) {
     info: "bg-slate-900 text-slate-50 border-slate-700 shadow-slate-950/30",
   };
 
+  const barColors: Record<ToastVariant, string> = {
+    success: "bg-emerald-400",
+    error: "bg-rose-400",
+    warning: "bg-amber-400",
+    info: "bg-sky-400",
+  };
+
   const isLongMessage = toast.message.length > 95;
 
   return (
     <div className="fixed bottom-5 right-5 z-120 pointer-events-none animate-in fade-in slide-in-from-bottom-3 duration-200 max-w-[calc(100vw-2.5rem)] flex justify-end">
+      {/* 60fps CSS Animation for butter-smooth linear countdown with zero React re-renders */}
+      <style>{`
+        @keyframes toast-progress-shrink {
+          0% { width: 100%; }
+          100% { width: 0%; }
+        }
+      `}</style>
       <div
         role="status"
-        className={`pointer-events-auto inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2 shadow-xl backdrop-blur-md w-auto max-w-[min(52rem,calc(100vw-3rem))] transition-all duration-200 ${styles[toast.variant]}`}
+        className={`relative overflow-hidden pointer-events-auto inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 shadow-xl backdrop-blur-md w-auto max-w-[min(52rem,calc(100vw-3rem))] transition-all duration-200 ${styles[toast.variant]}`}
       >
         <div className="shrink-0">
           {toast.variant === "success" && (
@@ -71,6 +98,18 @@ export function AdminToast({ toast, onDismiss }: AdminToastProps) {
         >
           <X className="h-3.5 w-3.5" />
         </button>
+
+        {/* Visual Countdown Progress Indicator (Hardware-accelerated 60fps linear shrink) */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/30 overflow-hidden">
+          <div
+            key={toast.id}
+            className={`h-full ${barColors[toast.variant]}`}
+            style={{
+              animation: `toast-progress-shrink ${duration}ms linear forwards`,
+              willChange: "width",
+            }}
+          />
+        </div>
       </div>
     </div>
   );

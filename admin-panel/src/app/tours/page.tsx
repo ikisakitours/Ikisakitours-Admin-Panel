@@ -6,6 +6,7 @@ import {
   ArrowUpDown,
   Calendar,
   LayoutGrid,
+  Package,
   RefreshCw,
   Search,
   Sparkles,
@@ -571,9 +572,11 @@ export default function ToursPage() {
                 />
               ))
             ) : (
-              <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
-                <p className="text-sm font-medium text-slate-500">
-                  No bookings found matching the active filters.
+              <div className="rounded-2xl bg-white border border-dashed border-slate-300 py-14 px-6 text-center space-y-2">
+                <Package className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="text-sm font-bold text-slate-700">No tour bookings match your filters</p>
+                <p className="text-xs text-slate-500">
+                  Try clearing your search query or switching booking/payment status filters.
                 </p>
               </div>
             )}

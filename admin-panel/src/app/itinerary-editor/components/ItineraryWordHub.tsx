@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { ItineraryDocument } from "../types/itinerary.types";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 
 interface ItineraryWordHubProps {
   drafts: ItineraryDocument[];
@@ -32,6 +33,7 @@ export function ItineraryWordHub({
 }: ItineraryWordHubProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"recent" | "all">("recent");
+  const [docToDelete, setDocToDelete] = useState<{ id: string; title: string } | null>(null);
 
   const filteredDrafts = drafts.filter((d) => {
     const q = searchQuery.toLowerCase().trim();
@@ -223,11 +225,7 @@ export function ItineraryWordHub({
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
-                              if (confirm(`Delete document "${d.title}"?`)) {
-                                onDeleteDraft(d.id);
-                              }
-                            }}
+                            onClick={() => setDocToDelete({ id: d.id, title: d.title })}
                             className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                             title="Delete draft"
                           >
@@ -243,6 +241,22 @@ export function ItineraryWordHub({
           )}
         </div>
       </section>
+
+      {/* Unified Luxury AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={Boolean(docToDelete)}
+        title="Delete Itinerary Document"
+        description="Are you sure you want to delete this itinerary document? This action cannot be undone."
+        itemTitle={docToDelete?.title}
+        confirmLabel="Delete Document"
+        onClose={() => setDocToDelete(null)}
+        onConfirm={() => {
+          if (docToDelete) {
+            onDeleteDraft(docToDelete.id);
+            setDocToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

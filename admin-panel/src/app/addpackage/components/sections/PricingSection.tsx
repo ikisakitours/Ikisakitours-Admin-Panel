@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
+import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
 import {
   DollarSign,
   Users,
@@ -157,15 +159,36 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
     updatePricingNotes([...pricingNotes, newNote]);
   };
 
+  const [confirmAction, setConfirmAction] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    confirmLabel: string;
+    onConfirm: () => void;
+  } | null>(null);
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+
+  const notify = useCallback((message: string, variant: ToastVariant = "info") => {
+    setToast({ id: Date.now(), message, variant });
+  }, []);
+
   const removePricingNote = (index: number) => {
     const updated = pricingNotes.filter((_, i) => i !== index);
     updatePricingNotes(updated);
   };
 
   const resetStandardNotes = () => {
-    if (confirm("Reset pricing notes back to Ikisaki standard defaults?")) {
-      updatePricingNotes(DEFAULT_STANDARD_PRICING_NOTES);
-    }
+    setConfirmAction({
+      isOpen: true,
+      title: "Reset Important Pricing Notes",
+      description: "Are you sure you want to restore the recommended standard pricing notes? Any custom notes will be replaced by the default Ikisaki template.",
+      confirmLabel: "Reset to Defaults",
+      onConfirm: () => {
+        updatePricingNotes(DEFAULT_STANDARD_PRICING_NOTES);
+        notify("Pricing notes reset to standard defaults", "success");
+        setConfirmAction(null);
+      },
+    });
   };
 
   // Interactive Live Preview Simulation State (matching user booking widget: Adult, Couple, Child, Infant)
@@ -215,9 +238,17 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
   };
 
   const resetToStandardTiers = () => {
-    if (confirm("Reset group discount tiers to standard 5-tier template?")) {
-      updatePricingConfig({ tiers: DEFAULT_STANDARD_TIERS });
-    }
+    setConfirmAction({
+      isOpen: true,
+      title: "Reset Group Discount Tiers",
+      description: "Are you sure you want to reset group discount tiers to the standard 5-tier template?",
+      confirmLabel: "Reset to Defaults",
+      onConfirm: () => {
+        updatePricingConfig({ tiers: DEFAULT_STANDARD_TIERS });
+        notify("Group discount tiers reset to standard template", "success");
+        setConfirmAction(null);
+      },
+    });
   };
 
   // ── Handlers for Passenger Category Rules ──
@@ -1183,6 +1214,19 @@ export function PricingSection({ formData, setFormData, locale = "en" }: Props) 
           </div>
         </div>
       </div>
+
+      {/* Unified Luxury Confirmation Modal via AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={Boolean(confirmAction?.isOpen)}
+        title={confirmAction?.title || "Reset Confirmation"}
+        description={confirmAction?.description}
+        confirmLabel={confirmAction?.confirmLabel || "Confirm"}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={confirmAction?.onConfirm || (() => setConfirmAction(null))}
+      />
+
+      {/* Executive Toast Notification */}
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

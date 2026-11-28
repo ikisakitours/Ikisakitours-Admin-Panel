@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Calendar,
   Clock,
@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import type { ItineraryDocument } from "../types/itinerary.types";
+import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 
 interface ItineraryDraftsDrawerProps {
   isOpen: boolean;
@@ -30,6 +31,8 @@ export function ItineraryDraftsDrawer({
   onDeleteDraft,
   onNewDocument,
 }: ItineraryDraftsDrawerProps) {
+  const [draftToDelete, setDraftToDelete] = useState<{ id: string; title: string } | null>(null);
+
   if (!isOpen) return null;
 
   return (
@@ -141,11 +144,9 @@ export function ItineraryDraftsDrawer({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (confirm(`Delete draft "${draft.title}"?`)) {
-                          onDeleteDraft(draft.id);
-                        }
+                        setDraftToDelete({ id: draft.id, title: draft.title });
                       }}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                       title="Delete draft"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -157,6 +158,22 @@ export function ItineraryDraftsDrawer({
           )}
         </div>
       </div>
+
+      {/* Unified Luxury AdminDeleteModal */}
+      <AdminDeleteModal
+        isOpen={Boolean(draftToDelete)}
+        title="Delete Itinerary Draft"
+        description="Are you sure you want to delete this itinerary draft document? This action cannot be undone."
+        itemTitle={draftToDelete?.title}
+        confirmLabel="Delete Draft"
+        onClose={() => setDraftToDelete(null)}
+        onConfirm={() => {
+          if (draftToDelete) {
+            onDeleteDraft(draftToDelete.id);
+            setDraftToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }
