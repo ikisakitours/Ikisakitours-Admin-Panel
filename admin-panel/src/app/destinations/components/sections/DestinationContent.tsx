@@ -33,6 +33,7 @@ export default function DestinationContent({
           Summary / Excerpt ({language.toUpperCase()})
         </label>
         <textarea
+          id="dest_input_summary"
           rows={2}
           required
           value={summary[language] || ""}
@@ -48,6 +49,7 @@ export default function DestinationContent({
           Detailed Description ({language.toUpperCase()})
         </label>
         <textarea
+          id="dest_input_description"
           rows={5}
           required
           value={description[language] || ""}
@@ -65,6 +67,7 @@ export default function DestinationContent({
         {currentHighlights.map((highlight, index) => (
           <div key={index} className="flex gap-2 mb-2">
             <input
+              id={index === 0 ? "dest_input_highlights" : undefined}
               type="text"
               value={highlight}
               onChange={(e) => onHighlightChange(index, e.target.value)}

@@ -206,6 +206,7 @@ export default function DateConfigPanel({
         </div>
 
         <textarea
+          id="avail_input_note"
           rows={2}
           value={selectedNotes[noteLocale] || ""}
           onChange={(e) =>

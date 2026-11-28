@@ -37,11 +37,9 @@ export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
-    if (!docId || docId === autoId(title)) {
-      const generated = autoId(val);
-      setDocId(generated);
-      setIdError(existingIds.includes(generated) ? "This ID is already in use." : null);
-    }
+    const generated = autoId(val);
+    setDocId(generated);
+    setIdError(existingIds.includes(generated) ? "This ID is already in use by another document." : null);
   };
 
   const handleIdChange = (val: string) => {
@@ -114,22 +112,18 @@ export default function NewDocumentModal({ locale, onClose, onAdd, existingIds }
 
           <div>
             <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">
-              Document ID (slug) *
+              Document ID (Slug) * <span className="text-[9px] text-slate-400 font-normal lowercase">(read-only)</span>
             </label>
             <input
               type="text"
+              readOnly
               required
               value={docId}
-              onChange={(e) => handleIdChange(e.target.value)}
-              placeholder="e.g. refund-policy"
-              className={`w-full text-xs border rounded-lg p-2.5 outline-none bg-white font-mono transition-all ${
-                idError
-                  ? "border-red-300 focus:ring-red-100"
-                  : "border-slate-200 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100"
-              }`}
+              placeholder="Auto-generated from title"
+              className="w-full text-xs border border-slate-200 rounded-lg p-2.5 outline-none bg-slate-100/70 text-slate-500 font-mono cursor-not-allowed select-none"
             />
             {idError && <p className="mt-1 text-[10px] text-red-500 font-medium">{idError}</p>}
-            <p className="mt-1 text-[10px] text-slate-400">Auto-generated from title. Must be unique.</p>
+            <p className="mt-1 text-[10px] text-slate-400">Auto-generated from title &amp; read-only. Must be unique.</p>
           </div>
 
           <div>

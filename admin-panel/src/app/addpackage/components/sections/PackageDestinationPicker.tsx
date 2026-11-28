@@ -241,6 +241,7 @@ export function PackageDestinationPicker({
       {/* Search Dropdown Trigger / Input */}
       <div className="relative">
         <input
+          id="pkg_input_destinations"
           type="text"
           placeholder={`Search & append stop to route (${locale.toUpperCase()})...`}
           value={query}

@@ -75,6 +75,7 @@ export default function DocumentMetaModal({ doc, locale, onClose, onSave }: Prop
               Document Title ({langLabel}) {locale === "en" && "*"}
             </label>
             <input
+              id="legal_meta_input_title"
               type="text"
               required={locale === "en"}
               value={title}
@@ -89,6 +90,7 @@ export default function DocumentMetaModal({ doc, locale, onClose, onSave }: Prop
               Eyebrow Label ({langLabel})
             </label>
             <input
+              id="legal_meta_input_eyebrow"
               type="text"
               value={eyebrow}
               onChange={(e) => setEyebrow(e.target.value)}

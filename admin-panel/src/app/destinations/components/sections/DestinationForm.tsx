@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { destinationService, DestinationPayload } from "@/services/destination.service";
 import { Save, Plus } from "lucide-react";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
+import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
+import { FormReadinessDrawer, FormReadinessItem } from "@/components/FormReadinessDrawer";
+import { formatBackendErrorMessage } from "@/utils/errorHelper";
 import DestinationBasicInfo from "./DestinationBasicInfo";
 import DestinationContent from "./DestinationContent";
 import DestinationMedia from "./DestinationMedia";
@@ -28,8 +31,19 @@ export default function DestinationForm({
 
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>(() => initialData?.images || []);
   const [isCustomSlug, setIsCustomSlug] = useState<boolean>(() => Boolean(initialData?.slug));
   const [slug, setSlug] = useState<string>(() => initialData?.slug || "");
+
+  // Toast Notification System
+  const [toast, setToast] = useState<AdminToastState | null>(null);
+  const notify = useCallback((message: string, variant: ToastVariant = "info") => {
+    setToast({ id: Date.now(), message, variant });
+  }, []);
+
+  const handleRemoveExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // Active language tab selected in admin form
   const [activeLang, setActiveLang] = useState<string>("en");
@@ -131,11 +145,11 @@ export default function DestinationForm({
     },
   });
 
-  // Only update state if initialData actually changes to a different record after mount
-  const prevInitialIdRef = useRef<string | undefined>(initialData?.id);
+  // Sync whenever initialData arrives (e.g. async fetch in EditDestinationPage)
+  const prevInitialDataRef = useRef<DestinationPayload | null | undefined>(undefined);
   useEffect(() => {
-    if (initialData && initialData.id !== prevInitialIdRef.current) {
-      prevInitialIdRef.current = initialData.id;
+    if (initialData && initialData !== prevInitialDataRef.current) {
+      prevInitialDataRef.current = initialData;
       const detectedLangs = Array.from(
         new Set([
           "en",
@@ -171,6 +185,9 @@ export default function DestinationForm({
           ...initialData.highlights,
         });
       }
+
+      setExistingImages(initialData.images || []);
+      setSelectedFiles([]);
     }
   }, [initialData]);
 
@@ -307,19 +324,36 @@ export default function DestinationForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const sampleTitle = formData.title.en?.trim() || Object.values(formData.title)[0]?.trim() || "";
+    if (!sampleTitle) {
+      notify("Please provide a destination title (English is required).", "warning");
+      return;
+    }
+
+    const rawSlug = slug.trim() !== "" ? slug : sampleTitle;
+    const computedSlug = slugify(rawSlug);
+    const finalSlug = computedSlug.length > 0 ? computedSlug : `destination-${Date.now()}`;
+
+    if (!finalSlug) {
+      notify("Please provide a destination slug.", "warning");
+      return;
+    }
+
+    if (existingImages.length + selectedFiles.length === 0) {
+      notify("Please attach at least one photo for this destination.", "warning");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      let imageUrls: string[] = [];
-
+      let newUploadedUrls: string[] = [];
       if (selectedFiles.length > 0) {
-        imageUrls = await destinationService.uploadImages(selectedFiles, "destinations");
+        newUploadedUrls = await destinationService.uploadImages(selectedFiles);
       }
 
-      const sampleTitle = formData.title.en || Object.values(formData.title)[0] || "";
-      const rawSlug = slug.trim() !== "" ? slug : sampleTitle;
-      const computedSlug = slugify(rawSlug);
-      const finalSlug = computedSlug.length > 0 ? computedSlug : `destination-${Date.now()}`;
+      const finalImages = [...existingImages, ...newUploadedUrls];
 
       // Sanitize highlights per language
       const cleanedHighlights: Record<string, string[]> = {};
@@ -334,7 +368,7 @@ export default function DestinationForm({
         description: formData.description,
         province: formData.province,
         highlights: cleanedHighlights,
-        ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
+        images: finalImages,
         bestTimeToVisit: formData.bestTimeToVisit,
         climate: formData.climate,
         primaryLanguage: formData.primaryLanguage,
@@ -348,14 +382,15 @@ export default function DestinationForm({
       if (isEditMode && initialData?.id) {
         await destinationService.updateDestination(initialData.id, payload);
         clearDraft();
-        alert("Destination updated successfully!");
+        notify("Destination updated successfully!", "success");
       } else {
         const newDest = await destinationService.createDestination(payload);
         clearDraft();
-        alert(`Destination created successfully! ID: ${newDest.id}`);
+        notify(`Destination created successfully! ID: ${newDest.id}`, "success");
 
         // Reset Form
         setSelectedFiles([]);
+        setExistingImages([]);
         setIsCustomSlug(false);
         setSlug("");
         setActiveLang("en");
@@ -378,14 +413,186 @@ export default function DestinationForm({
       if (onSuccess) onSuccess();
       if (onDestinationCreated) onDestinationCreated();
     } catch (err: any) {
-      alert(`Error: ${err.message}`);
+      notify(formatBackendErrorMessage(err), "error");
     } finally {
       setLoading(false);
     }
   };
 
+  // Readiness checklist items tracking EVERY field
+  const readinessItems: FormReadinessItem[] = [
+    {
+      id: "dest_title_en",
+      label: "Title (English)",
+      isComplete: Boolean(formData.title?.en?.trim()),
+      elementId: "dest_input_title",
+      targetLang: "en",
+      hint: "English destination name",
+    },
+    {
+      id: "dest_title_ja",
+      label: "Title (Japanese)",
+      isComplete: Boolean(formData.title?.ja?.trim()),
+      elementId: "dest_input_title",
+      targetLang: "ja",
+      hint: "Japanese destination name",
+    },
+    {
+      id: "dest_slug",
+      label: "URL Slug",
+      isComplete: Boolean(slug?.trim()),
+      elementId: "dest_input_slug",
+      hint: "Auto-generated destination slug",
+    },
+    {
+      id: "dest_province_en",
+      label: "Province / Region (English)",
+      isComplete: Boolean(formData.province?.en?.trim()),
+      elementId: "dest_input_province",
+      targetLang: "en",
+      hint: "Province or geographical zone (EN)",
+    },
+    {
+      id: "dest_province_ja",
+      label: "Province / Region (Japanese)",
+      isComplete: Boolean(formData.province?.ja?.trim()),
+      elementId: "dest_input_province",
+      targetLang: "ja",
+      hint: "Province or geographical zone (JA)",
+    },
+    {
+      id: "dest_images",
+      label: "Photos (≥ 1 Image)",
+      isComplete: existingImages.length + selectedFiles.length > 0,
+      elementId: "dest_input_images",
+      hint: "Hero banner and gallery photos",
+    },
+    {
+      id: "dest_summary_en",
+      label: "Summary (English)",
+      isComplete: Boolean(formData.summary?.en?.trim()),
+      elementId: "dest_input_summary",
+      targetLang: "en",
+      hint: "Short introductory overview (EN)",
+    },
+    {
+      id: "dest_summary_ja",
+      label: "Summary (Japanese)",
+      isComplete: Boolean(formData.summary?.ja?.trim()),
+      elementId: "dest_input_summary",
+      targetLang: "ja",
+      hint: "Short introductory overview (JA)",
+    },
+    {
+      id: "dest_description_en",
+      label: "Detailed Description (English)",
+      isComplete: Boolean(formData.description?.en?.trim()),
+      elementId: "dest_input_description",
+      targetLang: "en",
+      hint: "Full destination guide & history (EN)",
+    },
+    {
+      id: "dest_description_ja",
+      label: "Detailed Description (Japanese)",
+      isComplete: Boolean(formData.description?.ja?.trim()),
+      elementId: "dest_input_description",
+      targetLang: "ja",
+      hint: "Full destination guide & history (JA)",
+    },
+    {
+      id: "dest_highlights_en",
+      label: "Key Highlights (English)",
+      isComplete: (highlights?.en || []).filter((h) => h.trim() !== "").length > 0,
+      elementId: "dest_input_highlights",
+      targetLang: "en",
+      hint: "Must-see attractions (EN)",
+    },
+    {
+      id: "dest_highlights_ja",
+      label: "Key Highlights (Japanese)",
+      isComplete: (highlights?.ja || []).filter((h) => h.trim() !== "").length > 0,
+      elementId: "dest_input_highlights",
+      targetLang: "ja",
+      hint: "Must-see attractions (JA)",
+    },
+    {
+      id: "dest_best_time_en",
+      label: "Best Time to Visit (English)",
+      isComplete: Boolean(formData.bestTimeToVisit?.en?.trim()),
+      elementId: "dest_input_best_time",
+      targetLang: "en",
+      hint: "Optimal travel months & seasons (EN)",
+    },
+    {
+      id: "dest_best_time_ja",
+      label: "Best Time to Visit (Japanese)",
+      isComplete: Boolean(formData.bestTimeToVisit?.ja?.trim()),
+      elementId: "dest_input_best_time",
+      targetLang: "ja",
+      hint: "Optimal travel months & seasons (JA)",
+    },
+    {
+      id: "dest_climate_en",
+      label: "Climate Info (English)",
+      isComplete: Boolean(formData.climate?.en?.trim()),
+      elementId: "dest_input_climate",
+      targetLang: "en",
+      hint: "Weather & temperature details (EN)",
+    },
+    {
+      id: "dest_climate_ja",
+      label: "Climate Info (Japanese)",
+      isComplete: Boolean(formData.climate?.ja?.trim()),
+      elementId: "dest_input_climate",
+      targetLang: "ja",
+      hint: "Weather & temperature details (JA)",
+    },
+    {
+      id: "dest_language_en",
+      label: "Primary Language (English)",
+      isComplete: Boolean(formData.primaryLanguage?.en?.trim()),
+      elementId: "dest_input_language",
+      targetLang: "en",
+      hint: "Spoken languages (EN)",
+    },
+    {
+      id: "dest_language_ja",
+      label: "Primary Language (Japanese)",
+      isComplete: Boolean(formData.primaryLanguage?.ja?.trim()),
+      elementId: "dest_input_language",
+      targetLang: "ja",
+      hint: "Spoken languages (JA)",
+    },
+    {
+      id: "dest_currency_en",
+      label: "Local Currency (English)",
+      isComplete: Boolean(formData.localCurrency?.en?.trim()),
+      elementId: "dest_input_currency",
+      targetLang: "en",
+      hint: "Currency code and notes (EN)",
+    },
+    {
+      id: "dest_currency_ja",
+      label: "Local Currency (Japanese)",
+      isComplete: Boolean(formData.localCurrency?.ja?.trim()),
+      elementId: "dest_input_currency",
+      targetLang: "ja",
+      hint: "Currency code and notes (JA)",
+    },
+  ];
+
   return (
     <form onSubmit={handleSubmit} className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 space-y-6">
+      <AdminToast toast={toast} onDismiss={() => setToast(null)} />
+      <FormReadinessDrawer
+        items={readinessItems}
+        entityTitle="Destination"
+        onNavigateToField={(item) => {
+          if (item.targetLang) {
+            setActiveLang(item.targetLang);
+          }
+        }}
+      />
       <DraftRecoveryBanner
         hasDraft={hasDraft}
         draftSavedAt={draftSavedAt}
@@ -450,55 +657,62 @@ export default function DestinationForm({
       {!isEditMode && <DestinationJsonUploader onDataLoaded={handleJsonLoaded} />}
 
       {/* Basic Info (Title, Slug, Province & Language tabs) */}
-      <DestinationBasicInfo
-        title={formData.title}
-        slug={slug}
-        language={activeLang}
-        availableLanguages={availableLanguages}
-        province={formData.province}
-        onTitleChange={handleTitleChange}
-        onSlugChange={handleSlugChange}
-        onLanguageChange={(lang) => setActiveLang(lang)}
-        onProvinceChange={(val) => handleFieldChange("province", val)}
-      />
+      <div id="dest_section_basic">
+        <DestinationBasicInfo
+          title={formData.title}
+          slug={slug}
+          language={activeLang}
+          availableLanguages={availableLanguages}
+          province={formData.province}
+          onTitleChange={handleTitleChange}
+          onSlugChange={handleSlugChange}
+          onLanguageChange={(lang) => setActiveLang(lang)}
+          onProvinceChange={(val) => handleFieldChange("province", val)}
+        />
+      </div>
 
       {/* Content (Summary, Description, Highlights) */}
-      <DestinationContent
-        language={activeLang}
-        summary={formData.summary}
-        description={formData.description}
-        highlights={highlights}
-        onSummaryChange={(val) => handleFieldChange("summary", val)}
-        onDescriptionChange={(val) => handleFieldChange("description", val)}
-        onHighlightChange={handleHighlightChange}
-        onAddHighlight={handleAddHighlight}
-        onRemoveHighlight={handleRemoveHighlight}
-      />
+      <div id="dest_section_content">
+        <DestinationContent
+          language={activeLang}
+          summary={formData.summary}
+          description={formData.description}
+          highlights={highlights}
+          onSummaryChange={(val) => handleFieldChange("summary", val)}
+          onDescriptionChange={(val) => handleFieldChange("description", val)}
+          onHighlightChange={handleHighlightChange}
+          onAddHighlight={handleAddHighlight}
+          onRemoveHighlight={handleRemoveHighlight}
+        />
+      </div>
 
       {/* Media Files (Hidden when hideImageUpload prop is true) */}
       {!hideImageUpload && (
-        <DestinationMedia
-          selectedFiles={selectedFiles}
-          onFileSelect={(e) => {
-            if (e.target.files) {
-              setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)].slice(0, 6));
-            }
-          }}
-          onRemoveFile={(idx) => setSelectedFiles((prev) => prev.filter((_, i) => i !== idx))}
-        />
+        <div id="dest_section_media">
+          <DestinationMedia
+            existingImages={existingImages}
+            onRemoveExisting={handleRemoveExistingImage}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            disabled={loading}
+            maxImages={6}
+          />
+        </div>
       )}
 
       {/* Quick Facts */}
-      <DestinationQuickFacts
-        language={activeLang}
-        bestTimeToVisit={formData.bestTimeToVisit}
-        climate={formData.climate}
-        primaryLanguage={formData.primaryLanguage}
-        localCurrency={formData.localCurrency}
-        lat={formData.lat}
-        lng={formData.lng}
-        onChange={handleQuickFactChange}
-      />
+      <div id="dest_section_quick_facts">
+        <DestinationQuickFacts
+          language={activeLang}
+          bestTimeToVisit={formData.bestTimeToVisit}
+          climate={formData.climate}
+          primaryLanguage={formData.primaryLanguage}
+          localCurrency={formData.localCurrency}
+          lat={formData.lat}
+          lng={formData.lng}
+          onChange={handleQuickFactChange}
+        />
+      </div>
     </form>
   );
 }

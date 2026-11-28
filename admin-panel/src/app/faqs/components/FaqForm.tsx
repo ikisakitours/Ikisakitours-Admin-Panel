@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
 import { useFormDraft } from '@/hooks/useFormDraft';
 import { DraftRecoveryBanner } from '@/components/DraftRecoveryBanner';
+import { FormReadinessDrawer, FormReadinessItem } from '@/components/FormReadinessDrawer';
 
 interface FaqFormProps {
   initialData?: FaqItem | null;
@@ -165,8 +166,69 @@ export default function FaqForm({
     }
   };
 
+  // Comprehensive FAQ Field Checklist
+  const readinessItems: FormReadinessItem[] = [
+    {
+      id: "faq_cat_en",
+      label: "Category (English)",
+      isComplete: Boolean(formData.category?.en?.trim()),
+      elementId: "faq_input_category",
+      targetLang: "en",
+      hint: "Topic grouping (e.g. Booking, Transport)",
+    },
+    {
+      id: "faq_cat_ja",
+      label: "Category (Japanese)",
+      isComplete: Boolean(formData.category?.ja?.trim()),
+      elementId: "faq_input_category",
+      targetLang: "ja",
+      hint: "Japanese topic grouping",
+    },
+    {
+      id: "faq_q_en",
+      label: "Question (English)",
+      isComplete: Boolean(formData.question?.en?.trim()),
+      elementId: "faq_input_question",
+      targetLang: "en",
+      hint: "Core customer question (EN)",
+    },
+    {
+      id: "faq_q_ja",
+      label: "Question (Japanese)",
+      isComplete: Boolean(formData.question?.ja?.trim()),
+      elementId: "faq_input_question",
+      targetLang: "ja",
+      hint: "Customer question in Japanese (JA)",
+    },
+    {
+      id: "faq_a_en",
+      label: "Answer (English)",
+      isComplete: Boolean(formData.answer?.en?.trim()),
+      elementId: "faq_input_answer",
+      targetLang: "en",
+      hint: "Detailed solution / response (EN)",
+    },
+    {
+      id: "faq_a_ja",
+      label: "Answer (Japanese)",
+      isComplete: Boolean(formData.answer?.ja?.trim()),
+      elementId: "faq_input_answer",
+      targetLang: "ja",
+      hint: "Detailed solution in Japanese (JA)",
+    },
+  ];
+
   return (
     <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-8">
+      <FormReadinessDrawer
+        items={readinessItems}
+        entityTitle="FAQ"
+        onNavigateToField={(item) => {
+          if (item.targetLang) {
+            setActiveLang(item.targetLang);
+          }
+        }}
+      />
       <form onSubmit={handleSubmit}>
         <DraftRecoveryBanner
           hasDraft={hasDraft}
@@ -264,6 +326,7 @@ export default function FaqForm({
               </label>
               <div>
                 <input
+                  id="faq_input_category"
                   type="text"
                   value={formData.category[activeLang] || ''}
                   onChange={(e) => handleFieldChange('category', e.target.value)}
@@ -281,6 +344,7 @@ export default function FaqForm({
               </label>
               <div>
                 <input
+                  id="faq_input_question"
                   type="text"
                   value={formData.question[activeLang] || ''}
                   onChange={(e) => handleFieldChange('question', e.target.value)}
@@ -298,6 +362,7 @@ export default function FaqForm({
               </label>
               <div>
                 <textarea
+                  id="faq_input_answer"
                   value={formData.answer[activeLang] || ''}
                   onChange={(e) => handleFieldChange('answer', e.target.value)}
                   placeholder={`Provide a thorough, helpful answer in ${activeLang.toUpperCase()}...`}

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { blogService, BlogPayload } from "@/services/blog.service";
 import { Save, Plus } from "lucide-react";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { DraftRecoveryBanner } from "@/components/DraftRecoveryBanner";
+import { AdminToast, type AdminToastState, type ToastVariant } from "@/components/AdminToast";
+import { formatBackendErrorMessage } from "@/utils/errorHelper";
 import JsonImporter from "./JsonImporter";
 import MultilingualEditor from "./MultilingualEditor";
 import ImageUploader from "./ImageUploader";
@@ -26,7 +28,18 @@ export default function BlogForm({
 
     const [loading, setLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [existingImages, setExistingImages] = useState<string[]>(() => initialData?.images || []);
     const [isCustomSlug, setIsCustomSlug] = useState<boolean>(() => Boolean(initialData?.slug));
+
+    // Toast Notification System
+    const [toast, setToast] = useState<AdminToastState | null>(null);
+    const notify = useCallback((message: string, variant: ToastVariant = "info") => {
+        setToast({ id: Date.now(), message, variant });
+    }, []);
+
+    const handleRemoveExistingImage = (index: number) => {
+        setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    };
 
     // Dynamic language management
     const [activeLang, setActiveLang] = useState<string>("en");
@@ -96,11 +109,11 @@ export default function BlogForm({
         },
     });
 
-    // Only sync if initialData changes to a DIFFERENT record after mount
-    const prevInitialIdRef = useRef<string | undefined>(initialData?.id);
+    // Sync whenever initialData arrives (e.g. async fetch in EditBlogPage)
+    const prevInitialDataRef = useRef<BlogPayload | null | undefined>(undefined);
     useEffect(() => {
-        if (initialData && initialData.id !== prevInitialIdRef.current) {
-            prevInitialIdRef.current = initialData.id;
+        if (initialData && initialData !== prevInitialDataRef.current) {
+            prevInitialDataRef.current = initialData;
             const detectedLangs = Array.from(
                 new Set([
                     "en",
@@ -124,6 +137,8 @@ export default function BlogForm({
                 author: initialData.author || "",
                 blog: { en: "", ja: "", ...(initialData.blog || {}) },
             });
+            setExistingImages(initialData.images || []);
+            setSelectedFiles([]);
         }
     }, [initialData]);
 
@@ -199,8 +214,13 @@ export default function BlogForm({
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const filesArray = Array.from(e.target.files);
-            setSelectedFiles((prev) => [...prev, ...filesArray]);
+            const currentTotal = existingImages.length + selectedFiles.length;
+            const remainingSlots = Math.max(0, 6 - currentTotal);
+            const incoming = Array.from(e.target.files).slice(0, remainingSlots);
+            if (incoming.length > 0) {
+                setSelectedFiles((prev) => [...prev, ...incoming]);
+            }
+            e.target.value = "";
         }
     };
 
@@ -210,21 +230,35 @@ export default function BlogForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const englishTitle = formData.title["en"]?.trim() || Object.values(formData.title)[0]?.trim() || "";
+        if (!englishTitle) {
+            notify("Please enter a blog title (English is required).", "warning");
+            return;
+        }
+
+        const finalSlug = slugify(formData.slug.trim() ? formData.slug : englishTitle) || `blog-${Date.now()}`;
+        if (!finalSlug) {
+            notify("Blog slug is required.", "warning");
+            return;
+        }
+
+        if (existingImages.length + selectedFiles.length === 0) {
+            notify("Please attach at least one photo for this blog article.", "warning");
+            return;
+        }
+
         setLoading(true);
 
         try {
-            let imageUrls: string[] = [];
-
+            let newUploadedUrls: string[] = [];
             if (selectedFiles.length > 0) {
-                imageUrls = await blogService.uploadImages(selectedFiles, "blogs");
+                newUploadedUrls = await blogService.uploadImages(selectedFiles, "blog-images");
             }
 
-            const englishTitle = formData.title["en"] || Object.values(formData.title)[0] || "";
-            const finalSlug =
-                slugify(formData.slug.trim() ? formData.slug : englishTitle) ||
-                `blog-${Date.now()}`;
+            const finalImages = [...existingImages, ...newUploadedUrls];
 
-            const blogPayload = {
+            const blogPayload: BlogPayload = {
                 title: formData.title,
                 slug: finalSlug,
                 summary: formData.summary,
@@ -232,19 +266,20 @@ export default function BlogForm({
                 readTime: formData.readTime,
                 author: formData.author,
                 blog: formData.blog,
-                ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
+                images: finalImages,
             };
 
             if (isEditMode && initialData?.id) {
                 await blogService.updateBlog(initialData.id, blogPayload);
                 clearDraft();
-                alert("Blog updated successfully!");
+                notify("Blog article updated successfully!", "success");
             } else {
                 const newPost = await blogService.createBlog(blogPayload);
                 clearDraft();
-                alert(`Blog created successfully! ID: ${newPost.id}`);
+                notify(`Blog article created successfully! ID: ${newPost.id}`, "success");
 
                 setSelectedFiles([]);
+                setExistingImages([]);
                 setIsCustomSlug(false);
                 setActiveLang("en");
                 setAvailableLanguages(["en", "ja"]);
@@ -262,14 +297,15 @@ export default function BlogForm({
             if (onSuccess) onSuccess();
             if (onBlogCreated) onBlogCreated();
         } catch (err: any) {
-            alert(`Error: ${err.message}`);
+            notify(formatBackendErrorMessage(err), "error");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-xl border border-slate-200 space-y-6">
+        <form onSubmit={handleSubmit} className="w-full space-y-8 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200 shadow-xs">
+            <AdminToast toast={toast} onDismiss={() => setToast(null)} />
             <DraftRecoveryBanner
                 hasDraft={hasDraft}
                 draftSavedAt={draftSavedAt}
@@ -347,9 +383,11 @@ export default function BlogForm({
             {/* Component 3: Image Uploader (Hidden when hideImageUpload is true) */}
             {!hideImageUpload && (
                 <ImageUploader
+                    existingImages={existingImages}
+                    onRemoveExisting={handleRemoveExistingImage}
                     selectedFiles={selectedFiles}
-                    onFilesSelected={handleFileSelect}
-                    onRemoveFile={removeFile}
+                    setSelectedFiles={setSelectedFiles}
+                    disabled={loading}
                 />
             )}
         </form>

@@ -52,6 +52,7 @@ export default function CharterRatesForm({ data, locale, onChange }: Props) {
               Title Base ({langLabel})
             </label>
             <input
+              id="pricing_input_title_base"
               type="text"
               value={data.titleBase?.[locale] ?? ""}
               onChange={(e) => updateTextField("titleBase", e.target.value)}
@@ -65,6 +66,7 @@ export default function CharterRatesForm({ data, locale, onChange }: Props) {
               Title Accent ({langLabel})
             </label>
             <input
+              id="pricing_input_title_accent"
               type="text"
               value={data.titleAccent?.[locale] ?? ""}
               onChange={(e) => updateTextField("titleAccent", e.target.value)}
@@ -91,6 +93,7 @@ export default function CharterRatesForm({ data, locale, onChange }: Props) {
               Subtitle Description ({langLabel})
             </label>
             <textarea
+              id="pricing_input_subtitle"
               rows={2}
               value={data.subtitle?.[locale] ?? ""}
               onChange={(e) => updateTextField("subtitle", e.target.value)}
@@ -151,16 +154,18 @@ export default function CharterRatesForm({ data, locale, onChange }: Props) {
       </div>
 
       {/* ── Section 3: Dynamic Charter Pricing Notes ─────────────────────── */}
-      <DynamicListManager
-        title="Charter Pricing Notes"
-        description="Add, edit, reorder, or remove individual charter rate notes displayed to guests."
-        items={data.notes?.[locale] ?? []}
-        locale={locale}
-        placeholder="Enter charter pricing note"
-        addLabel="Add Pricing Note"
-        accentColor="amber"
-        onChange={updateNotes}
-      />
+      <div id="pricing_input_notes">
+        <DynamicListManager
+          title="Charter Pricing Notes"
+          description="Add, edit, reorder, or remove individual charter rate notes displayed to guests."
+          items={data.notes?.[locale] ?? []}
+          locale={locale}
+          placeholder="Enter charter pricing note"
+          addLabel="Add Pricing Note"
+          accentColor="amber"
+          onChange={updateNotes}
+        />
+      </div>
     </div>
   );
 }

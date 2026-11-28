@@ -20,6 +20,7 @@ import DateConfigPanel from "./DateConfigPanel";
 import ClosedDatesList from "./ClosedDatesList";
 import { AdminDeleteModal } from "@/components/AdminDeleteModal";
 import { AdminToast, type AdminToastState } from "@/components/AdminToast";
+import { FormReadinessDrawer, FormReadinessItem } from "@/components/FormReadinessDrawer";
 
 // Re-export constants & types for backwards compatibility
 export { TOUR_TYPES, MONTHS, YEARS };
@@ -317,8 +318,57 @@ export default function AvailabilityManager() {
 
   const isSelectedDateClosed = selectedDate ? closedDates.includes(selectedDate) : false;
 
+  const readinessItems: FormReadinessItem[] = [
+    {
+      id: "avail_selected_date",
+      label: selectedDate ? `Active Date: ${selectedDate}` : "Select a Calendar Date",
+      isComplete: Boolean(selectedDate),
+      elementId: "avail_calendar_grid",
+      hint: "Click any date on the calendar",
+    },
+    {
+      id: "avail_tour_types",
+      label: "Tour Type Restriction",
+      isComplete: selectedTourTypes.length > 0,
+      elementId: "avail_date_config_panel",
+      hint: "Select at least one restricted tour type",
+    },
+    {
+      id: "avail_note_en",
+      label: "Customer Notice (English)",
+      isComplete: Boolean(selectedNotes?.en?.trim()),
+      elementId: "avail_input_note",
+      targetLang: "en",
+      hint: "Reason shown on booking popup (EN)",
+    },
+    {
+      id: "avail_note_ja",
+      label: "Customer Notice (Japanese)",
+      isComplete: Boolean(selectedNotes?.ja?.trim()),
+      elementId: "avail_input_note",
+      targetLang: "ja",
+      hint: "Reason shown on booking popup (JA)",
+    },
+    {
+      id: "avail_changes_saved",
+      label: hasUnsavedChanges ? "Pending Unsaved Changes" : "All Changes Saved to Cloud",
+      isComplete: !hasUnsavedChanges,
+      elementId: "avail_save_btn",
+      hint: hasUnsavedChanges ? 'Click "Save Changes" at the top' : "Up-to-date",
+    },
+  ];
+
   return (
     <div className="w-full space-y-5">
+      <FormReadinessDrawer
+        items={readinessItems}
+        entityTitle="Availability"
+        onNavigateToField={(item) => {
+          if (item.targetLang) {
+            setNoteLocale(item.targetLang);
+          }
+        }}
+      />
       {/* Error Alert Banner */}
       {errorMessage && (
         <div className="flex items-center justify-between gap-3 px-4 py-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs font-semibold shadow-xs">
@@ -339,22 +389,24 @@ export default function AvailabilityManager() {
       {/* Main Card Container */}
       <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
         {/* Top Header Bar */}
-        <AvailabilityHeader
-          noteLocale={noteLocale}
-          availableLanguages={availableLanguages}
-          onLocaleChange={setNoteLocale}
-          onAddLanguage={addCustomLanguage}
-          loading={loading}
-          saved={saved}
-          hasUnsavedChanges={hasUnsavedChanges}
-          onReload={loadAvailability}
-          onSave={handleSave}
-        />
+        <div id="avail_save_btn">
+          <AvailabilityHeader
+            noteLocale={noteLocale}
+            availableLanguages={availableLanguages}
+            onLocaleChange={setNoteLocale}
+            onAddLanguage={addCustomLanguage}
+            loading={loading}
+            saved={saved}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onReload={loadAvailability}
+            onSave={handleSave}
+          />
+        </div>
 
         {/* Main Two-Column Layout: Calendar (Left) & Date Config / List (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6">
           {/* Left Column: Calendar Grid */}
-          <div className="lg:col-span-7">
+          <div id="avail_calendar_grid" className="lg:col-span-7">
             <AvailabilityCalendar
               currentMonth={currentMonth}
               currentYear={currentYear}
@@ -370,7 +422,7 @@ export default function AvailabilityManager() {
           </div>
 
           {/* Right Column: Selected Date Control & Configured Dates List */}
-          <div className="lg:col-span-5 space-y-5">
+          <div id="avail_date_config_panel" className="lg:col-span-5 space-y-5">
             <DateConfigPanel
               selectedDate={selectedDate}
               isSelectedDateClosed={isSelectedDateClosed}

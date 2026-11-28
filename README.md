@@ -45,6 +45,7 @@
   - [9. Session Timeout Interceptor, 401 Recovery & Cloudflare R2 Asset Lifecycle](#9-session-timeout-interceptor-401-recovery--cloudflare-r2-asset-lifecycle)
   - [10. PDF Itinerary Studio & Word Hub (`/itinerary-editor`)](#10-pdf-itinerary-studio--word-hub-itinerary-editor)
   - [11. Offline-Resilient Multilingual Form Auto-Save, Crash Recovery & Unsaved Navigation Guard Engine (`useFormDraft` & `DraftRecoveryBanner`)](#11-offline-resilient-multilingual-form-auto-save-crash-recovery--unsaved-navigation-guard-engine-useformdraft--draftrecoverybanner)
+  - [12. Universal Multilingual Form Readiness & Completion Assistant (`FormReadinessDrawer`), Direct-to-R2 Interactive 16:9 Image Cropper & Read-Only Slug Architecture](#12-universal-multilingual-form-readiness--completion-assistant-formreadinessdrawer-direct-to-r2-interactive-169-image-cropper--read-only-slug-architecture)
 - [API Service Layer Reference](#api-service-layer-reference)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -393,6 +394,21 @@ The Ikisaki Tours Admin Panel implements an enterprise-grade Zero-Trust authenti
     - **`🗑️ No Need`**: Safely purges the draft from `localStorage` and resets the form to a clean slate.
 - **Clean State Lifecycle**:
   - Successful form submission (`POST`) or update (`PATCH`/`PUT`) automatically invokes `clearDraft()`, removing temporary drafts from storage so the browser remains clean.
+
+### 12. Universal Multilingual Form Readiness & Completion Assistant (`FormReadinessDrawer`), Direct-to-R2 Interactive 16:9 Image Cropper & Read-Only Slug Architecture
+
+- **Universal Multilingual Form Readiness Assistant (`FormReadinessDrawer.tsx`)**:
+  - **Right-Edge Fixed Vertical Dock Tab (`fixed right-0 top-40 z-[100]`)**: Displays a real-time SVG circular gauge with percentage completion (`0%` to `100%`), live empty fields counter badge, and pulsing amber warning pill until 100% complete.
+  - **Granular Multi-Language Field Tracking**: Tracks completion across all required and rich content fields separately for English (`EN`) and Japanese (`JA`).
+  - **1-Click Auto-Navigate & Auto-Language Switching (`onNavigateToField`)**: Clicking any field card immediately auto-closes the drawer, notifies the parent form to switch language tabs if the field resides on an inactive tab (e.g. `JA`), smoothly centers the viewport onto the exact `<input>` or `<textarea>` element, and applies a non-conflicting prominent temporary ring (`!ring-4 !ring-rose-500` for empty fields, `!ring-4 !ring-emerald-500` for filled fields) while setting DOM focus.
+  - **High-Z-Index Drawer Architecture (`z-[110]`)**: The slide-out tracker drawer opens at the highest layer with quick filtering tabs (`All`, `Empty`, `Filled`), an un-squeezed header with absolute top-right close button, and an executive English SEO & UX quality reminder.
+- **Direct-to-Cloudflare R2 Interactive 16:9 Image Cropping Engine (`ImageCropperModal.tsx` & `cropImageHelper.ts`)**:
+  - **Guaranteed Zero-Cropping Error**: Pre-crops uploaded photos to a strict 16:9 landscape aspect ratio with interactive pan, drag, and zoom controls. Ensures hero banners and listing cards on the public website display the exact intended focal point without unwanted edge truncation.
+  - **Client-Side High-Resolution WebP Encoding**: Converts and encodes cropped images directly in the browser via canvas `toBlob("image/webp", 0.85)` with dimensions capped at 1920px.
+  - **Dual-Badge Compression Visualization**: Preview cards render a high-contrast dark badge displaying `~~Original Size~~ → Compressed Size` (e.g. `~~88.1 MB~~ → 385 KB`) alongside an emerald savings pill (`↓ 99% Saved (WebP)`), providing administrators with transparent file optimization metrics.
+- **System-Wide Read-Only URL Slug Guardrail**:
+  - All URL slugs across Tour Packages, Destinations, Blogs, and Legal Documents are strictly locked as `readOnly` (with disabled cursors and muted styling).
+  - Automatically derives slugs from English entity titles, preventing human typographic mistakes, broken public hyperlinks, and SEO indexing penalties.
 
 ---
 

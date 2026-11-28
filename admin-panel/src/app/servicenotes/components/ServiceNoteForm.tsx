@@ -218,6 +218,7 @@ export default function ServiceNoteForm({
 
                             {isCustomVehicle ? (
                                 <input
+                                    id="sn_input_vehicle_type"
                                     type="text"
                                     required
                                     value={formData.vehicleType}
@@ -227,6 +228,7 @@ export default function ServiceNoteForm({
                                 />
                             ) : (
                                 <select
+                                    id="sn_input_vehicle_type"
                                     value={formData.vehicleType || ""}
                                     onChange={(e) => {
                                         if (e.target.value === "__custom__") {
@@ -257,6 +259,7 @@ export default function ServiceNoteForm({
                                 {isTransfer ? "Base Transfer Rate" : "Starting Base Rate"}
                             </label>
                             <input
+                                id="sn_input_starting_price"
                                 type="text"
                                 required
                                 value={formData.startingPrice}
@@ -272,6 +275,7 @@ export default function ServiceNoteForm({
                                 <Users className="w-3 h-3 text-slate-400" /> Passenger Capacity
                             </label>
                             <input
+                                id="sn_input_capacity"
                                 type="text"
                                 required
                                 value={formData.vehicleCapacity}
@@ -287,6 +291,7 @@ export default function ServiceNoteForm({
                                 <Briefcase className="w-3 h-3 text-slate-400" /> Luggage Allowance
                             </label>
                             <input
+                                id="sn_input_luggage"
                                 type="text"
                                 required
                                 value={formData.luggages}
@@ -320,6 +325,7 @@ export default function ServiceNoteForm({
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 mb-1">With Driver Price</label>
                                     <input
+                                        id="sn_input_driver_price"
                                         type="text"
                                         required={!isTransfer}
                                         value={formData.withDriverPrice || ""}
@@ -332,6 +338,7 @@ export default function ServiceNoteForm({
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 mb-1">With Guide Price</label>
                                     <input
+                                        id="sn_input_guide_price"
                                         type="text"
                                         required={!isTransfer}
                                         value={formData.withGuidePrice || ""}
@@ -369,7 +376,7 @@ export default function ServiceNoteForm({
                         </span>
                     </div>
 
-                    <div className="space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div id="sn_input_notes" className="space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-200">
                         {(formData.notes?.[locale] || [""]).map((noteLine, index) => (
                             <div key={index} className="flex gap-2">
                                 <span className="flex h-9 w-6 items-center justify-center text-xs font-bold text-slate-400 shrink-0">

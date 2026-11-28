@@ -35,7 +35,7 @@ export default function EditDestinationPage() {
   }, [id]);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 w-full max-w-7xl mx-auto space-y-6">
       <div>
         <Link
           href="/managedestinations"
@@ -59,7 +59,7 @@ export default function EditDestinationPage() {
       ) : (
         <DestinationForm
           initialData={destination}
-          hideImageUpload={true}
+          hideImageUpload={false}
           onSuccess={() => router.push('/managedestinations')}
         />
       )}
